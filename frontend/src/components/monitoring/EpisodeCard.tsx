@@ -1,6 +1,7 @@
 "use client";
 
 import { buttonSecondaryClass } from "@/components/Card";
+import { LegalBasis } from "@/components/LegalBasis";
 import { EpisodeMedia } from "@/components/media/EpisodeMedia";
 import { Field, ReviewBadge } from "@/components/media/EventDetails";
 import { EvidenceFrames } from "@/components/media/EvidenceFrames";
@@ -80,6 +81,8 @@ export function EpisodeCard({
             </Field>
           )}
         </dl>
+
+        <LegalBasis basis={result.legalBasis} />
 
         <button
           type="button"

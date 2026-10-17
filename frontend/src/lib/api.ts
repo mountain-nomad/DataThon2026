@@ -6,6 +6,7 @@ import {
   SCENARIOS,
   type AnalysisRecord,
   type EvidenceFrame,
+  type LegalBasis,
   type PipelineResult,
   type ReviewStatus,
   type ScenarioResult,
@@ -26,7 +27,23 @@ interface RawSpecialist {
   start_sec?: number | null;
   end_sec?: number | null;
   evidence_frames?: RawFrame[];
+  legal_basis?: RawLegalBasis | null;
   review_status?: ReviewStatus | null;
+}
+
+interface RawLegalBasis {
+  type_id?: string | null;
+  name?: string | null;
+  mapping_status?: string | null;
+  limitations?: string | null;
+  rules?: {
+    rule_id: string;
+    clause: string;
+    summary?: string | null;
+    human_verified?: boolean;
+    qualifier?: string | null;
+    source?: { source_id?: string; title?: string; url?: string; binding?: boolean };
+  }[];
 }
 
 export interface RawPipelineJob {
@@ -144,6 +161,29 @@ export function normalizeScenario(raw: string): string {
   return (SCENARIOS as readonly string[]).includes(id) ? id : raw;
 }
 
+function toLegalBasis(raw: RawLegalBasis | null | undefined): LegalBasis | undefined {
+  if (!raw) return undefined;
+  return {
+    typeId: raw.type_id ?? undefined,
+    name: raw.name ?? undefined,
+    mappingStatus: raw.mapping_status ?? undefined,
+    limitations: raw.limitations ?? undefined,
+    clauses: (raw.rules ?? []).map((c) => ({
+      ruleId: c.rule_id,
+      clause: c.clause,
+      summary: c.summary ?? undefined,
+      humanVerified: c.human_verified === true,
+      qualifier: c.qualifier ?? undefined,
+      source: {
+        sourceId: c.source?.source_id ?? "",
+        title: c.source?.title ?? c.source?.source_id ?? "",
+        url: c.source?.url || undefined,
+        binding: c.source?.binding !== false,
+      },
+    })),
+  };
+}
+
 const num = (v: number | null | undefined) => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
 
 function toScenario(raw: RawPipelineJob["scenario"]): ScenarioResult | null {
@@ -172,6 +212,7 @@ export function toPipelineResult(job: RawPipelineJob): PipelineResult {
         startSec,
         endSec: num(r.end_sec),
         evidenceFrames: (r.evidence_frames ?? []).slice(0, 3).map((f) => toFrame(f, startSec ?? 0)),
+        legalBasis: toLegalBasis(r.legal_basis),
         reviewStatus:
           r.status !== "violation" ? undefined : r.review_status === "false_positive" ? "false_positive" : "pending",
       } satisfies SpecialistResult;

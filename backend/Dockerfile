@@ -4,7 +4,7 @@ WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy PATH="/app/.venv/bin:$PATH"
 
 COPY pyproject.toml uv.lock* ./
-RUN uv sync --no-dev --no-install-project
+RUN uv sync --no-dev --no-install-project --frozen
 
 COPY . .
 EXPOSE 8000

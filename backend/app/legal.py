@@ -1,0 +1,112 @@
+"""Legal basis of a violation: specialist rule -> violation type (T) -> clauses (R) -> sources.
+
+Data comes from two files the team maintains:
+- LEGAL_MAPPING_FILE (fortebank_violation_legal_mapping_updated.yaml): sources, clauses (rules)
+  and violation types;
+- CROSSWALK_FILE (specialist_crosswalk.yaml): specialist rule_id -> violation type.
+Nothing is inferred: an unmapped rule gets no legal basis.
+"""
+
+import logging
+from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+import yaml
+
+log = logging.getLogger(__name__)
+
+NOT_BINDING = {"not_a_government_normative_legal_act"}
+
+
+def _clean_url(url: str) -> str:
+    """Drop tracking parameters (utm_*) from a source link."""
+    parts = urlsplit(url)
+    query = [(k, v) for k, v in parse_qsl(parts.query) if not k.startswith("utm_")]
+    return urlunsplit(parts._replace(query=urlencode(query)))
+
+
+def _read(path: Path) -> dict:
+    if not path.exists():
+        log.warning("No file at %s; violations get no legal basis", path)
+        return {}
+    return yaml.safe_load(path.read_text()) or {}
+
+
+class LegalIndex:
+    def __init__(self, mapping: dict, crosswalk: dict) -> None:
+        self.sources = {
+            sid: {
+                "source_id": sid,
+                "title": s.get("title", sid),
+                "url": _clean_url(s.get("alternate_url") or s.get("url") or ""),
+                "binding": s.get("normative_status") not in NOT_BINDING,
+            }
+            for sid, s in (mapping.get("sources") or {}).items()
+        }
+        self.rules = {r["rule_id"]: r for r in mapping.get("rules") or []}
+        self.types = {t["type_id"]: t for t in mapping.get("violation_types") or []}
+        self.crosswalk = crosswalk.get("specialist_rules") or {}
+
+    def _type_entry(self, rule_id: str | None, type_hint: str | None) -> tuple[str | None, dict]:
+        if type_hint in self.types:  # the analyzer may name the type directly ("T10")
+            return type_hint, self.types[type_hint]
+        target = self.crosswalk.get(rule_id) if rule_id else None
+        if isinstance(target, str):
+            return (target, self.types[target]) if target in self.types else (None, {})
+        if isinstance(target, dict):
+            return None, target
+        return None, {}
+
+    def resolve(self, rule_id: str | None, type_hint: str | None = None) -> dict | None:
+        """The legal basis for a specialist result, or None if it isn't mapped."""
+        type_id, entry = self._type_entry(rule_id, type_hint)
+        if not entry:
+            return None
+        clauses = []
+        for rid in entry.get("rule_ids") or []:
+            rule = self.rules.get(rid)
+            if not rule:
+                continue
+            source = self.sources.get(rule.get("source_id"), {})
+            clauses.append(
+                {
+                    "rule_id": rid,
+                    "clause": rule.get("clause"),
+                    "summary": rule.get("summary_ru"),
+                    "human_verified": bool(rule.get("human_verified")),
+                    "qualifier": rule.get("qualifier_ru"),
+                    "source": source,
+                }
+            )
+        return {
+            "type_id": type_id,
+            "name": entry.get("name_ru"),
+            "observable_cue": entry.get("observable_cue_ru"),
+            "mapping_status": entry.get("mapping_status"),
+            "limitations": entry.get("limitations_ru"),
+            "rules": clauses,
+        }
+
+
+def citation(basis: dict) -> str:
+    """One line for the API description: the clauses grouped by source, with links."""
+    by_source: dict[str, list[str]] = {}
+    sources: dict[str, dict] = {}
+    for c in basis["rules"]:
+        sid = c["source"].get("source_id", "")
+        by_source.setdefault(sid, []).append(c["clause"])
+        sources[sid] = c["source"]
+    parts = []
+    for sid, clauses in by_source.items():
+        s = sources[sid]
+        text = f"{s.get('title', sid)}, {'; '.join(clauses)}"
+        if s.get("url"):
+            text += f" ({s['url']})"
+        if not s.get("binding", True):
+            text += " — вспомогательный образец, не НПА"
+        parts.append(text)
+    return "Основание: " + " | ".join(parts) if parts else ""
+
+
+def load_legal(mapping_file: Path, crosswalk_file: Path) -> LegalIndex:
+    return LegalIndex(_read(mapping_file), _read(crosswalk_file))

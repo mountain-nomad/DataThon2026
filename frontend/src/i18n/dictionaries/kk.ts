@@ -197,6 +197,23 @@ export const kk = {
     badgePending: "AI анықтады · Тексеруді күтуде",
     badgeAi: "AI анықтады",
   },
+  legal: {
+    title: "Нормативтік негіз",
+    notMapped: "Бұл ереже үшін нормативтік негіз әлі сәйкестендірілмеген.",
+    notVerified: "заңгер тексермеген",
+    nonBinding: "қосымша үлгі, НҚА емес",
+    limitations: "Шектеулер",
+    mapping: {
+      direct_if_visible: "әрекет көрінсе, тікелей байланыс",
+      direct_if_complete: "жазба толық болса, тікелей байланыс",
+      conditional: "шартты байланыс",
+      weak: "әлсіз байланыс",
+      video_unverifiable: "бейне бойынша тексеру мүмкін емес",
+      supplementary_conditional: "қосымша дереккөз, шартты",
+      supplementary_indirect: "қосымша дереккөз, жанама",
+      supplementary_textual_match: "қосымша дереккөз, мәтін сәйкестігі",
+    } as Record<string, string>,
+  },
   dashboardPage: {
     label: "Бақылау панелі",
     title: "Бақылау панелі",

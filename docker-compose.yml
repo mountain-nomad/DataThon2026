@@ -1,33 +1,14 @@
+# Minimal platform: one service (API + web UI + background jobs). frontend/ and ml/ are not used.
 services:
-  ml:
-    build: ./ml
-    ports: ["8001:8001"]
-    volumes:
-      - ./ml/artifacts:/app/artifacts   # retrain on host, then POST /model/reload
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
-      interval: 10s
-      retries: 5
-
   backend:
     build: ./backend
     ports: ["8000:8000"]
+    env_file: ./backend/.env   # copy backend/.env.example; API_KEY is required
     environment:
-      ML_SERVICE_URL: http://ml:8001
-      DATABASE_URL: sqlite:////app/data/app.db
+      DATA_DIR: /data
     volumes:
-      - backend-data:/app/data
-    depends_on:
-      ml:
-        condition: service_healthy
-
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        BACKEND_URL: http://backend:8000
-    ports: ["3000:3000"]
-    depends_on: [backend]
+      - backend-data:/data   # uploads and job JSON survive restarts
+    restart: unless-stopped
 
 volumes:
   backend-data:
