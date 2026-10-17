@@ -72,9 +72,56 @@ body {
   }
 }
 
-/* Indeterminate progress bar (used only while a job runs; callers gate it with motion-safe:). */
+/* Completed stage connector on /demo-inference: white -> Forte magenta (frontend_description2.md §4). */
+@utility bg-stage-done {
+  background-image: linear-gradient(90deg, var(--surface) 0%, var(--primary) 100%);
+}
+
+/* Running stage connector: a magenta wave flowing left to right (animated by animate-flow). */
+@utility bg-stage-flow {
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-muted) 0%,
+    var(--primary) 25%,
+    var(--surface-muted) 50%,
+    var(--primary) 75%,
+    var(--surface-muted) 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* Progress animations, used only while a job runs; callers gate them with motion-safe:. */
 @theme {
   --animate-indeterminate: indeterminate 1.4s ease-in-out infinite;
+  --animate-flow: flow 1.6s linear infinite;
+  --animate-wave: wave 1.6s ease-in-out infinite;
+  --animate-reveal: reveal 0.4s ease-out;
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+
+  @keyframes flow {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: -100% 0;
+    }
+  }
+
+  @keyframes wave {
+    0%,
+    100% {
+      transform: scaleY(1);
+    }
+    50% {
+      transform: scaleY(1.6);
+    }
+  }
 
   @keyframes indeterminate {
     from {

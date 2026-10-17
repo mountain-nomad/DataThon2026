@@ -29,3 +29,10 @@ export function episodeTimecodeSec(event: ViolationEvent, clipDurationSec?: numb
 export function imageSrc(imageBase64: string): string {
   return imageBase64.startsWith("data:") ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`;
 }
+
+// mm:ss.d (tenths), for localized violation times: 00:44.2.
+export function formatTimecodePrecise(sec: number | null | undefined): string {
+  if (sec == null || !Number.isFinite(sec) || sec < 0) return "--:--.-";
+  const tenths = Math.floor(sec * 10) % 10;
+  return `${formatTimecode(sec)}.${tenths}`;
+}

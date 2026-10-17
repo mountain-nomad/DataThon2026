@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { localeLabels, localePath, locales } from "@/i18n/config";
+import { localeLabels, locales } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
 
 function Chevron({ up }: { up: boolean }) {
@@ -14,10 +13,11 @@ function Chevron({ up }: { up: boolean }) {
 }
 
 // Disclosure dropdown: the bordered box grows downward to list the other languages, and its
-// border turns Forte Magenta on hover, focus and while open. `path` is the current route
-// without a locale prefix, so switching keeps the page.
+// border turns Forte Magenta on hover, focus and while open. Choosing a language translates the
+// page in place (see I18nProvider.setLocale); `path` is the current route without a locale
+// prefix, used to rewrite the URL.
 export function LanguageSwitcher({ path }: { path: string }) {
-  const { locale, t } = useI18n();
+  const { locale, t, setLocale } = useI18n();
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
 
@@ -60,15 +60,17 @@ export function LanguageSwitcher({ path }: { path: string }) {
               .filter((l) => l !== locale)
               .map((l) => (
                 <li key={l}>
-                  <Link
-                    href={localePath(l, path)}
-                    hrefLang={l}
+                  <button
+                    type="button"
                     lang={l}
-                    onClick={() => setOpen(false)}
-                    className="block px-3 py-1.5 text-sm text-foreground hover:text-primary focus-visible:text-primary focus-visible:outline-none"
+                    onClick={() => {
+                      setOpen(false);
+                      setLocale(l, path);
+                    }}
+                    className="block w-full px-3 py-1.5 text-left text-sm text-foreground hover:text-primary focus-visible:text-primary focus-visible:outline-none"
                   >
                     {localeLabels[l]}
-                  </Link>
+                  </button>
                 </li>
               ))}
           </ul>
