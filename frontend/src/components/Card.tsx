@@ -7,10 +7,10 @@ export function Card({ title, children }: { title: string; children: React.React
   );
 }
 
-export function ErrorText({ error }: { error: string | null }) {
+export function ErrorText({ error, prefix }: { error: string | null; prefix: string }) {
   return error ? (
     <p role="alert" className="rounded-xl bg-danger-bg px-3 py-2 text-sm text-danger-fg">
-      <span className="font-semibold">Error: </span>
+      <span className="font-semibold">{prefix}</span>
       {error}
     </p>
   ) : null;

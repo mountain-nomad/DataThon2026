@@ -1,7 +1,11 @@
+"use client";
+
 import { buttonSecondaryClass } from "@/components/Card";
 import { EvidenceFrames } from "@/components/media/EvidenceFrames";
 import { Field, RegulatoryReference, ReviewBadge } from "@/components/media/EventDetails";
 import { VideoPlayer } from "@/components/media/VideoPlayer";
+import { fmt } from "@/i18n/config";
+import { useI18n } from "@/i18n/I18nProvider";
 import { episodeTimecodeSec, formatTimecode } from "@/lib/format";
 import type { Camera, ViolationEvent } from "@/lib/types";
 
@@ -14,6 +18,8 @@ export function EpisodeCard({
   camera?: Camera;
   onToggleFalsePositive: () => void;
 }) {
+  const { t } = useI18n();
+  const td = t.dashboard;
   const falsePositive = event.reviewStatus === "false_positive";
   const localSec = episodeTimecodeSec(event);
 
@@ -26,7 +32,7 @@ export function EpisodeCard({
     >
       <VideoPlayer
         src={event.clipUrl}
-        label={`Episode clip · ${camera?.name ?? "Unknown camera"}`}
+        label={fmt(td.episodeClip, { camera: camera?.name ?? td.unknownCamera })}
         markers={localSec === null ? [] : [{ id: event.id, sec: localSec, label: event.type }]}
       />
 
@@ -34,27 +40,27 @@ export function EpisodeCard({
         <ReviewBadge status={event.reviewStatus} />
         <div className="flex flex-col gap-1">
           <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">
-            {event.processName ?? "Process not specified"}
+            {event.processName ?? td.processUnknown}
           </p>
           <h3 className="text-lg font-bold">{event.type}</h3>
         </div>
 
         <dl className="grid grid-cols-3 gap-4">
-          <Field label="Camera">{camera?.name ?? "—"}</Field>
-          <Field label="Episode">
+          <Field label={t.fields.camera}>{camera?.name ?? "—"}</Field>
+          <Field label={t.fields.episode}>
             <span className="tabular-nums">{formatTimecode(localSec)}</span>
           </Field>
-          <Field label="Source">
+          <Field label={t.fields.source}>
             <span className="tabular-nums">{formatTimecode(event.timecodeSec)}</span>
           </Field>
         </dl>
 
         <dl className="flex flex-col gap-4">
-          <Field label="Description">{event.description}</Field>
-          <Field label="Evidence frames">
+          <Field label={t.fields.description}>{event.description}</Field>
+          <Field label={t.fields.evidence}>
             <EvidenceFrames frames={event.evidenceFrames} />
           </Field>
-          <Field label="Referenced rule">
+          <Field label={t.fields.rule}>
             <RegulatoryReference source={event.regulatorySource} />
           </Field>
         </dl>
@@ -65,7 +71,7 @@ export function EpisodeCard({
           onClick={onToggleFalsePositive}
           className={`${buttonSecondaryClass} self-start`}
         >
-          {falsePositive ? "Undo false positive" : "Mark as False Positive"}
+          {falsePositive ? td.undoFalse : td.markFalse}
         </button>
       </div>
     </article>

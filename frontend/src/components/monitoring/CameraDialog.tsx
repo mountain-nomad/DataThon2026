@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { VideoPlayer } from "@/components/media/VideoPlayer";
 import { MediaPlaceholder } from "@/components/media/MediaPlaceholder";
+import { useI18n } from "@/i18n/I18nProvider";
 import { formatTimecode } from "@/lib/format";
 import type { Camera, ViolationEvent } from "@/lib/types";
 
@@ -16,6 +17,7 @@ export function CameraDialog({
   events: ViolationEvent[];
   onClose: () => void;
 }) {
+  const { t } = useI18n();
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -41,11 +43,11 @@ export function CameraDialog({
               onClick={() => ref.current?.close()}
               className="rounded-full px-3 py-1 text-sm font-semibold text-muted hover:bg-surface-muted hover:text-foreground"
             >
-              Close
+              {t.dashboard.close}
             </button>
           </div>
           {camera.status === "unavailable" ? (
-            <MediaPlaceholder tone="error" label="Camera unavailable" />
+            <MediaPlaceholder tone="error" label={t.dashboard.cameraUnavailable} />
           ) : (
             <VideoPlayer key={camera.id} src={camera.videoUrl} label={camera.name} loop />
           )}
@@ -58,7 +60,7 @@ export function CameraDialog({
                     <span className="text-muted tabular-nums"> · {formatTimecode(e.timecodeSec)}</span>
                   </span>
                   <a href={`#episode-${e.id}`} onClick={() => ref.current?.close()} className="shrink-0 font-semibold text-primary hover:underline">
-                    Go to episode
+                    {t.dashboard.goToEpisode}
                   </a>
                 </li>
               ))}

@@ -1,12 +1,16 @@
+"use client";
+
+import { useI18n } from "@/i18n/I18nProvider";
 import type { ViolationEvent } from "@/lib/types";
 
 // Every figure is derived from the single event list, so a review mark updates them all.
 export function ViolationStats({ events }: { events: ViolationEvent[] }) {
+  const { t } = useI18n();
   const stats = [
-    { label: "Total detected events", value: events.length },
-    { label: "Cameras with detections", value: new Set(events.map((e) => e.cameraId).filter(Boolean)).size },
-    { label: "Pending review", value: events.filter((e) => e.reviewStatus === "pending").length },
-    { label: "False positives", value: events.filter((e) => e.reviewStatus === "false_positive").length },
+    { label: t.dashboard.statTotal, value: events.length },
+    { label: t.dashboard.statCameras, value: new Set(events.map((e) => e.cameraId).filter(Boolean)).size },
+    { label: t.dashboard.statPending, value: events.filter((e) => e.reviewStatus === "pending").length },
+    { label: t.dashboard.statFalse, value: events.filter((e) => e.reviewStatus === "false_positive").length },
   ];
 
   const byType = Object.entries(
@@ -27,7 +31,7 @@ export function ViolationStats({ events }: { events: ViolationEvent[] }) {
 
       {byType.length > 0 && (
         <div className="flex flex-col gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">By violation type</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">{t.dashboard.byType}</p>
           <ul className="flex flex-col gap-3">
             {byType.map(([type, count], i) => (
               <li key={type} className="flex flex-col gap-1">

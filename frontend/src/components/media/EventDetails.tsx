@@ -1,3 +1,6 @@
+"use client";
+
+import { useI18n } from "@/i18n/I18nProvider";
 import type { RegulatorySource, ReviewStatus } from "@/lib/types";
 
 // Small pieces shared by the inference result cards and the dashboard episode cards.
@@ -13,7 +16,8 @@ export function Field({ label, children }: { label: string; children: React.Reac
 
 // Never invent a norm: without a confirmed match, say so.
 export function RegulatoryReference({ source }: { source?: RegulatorySource }) {
-  if (!source) return <span className="text-muted">No confirmed regulatory reference.</span>;
+  const { t } = useI18n();
+  if (!source) return <span className="text-muted">{t.media.noRule}</span>;
   const text = source.section ? `${source.documentTitle}, ${source.section}` : source.documentTitle;
   return source.url ? (
     <a href={source.url} target="_blank" rel="noreferrer" className="text-primary underline-offset-2 hover:underline">
@@ -26,18 +30,19 @@ export function RegulatoryReference({ source }: { source?: RegulatorySource }) {
 
 // Keeps "the model flagged this" visibly separate from "a person reviewed this".
 export function ReviewBadge({ status }: { status?: ReviewStatus }) {
+  const { t } = useI18n();
   if (status === "false_positive") {
     return (
       <span className="inline-flex items-center gap-2 self-start rounded-full border border-border px-3 py-1 text-xs font-semibold text-muted">
         <span aria-hidden className="size-2 rounded-full bg-muted" />
-        Human review · False positive
+        {t.media.badgeFalsePositive}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-2 self-start rounded-full bg-surface-muted px-3 py-1 text-xs font-semibold">
       <span aria-hidden className="size-2 rounded-full bg-forte-coral" />
-      {status === "pending" ? "AI detection · Pending review" : "AI detection"}
+      {status === "pending" ? t.media.badgePending : t.media.badgeAi}
     </span>
   );
 }
