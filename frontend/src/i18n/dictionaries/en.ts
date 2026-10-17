@@ -197,6 +197,23 @@ export const en = {
     badgePending: "AI detection · Pending review",
     badgeAi: "AI detection",
   },
+  legal: {
+    title: "Legal basis",
+    notMapped: "No legal basis has been mapped to this rule yet.",
+    notVerified: "not reviewed by a lawyer",
+    nonBinding: "supplementary template, not a legal act",
+    limitations: "Limitations",
+    mapping: {
+      direct_if_visible: "direct link if the action is visible",
+      direct_if_complete: "direct link if the recording is complete",
+      conditional: "conditional link",
+      weak: "weak link",
+      video_unverifiable: "can't be verified from video",
+      supplementary_conditional: "supplementary source, conditional",
+      supplementary_indirect: "supplementary source, indirect",
+      supplementary_textual_match: "supplementary source, textual match",
+    } as Record<string, string>,
+  },
   dashboardPage: {
     label: "Monitoring dashboard",
     title: "Monitoring Dashboard",

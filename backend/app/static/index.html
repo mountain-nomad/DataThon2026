@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Анализ видео кассы</title>
+<link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+<style>
+  /* Forte tokens (see .claude/skills/forte-design). Open Sans if installed; no web fonts, works offline. */
+  :root {
+    color-scheme: light;
+    --background: #ffffff;
+    --surface-muted: #f7f6f6;
+    --foreground: #1d1d1d;
+    --muted: #6c6c6c;
+    --border: #eaebef;
+    --primary: #a31551;
+    --primary-hover: #8a1145;
+    --primary-foreground: #ffffff;
+    --accent: #61cfff;
+    --danger-bg: #fdf1f4;
+    --danger-fg: #8a1145;
+    --gradient-primary: linear-gradient(90deg, #4a0221, #fc9385);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--background); color: var(--foreground);
+    font: 400 15px/1.5 "Open Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header { border-bottom: 1px solid var(--border); }
+  header .inner, main { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  header .inner { height: 64px; display: flex; align-items: center; gap: 16px; }
+  header img { height: 28px; }
+  header span { color: var(--muted); font-size: 13px; }
+  .rule-line { height: 2px; background: var(--gradient-primary); }
+  main { padding-top: 40px; padding-bottom: 64px; display: grid; gap: 32px; }
+  h1 { font-size: 32px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .lead { color: var(--muted); font-weight: 300; font-size: 18px; margin: 0; }
+  .card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+  .upload { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .upload input[type=file] { flex: 1 1 260px; min-width: 0; font: inherit; }
+  button {
+    font: inherit; font-weight: 600; line-height: 1; border: 0; border-radius: 999px;
+    padding: 12px 22px; background: var(--primary); color: var(--primary-foreground); cursor: pointer;
+  }
+  button:hover { background: var(--primary-hover); }
+  button:disabled { opacity: .5; cursor: default; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .status { color: var(--muted); font-size: 14px; margin: 12px 0 0; min-height: 21px; }
+  .status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); margin-right: 8px; vertical-align: middle; }
+  .error { background: var(--danger-bg); color: var(--danger-fg); border-radius: 12px; padding: 12px 16px; }
+  .verdict { font-size: 22px; font-weight: 700; margin: 0; }
+  .verdict small { display: block; font-size: 13px; font-weight: 400; color: var(--muted); margin-top: 4px; }
+  .result { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 24px; align-items: start; }
+  @media (max-width: 760px) { .result { grid-template-columns: 1fr; } }
+  video { width: 100%; max-height: 70vh; background: var(--surface-muted); border-radius: 12px;
+    object-fit: contain; display: block; }
+  .list { display: grid; gap: 12px; }
+  .violation { border: 1px solid var(--border); border-radius: 16px; padding: 16px; cursor: pointer; }
+  .violation:hover, .violation.active { border-color: var(--primary); }
+  .violation .head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .violation .type { font-weight: 600; word-break: break-word; }
+  .violation .time { color: var(--primary); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .violation p { margin: 8px 0 0; white-space: pre-line; }
+  .violation .rule { color: var(--muted); font-size: 13px; }
+  .violation .rule a { color: var(--primary); }
+  .frames { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .frames figure { margin: 0; }
+  .frames img { height: 96px; border-radius: 8px; border: 1px solid var(--border); display: block; }
+  .frames figcaption { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
+  footer .inner { max-width: 1120px; margin: 0 auto; padding: 16px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="inner"><img src="/static/logo.svg" alt="Forte"><span>Анализ видео кассовых операций</span></div>
+  <div class="rule-line"></div>
+</header>
+
+<main>
+  <section>
+    <h1>Проверка видео кассы</h1>
+    <p class="lead">Загрузите запись с камеры: сервис отметит возможные нарушения, время и кадры-доказательства.</p>
+  </section>
+
+  <section class="card">
+    <form class="upload" id="form">
+      <input type="file" id="file" accept=".mov,.mp4,video/quicktime,video/mp4" required>
+      <button type="submit" id="submit">Анализировать</button>
+    </form>
+    <p class="status" id="status"></p>
+    <div class="error" id="error" hidden></div>
+  </section>
+
+  <section id="result" hidden>
+    <p class="verdict" id="verdict"></p>
+    <div class="result" style="margin-top:24px">
+      <video id="video" controls playsinline preload="metadata"></video>
+      <div class="list" id="list"></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="inner">Прототип для DataThon 2026. Не является официальным продуктом или сервисом ForteBank. Результаты — признаки возможных нарушений и требуют проверки человеком.</div></footer>
+
+<script>
+const POLL_MS = 2000;
+const CLIENT_TIMEOUT_MS = 6 * 60 * 1000; // the server fails jobs after 5 min; this is a backstop
+
+const $ = (id) => document.getElementById(id);
+const els = { form: $("form"), file: $("file"), submit: $("submit"), status: $("status"),
+  error: $("error"), result: $("result"), verdict: $("verdict"), video: $("video"), list: $("list") };
+
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60), s = sec - m * 60;
+  return `${String(m).padStart(2, "0")}:${s.toFixed(1).padStart(4, "0")}`;
+}
+
+function setStatus(text, live = false) {
+  els.status.replaceChildren();
+  if (live) els.status.append(Object.assign(document.createElement("span"), { className: "dot" }));
+  els.status.append(text);
+}
+
+function showError(text) {
+  els.error.textContent = text;
+  els.error.hidden = !text;
+}
+
+async function call(path, init) {
+  const res = await fetch(path, init);
+  const body = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(body?.detail ? String(body.detail) : `${res.status} ${res.statusText}`);
+  return body;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function seek(sec) {
+  els.video.currentTime = sec;
+  els.video.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function el(tag, props = {}, ...children) {
+  const node = Object.assign(document.createElement(tag), props);
+  node.append(...children.filter((c) => c !== null && c !== undefined));
+  return node;
+}
+
+function renderViolation(v) {
+  const card = el("div", { className: "violation", tabIndex: 0 });
+  card.append(el("div", { className: "head" },
+    el("span", { className: "type", textContent: v.type }),
+    el("span", { className: "time", textContent: fmtTime(v.timecode_sec) })));
+  // The server appends the legal citation to the description; it's shown as links below.
+  const citation = v.description.lastIndexOf("\nОснование:");
+  card.append(el("p", { textContent: citation >= 0 ? v.description.slice(0, citation) : v.description }));
+  const basis = v.legal_basis;
+  if (basis?.rules?.length) {
+    for (const c of basis.rules) {
+      const s = c.source || {};
+      const line = el("p", { className: "rule" }, `Основание: ${s.title || s.source_id}, ${c.clause}`);
+      if (s.url) line.append(" ", el("a", { href: s.url, target: "_blank", rel: "noopener", textContent: "источник" }));
+      if (!s.binding) line.append(" — вспомогательный образец, не НПА");
+      if (!c.human_verified) line.append(" (не проверено юристом)");
+      card.append(line);
+    }
+    if (basis.limitations) card.append(el("p", { className: "rule", textContent: `Ограничения: ${basis.limitations}` }));
+  } else if (v.rule_id) {
+    card.append(el("p", { className: "rule", textContent: `Правило ${v.rule_id}: нормативное основание не сопоставлено` }));
+  }
+  if (v.evidence_frames?.length) {
+    const frames = el("div", { className: "frames" });
+    for (const f of v.evidence_frames) {
+      const fig = el("figure", {},
+        el("img", { src: `data:image/jpeg;base64,${f.image_base64}`, alt: `Кадр ${fmtTime(f.timestamp_sec)}` }),
+        el("figcaption", { textContent: fmtTime(f.timestamp_sec) }));
+      fig.addEventListener("click", (e) => { e.stopPropagation(); seek(f.timestamp_sec); });
+      frames.append(fig);
+    }
+    card.append(frames);
+  }
+  const activate = () => {
+    els.list.querySelectorAll(".violation.active").forEach((n) => n.classList.remove("active"));
+    card.classList.add("active");
+    seek(v.timecode_sec);
+  };
+  card.addEventListener("click", activate);
+  card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); } });
+  return card;
+}
+
+function renderResult(job) {
+  const n = job.violations.length;
+  els.verdict.replaceChildren(
+    n ? "Обнаружены признаки возможных нарушений" : "Нарушение не обнаружено",
+    el("small", { textContent: n ? `Найдено: ${n}. Нажмите на нарушение, чтобы перейти к моменту на видео.` : (job.filename || "") }));
+  els.list.replaceChildren(...job.violations.map(renderViolation));
+  els.list.hidden = !n;
+  els.video.src = `/ui/jobs/${job.job_id}/video`;
+  els.result.hidden = false;
+}
+
+els.form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const file = els.file.files[0];
+  if (!file) return;
+  els.submit.disabled = true;
+  els.result.hidden = true;
+  showError("");
+  try {
+    setStatus("Загрузка видео…", true);
+    const form = new FormData();
+    form.append("file", file);
+    const { job_id } = await call("/ui/analyze", { method: "POST", body: form });
+    const started = Date.now();
+    for (;;) {
+      const sec = Math.round((Date.now() - started) / 1000);
+      setStatus(`Идет анализ… ${sec} с`, true);
+      await sleep(POLL_MS);
+      if (Date.now() - started > CLIENT_TIMEOUT_MS) throw new Error("Сервер не ответил вовремя.");
+      const job = await call(`/ui/jobs/${job_id}`);
+      if (job.status === "failed") throw new Error(`Анализ не удался: ${job.error}`);
+      if (job.status === "done") {
+        setStatus(`Готово за ${Math.round((Date.now() - started) / 1000)} с`);
+        renderResult(job);
+        break;
+      }
+    }
+  } catch (err) {
+    setStatus("");
+    showError(err.message || String(err));
+  } finally {
+    els.submit.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+# DRAFT crosswalk: specialist catalog rule_id (the internal regulation in the specialist prompts)
+# -> violation type (T..) in fortebank_violation_legal_mapping_updated.yaml, which links it to
+# clauses (R..) of public sources. Built by reading both files; the team must review it
+# (this is a legal judgment). Edit freely, then restart the backend.
+#
+# A value is either a type id ("T10") or an inline entry for rules with no fitting type:
+#   {name_ru: ..., rule_ids: [R..], mapping_status: ..., limitations_ru: ...}
+# A rule_id missing here is reported without a legal basis ("not mapped"), never guessed.
+status: draft
+
+specialist_rules:
+  # ENTRY (specialist_1)
+  s1:L13: T11   # client enters the service zone
+  s1:L14: T10   # door left open after entry
+  s1:L15: T15   # personal items on the desk (supplementary, non-binding source)
+
+  # CLIENT CASH DEPOSIT (specialist_3, section 2 variant A)
+  s2:L57: T06   # partial return to the client (weak)
+  s2:L58: T01   # money accepted without a document check
+  s2:L59: T04   # accepted money not put into the safe/locked storage
+
+  # COUNTING FROM SAFE (specialist_4)
+  s3:L85: T09   # safe left open; T09 assumes the cashier left, so the fit is weak
+
+  # OPENING A CASH BAG (specialist_5)
+  s4:L111: T08  # bag subject to storage left outside the safe
+
+  # RECEIVING A BAG FROM CLIENT (specialist_6)
+  s5:L136: T07  # bag accepted without the document check
+
+  # EXIT / CLOSING (specialist_7)
+  s7:L182: T14  # equipment left on (supplementary, non-binding source)
+  s7:L186: T14  # computer not turned off
+  s7:L183:
+    name_ru: Ключ оставлен в замке сейфа
+    rule_ids: [R08]
+    mapping_status: conditional
+    limitations_ru: П. 80 отсылает к внутренним документам банка о хранении ключей; видно только, что ключ оставлен в замке.
+  s7:L184: T13  # journal and stamps left on the desk
+  s7:L185: T05  # cash left on the desk before leaving
+
+# No fitting public source found yet (reported without a legal basis):
+#   s2:L60  another client's document used
+#   s2:L61  money not put into the safe in the client's presence
+#   s2:L62  banknote authenticity check skipped
+#   s4:L110 money from a bag deposited without prior counting

@@ -1,48 +1,247 @@
-# DataThon 2026
+# DataThon 2026: cash desk video analysis
 
-Hackathon skeleton: **Next.js frontend → FastAPI backend → FastAPI ML inference service**.
+A local service that takes a top-down CCTV video of a bank cash desk and reports possible
+cashier violations:
+- type and timecode;
+- 1–3 evidence frames;
+- what is visible and why it may be a violation;
+- the public legal source.
 
-```
-browser ──► frontend :3000 ──(/api/* rewrite)──► backend :8000 ──► ml :8001
-            Next.js 16                           FastAPI + SQLite   FastAPI + sklearn
-```
+| Part | What it is |
+|---|---|
+| `backend/` | FastAPI service: the jury API, background jobs and a simple web page |
+| `frontend/` | Next.js UI: `/demo-inference` (upload, AI pipeline stages, violation episode) and `/demo-dashboard` (history, statistics, false-positive review) |
+| `ml/` | The old iris demo skeleton. The real model will be a separate ML microservice, see [the contract below](#plugging-in-the-ml-microservice) |
 
-| Folder      | What it does |
-|-------------|--------------|
-| `frontend/` | Next.js (App Router, TS, Tailwind). Dashboard: service status, single JSON prediction, CSV batch upload, prediction history. API client in `src/lib/api.ts`. |
-| `backend/`  | Business logic + persistence. Proxies predictions to the ML service and logs them (`PredictionLog` table, SQLModel). Add your domain endpoints in `app/routers/`. |
-| `ml/`       | Inference API (`app/`) + training (`training/train.py`). Loads `artifacts/model.joblib` at startup; serves dummy predictions if no model exists. |
-| `data/`     | Put competition data here (gitignored). |
+The analysis sits behind a swappable interface. Until the model is ready, `ANALYZER=mock`
+returns **fake** results: real rule ids and quotes, but the evidence text is marked `[MOCK]`.
 
-## Quick start
+Fully local: no cloud services, works offline once installed. Dependencies are open source with
+licences that allow commercial use (FastAPI/Pydantic/PyYAML/httpx: MIT/BSD, OpenCV: Apache 2.0
+with LGPL FFmpeg bundled, Next.js/React: MIT).
 
-Requires `uv`, Node 20+.
+## Run locally
 
 ```bash
-make install
-make train        # baseline model on iris so everything works end to end
-make dev          # ml :8001, backend :8000, frontend :3000
+cp backend/.env.example backend/.env           # set API_KEY to a long random string
+cp frontend/.env.example frontend/.env.local   # ANALYSIS_API_KEY = the same value
+make install                                   # needs uv and Node 20+
+make dev                                       # backend :8000 + frontend :3000
 ```
 
-Open http://localhost:3000. API docs: http://localhost:8000/docs and http://localhost:8001/docs.
+| Address | What's there |
+|---|---|
+| http://localhost:3000/demo-inference | Upload a video and watch the stages |
+| http://localhost:3000/demo-dashboard | History of finished analyses |
+| http://localhost:8000 | The simple built-in page |
+| http://localhost:8000/docs | API docs |
 
-Docker alternative: `make train && make up`.
+The frontend uses `npm ci --legacy-peer-deps`, because `package.json` pins
+`eslint-config-next@14` next to Next 16. Docker (`docker compose up --build`) runs the backend
+only.
 
-## When the task drops
+## Jury API
 
-1. Put data in `data/`, then train a baseline:
-   `make train ARGS="--data ../data/train.csv --target <col>"` (add `--task regression` if inference guesses wrong).
-2. Reload without restarting: `curl -X POST localhost:8001/model/reload`.
-3. Replace the model: keep the `ModelService.predict()` contract in `ml/app/model.py` (records in, predictions out), and swap sklearn for whatever you need (torch, lightgbm, an LLM API...).
-4. Tighten schemas: `Record = dict[str, Any]` in `ml/app/schemas.py` / `backend/app/schemas.py` → a real Pydantic model.
-5. Build the actual UI in `frontend/src/app/` and add endpoints in `backend/app/routers/`.
+Every `/api/v1` request needs the `X-API-Key` header; otherwise `401`.
 
-## Endpoints
+```bash
+curl -X POST https://<address>/api/v1/analyze -H "X-API-Key: <key>" -F "file=@video_017.mov"
+# {"job_id":"3f2a9c1e..."}
+curl https://<address>/api/v1/jobs/3f2a9c1e... -H "X-API-Key: <key>"
+```
 
-**Backend** (`/api` prefix): `GET /health`, `GET /model`, `POST /predict` `{records:[...]}`, `POST /predict/csv` (multipart `file`), `GET /predictions?limit=&offset=`
+```json
+{
+  "job_id": "3f2a9c1e...",
+  "status": "done",
+  "verdict": "violation",
+  "violations": [
+    {
+      "type": "Кассир оставляет сейф открытым после извлечения денег и перехода к подсчету",
+      "timecode_sec": 44.2,
+      "description": "Что видно...\nПочему это может быть нарушением: по регламенту — ...\nОснование: Правила ... (Постановление Правления НБ РК ... №231), п. 20, абз. 2 (https://old.adilet.zan.kz/rus/docs/V1900019680)",
+      "evidence_frames": [{ "timestamp_sec": 44.2, "image_base64": "/9j/4AAQ..." }]
+    }
+  ]
+}
+```
 
-**ML**: `GET /health`, `GET /model`, `POST /model/reload`, `POST /predict` `{records:[...]}`
+- **`status` and `verdict`:** `status` is `processing`, `done` or `failed` (a failed job has
+  `error`). `verdict` is `violation` or `no_violation`; with `no_violation`, `violations` is
+  empty.
+- **`type`:** the regulation's wording of the violation (the specialist catalog quote).
+- **`description`:**
+  1. what is visible;
+  2. why it may be a violation (the regulation rule);
+  3. the public legal source with its clause and link.
+- **`evidence_frames`:** 1–3 JPEG frames, base64 without a `data:` prefix, long side ≤ 640 px.
+  There is always at least one: if the frames at the timecode can't be read, the middle or start
+  of the video is used.
+- **Upload errors:** `415` wrong extension, `400` empty file, `413` too large, `422` no readable
+  video stream. An unknown job returns `404`.
 
-## Config
+### Time limit
 
-Each service reads `.env` (see `.env.example`): `ML_SERVICE_URL`, `DATABASE_URL` (Postgres works too: add `psycopg[binary]` and use `postgresql+psycopg://...`), `CORS_ORIGINS`, `MODEL_PATH`, and `BACKEND_URL` for the Next.js rewrite (build-time).
+The jury counts a video as unprocessed after 5 minutes.
+- **Every job ends within `JOB_TIMEOUT_SEC`** (default 270 s), counted from the upload, queue
+  time included.
+- **Processing time varies per video**, so the analyzer gets a deadline. It reports partial
+  results as it goes: router, then each specialist.
+- **When the deadline passes:**
+  - the analyzer process is killed;
+  - the job returns `done` with the finished specialists' results;
+  - a note goes into `limitations`, which is internal and not sent to the jury.
+- **A job fails only when not even one specialist finished.**
+- **Queueing:** jobs run `MAX_CONCURRENT_JOBS` at a time (default 1). If the jury sends many
+  videos at once, later ones wait, and the wait eats into their budget. Measure the model's time
+  per video and raise the concurrency if the GPU allows.
+
+### Handing it to the jury
+
+1. Use a long random `API_KEY` in `backend/.env`. Send it to the jury together with the
+   address.
+2. Publish only the backend. For example, run `cloudflared tunnel --url http://localhost:8000`
+   for an HTTPS address, or put the backend behind a reverse proxy with a domain.
+3. **Only `/api/v1/*`, `/health` and `/docs` answer remote clients.** Everything else answers
+   only loopback and private-network clients (`LOCAL_ONLY_UI=true`): the web pages, the
+   key-less `/ui/*` and `/api/jobs/*` endpoints, the uploaded videos and the history.
+   - Tunnels and proxies pass the real client address in `X-Forwarded-For` /
+     `Cf-Connecting-Ip`, and those requests count as remote.
+   - So the test videos can't be seen or downloaded through the public address.
+4. **Test videos must not be used for training, published or passed on.** They are stored only
+   in `backend/data/uploads/`. `UPLOAD_RETENTION_HOURS` deletes them (results stay) after the
+   given time; keep it `0` until the jury has collected the results. Never add them to a dataset.
+
+## Plugging in the ML microservice
+
+Set `ANALYZER=http` and `ML_SERVICE_URL=http://<host>:<port>` in `backend/.env`. The ML service
+must implement:
+
+**`GET /health`** → `{"status": "ok", "model_loaded": true, "model_version": "..."}`. It's shown
+in the backend's `/health`.
+
+**`POST /analyze`**, `multipart/form-data`:
+
+| Field | Meaning |
+|---|---|
+| `file` | The video (`.mov`) |
+| `deadline_sec` | Seconds the analysis may take from now. Do less when it's small: fewer frames, skip the secondary scenario. |
+| `job_id` | For logs |
+
+**Response:** either a plain JSON `AnalysisResult`, or better, a stream
+(`Content-Type: application/x-ndjson`) with one JSON object per line:
+
+```
+{"event": "partial", "result": {"scenario": {...}, "specialist_results": []}}
+{"event": "partial", "result": {"scenario": {...}, "specialist_results": [...]}}
+{"event": "result",  "result": {"scenario": {...}, "specialist_results": [...]}}
+```
+
+`{"event": "error", "detail": "..."}` fails the job with that message.
+
+How the partials are used:
+- they drive the frontend's stage progress;
+- if the deadline passes, the last partial is returned to the jury instead of a failure.
+
+An `AnalysisResult` is the router scenario plus the specialist outputs, in the same fields as the
+specialist prompts' JSON:
+
+```json
+{
+  "scenario": { "primary": "COUNTING_FROM_SAFE", "secondary": null },
+  "specialist_results": [
+    {
+      "scenario": "COUNTING_FROM_SAFE",
+      "status": "violation",
+      "rule_id": "s3:L85",
+      "quote": "Нарушение: кассир оставляет сейф открытым после извлечения денег и перехода к подсчету.",
+      "evidence": "Кассир переходит к счетной машинке, дверца сейфа остается открытой.",
+      "start_sec": 44.2,
+      "end_sec": 51.0,
+      "confidence": 0.81,
+      "evidence_timestamps": null
+    }
+  ]
+}
+```
+
+**`scenario`:** one of the 7 router classes:
+- `ENTRY`
+- `COUNTING_DEPOSIT_WITHOUT_CLIENT`
+- `CLIENT_CASH_DEPOSIT`
+- `COUNTING_FROM_SAFE`
+- `OPENING_A_CASH_BAG`
+- `RECEIVING_A_BAG_FROM_CLIENT`
+- `EXIT_CLOSING`
+
+**`specialist_results`:** one item per finding. A specialist that found nothing returns one item
+with `no_violation` or `insufficient_evidence`.
+- **`status`:** `violation`, `no_violation` or `insufficient_evidence`.
+- **`rule_id` and `quote`:** from the specialist's catalog, copied exactly.
+- **`start_sec` / `end_sec`:** seconds of the original video.
+- **Optional fields:**
+  - `confidence`: a violation below `MIN_CONFIDENCE` is shown as `insufficient_evidence` and not
+    sent to the jury;
+  - `evidence_timestamps`: where to take the frames; the default is `start_sec` ± 1 s;
+  - `type`: a violation type id from the legal mapping, e.g. `T10`.
+
+What the backend does with it:
+1. the evidence frames, from the original file;
+2. the legal basis;
+3. the jury `type` and `description`;
+4. the verdict;
+5. the timeout and the queue.
+
+The ML service only has to answer this contract. `backend/app/analyzers/http.py` is the client.
+Without a separate service, a Python class works too:
+- `ANALYZER=module.path:ClassName` with `analyze(video_path, ctx)`;
+- `ctx.time_left()` and `ctx.report(partial)` play the same roles as `deadline_sec` and the
+  partial events.
+
+## Legal sources (task §6)
+
+Each detected violation is linked: **public source → clause → violation type → regulation rule →
+video fragment**. On the frontend this is shown under each violation, next to the localized
+episode and the evidence frames. In the API it is the last line of `description`.
+
+| File | Contents |
+|---|---|
+| `backend/fortebank_violation_legal_mapping_updated.yaml` | The team's research: sources, clauses (`R01`–`R21`), violation types (`T01`–`T17`) with limitations |
+| `backend/specialist_crosswalk.yaml` | **Draft** link from specialist `rule_id` to violation type. It needs the team's review. Unmapped rules are shown as "not mapped", never guessed. |
+
+The mapping's own caveats are carried through, not hidden:
+- every clause is still `human_verified: false` until someone checks it on Әділет;
+- the office-safety sample instruction is marked as a supplementary, non-binding source;
+- each type's limitations are shown next to the violation.
+
+Sources used:
+
+| Source | Link |
+|---|---|
+| Правила осуществления кассовых операций и операций по инкассации банкнот, монет и ценностей (Постановление Правления НБ РК от 29.11.2019 №231) | https://old.adilet.zan.kz/rus/docs/V1900019680 |
+| Правила организации охраны и устройства помещений банков (Постановление Правления НБ РК от 24.02.2020 №14) | https://old.adilet.zan.kz/rus/docs/V2000020075 |
+| Закон РК от 28.08.2009 №191-IV о противодействии легализации (отмыванию) доходов | https://old.adilet.zan.kz/rus/docs/Z090000191_ |
+| Закон РК «О банках и банковской деятельности в Республике Казахстан» №258-VIII | https://old.adilet.zan.kz/rus/docs/Z2600000258 |
+| Требования к обеспечению информационной безопасности банков (Постановление Правления АРРФР №53) | https://old.adilet.zan.kz/rus/docs/V2600038336 |
+| Инструкция по безопасности и охране труда для офис-менеджера (образец, ZakonPravo.kz; supplementary, not a normative act) | https://zakonpravo.kz/instrukciya-po-bezopasnosti-i-ohrane-truda-dlya-ofis-menedzhera |
+
+## Configuration (`backend/.env`)
+
+| Var | Default | Purpose |
+|---|---|---|
+| `API_KEY` | — (required) | Jury key; the service won't start without it |
+| `ANALYZER` | `mock` | `mock`, `http` (the ML microservice) or `module.path:ClassName` |
+| `ML_SERVICE_URL` | `http://localhost:8001` | ML microservice, for `ANALYZER=http` |
+| `MOCK_DELAY_SEC` | `3` | Fake processing time of the mock |
+| `JOB_TIMEOUT_SEC` | `270` | Upload to done/failed, queue included |
+| `MAX_CONCURRENT_JOBS` | `1` | Videos analyzed at the same time |
+| `MIN_CONFIDENCE` | `0.5` | Below it, a violation becomes `insufficient_evidence` |
+| `MAX_UPLOAD_MB` | `500` | Upload limit |
+| `DATA_DIR` | `./data` | `uploads/` (videos) and `jobs/` (one JSON per job) |
+| `LEGAL_MAPPING_FILE` | `./fortebank_violation_legal_mapping_updated.yaml` | Sources, clauses, violation types |
+| `CROSSWALK_FILE` | `./specialist_crosswalk.yaml` | Specialist rule → violation type |
+| `LOCAL_ONLY_UI` | `true` | Key-less endpoints and pages answer local clients only |
+| `UPLOAD_RETENTION_HOURS` | `0` | Delete uploaded videos after N hours (`0` keeps them) |
+| `UI_ENABLED` | `true` | The simple page and `/ui/*` |
+
+Jobs that are still `processing` when the service restarts are marked `failed`.

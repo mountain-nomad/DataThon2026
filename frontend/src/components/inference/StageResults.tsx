@@ -1,5 +1,6 @@
 "use client";
 
+import { LegalBasis } from "@/components/LegalBasis";
 import { plural } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatTimecodePrecise } from "@/lib/format";
@@ -67,6 +68,7 @@ function ResultItem({ result }: { result: SpecialistResult }) {
           <blockquote className="border-l-2 border-border pl-3 text-sm text-muted">{result.quote}</blockquote>
         </div>
       )}
+      {result.status === "violation" && <LegalBasis basis={result.legalBasis} />}
     </li>
   );
 }

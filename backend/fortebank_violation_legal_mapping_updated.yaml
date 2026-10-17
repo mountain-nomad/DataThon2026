@@ -1,0 +1,323 @@
+research_date: '2026-10-17'
+purpose: Черновой маппинг для Datathon. Перед утверждением точных юридических формулировок требуется проверка человеком
+  на Әділет.
+sources:
+  N231:
+    title: Правила осуществления кассовых операций и операций по инкассации банкнот, монет и ценностей ... (Постановление
+      Правления НБ РК от 29.11.2019 №231)
+    url: https://old.adilet.zan.kz/rus/docs/V1900019680
+    document_id: V1900019680
+  N14:
+    title: Правила организации охраны и устройства помещений банков ... (Постановление Правления НБ РК от 24.02.2020
+      №14)
+    url: https://old.adilet.zan.kz/rus/docs/V2000020075
+    document_id: V2000020075
+  AML191:
+    title: Закон РК от 28.08.2009 №191-IV о противодействии легализации (отмыванию) доходов ...
+    url: https://old.adilet.zan.kz/rus/docs/Z090000191_
+    document_id: Z090000191_
+  BANK258:
+    title: Закон РК от 16.01.2026 №258-VIII «О банках и банковской деятельности в Республике Казахстан»
+    url: https://old.adilet.zan.kz/rus/docs/Z2600000258
+    document_id: Z2600000258
+  INFO53:
+    title: Требования к обеспечению информационной безопасности банков ... (Постановление Правления АРРФР от 03.04.2026
+      №53)
+    url: https://old.adilet.zan.kz/rus/docs/V2600038336
+    document_id: V2600038336
+  OFFICE_OHS_SAMPLE:
+    title: Инструкция по безопасности и охране труда для офис-менеджера
+    url: https://zakonpravo.kz/en/instrukciya-po-bezopasnosti-i-ohrane-truda-dlya-ofis-menedzhera?utm_source=chatgpt.com
+    alternate_url: https://zakonpravo.kz/instrukciya-po-bezopasnosti-i-ohrane-truda-dlya-ofis-menedzhera
+    publisher: ZakonPravo.kz
+    publication_date: '2021-03-18'
+    source_type: sample_workplace_safety_instruction
+    normative_status: not_a_government_normative_legal_act
+    adoption_by_fortebank: not_established
+    use_as: supplementary_context_only
+    note_ru: Образец инструкции для офис-менеджера, а не обязательный НПА для банковского кассира. Ссылка подтверждает
+      содержание образца, но не применимость к ForteBank.
+rules:
+- rule_id: R01
+  source_id: N231
+  clause: п. 19, подп. 4–6
+  summary_ru: Сопоставление суммы по приходному документу с фактически принятой; оформление и выдача подтверждения.
+  human_verified: false
+- rule_id: R02
+  source_id: N231
+  clause: п. 20, абз. 1
+  summary_ru: Прием и пересчет наличных в присутствии клиента.
+  human_verified: false
+- rule_id: R03
+  source_id: N231
+  clause: п. 20, абз. 2
+  summary_ru: На рабочем месте находятся деньги текущего клиента; ранее принятые деньги хранятся в специальных запирающихся
+    устройствах хранения.
+  human_verified: false
+- rule_id: R04
+  source_id: N231
+  clause: п. 21
+  summary_ru: Прием наличных отдельно по каждому приходному документу, если их несколько.
+  human_verified: false
+- rule_id: R05
+  source_id: N231
+  clause: п. 22
+  summary_ru: Кассовому работнику нельзя покидать рабочее место до завершения обслуживания клиента.
+  human_verified: false
+- rule_id: R06
+  source_id: N231
+  clause: п. 24, подп. 1–4
+  summary_ru: При поступлении сумок от подразделения инкассации/инкассаторской организации проверяются сопроводительные
+    документы, регистрация суммы, целостность и пломбы.
+  human_verified: false
+- rule_id: R07
+  source_id: N231
+  clause: п. 74
+  summary_ru: Хранение наличных в кладовой и/или сейфовой комнате после учета в автоматизированной цифровой системе;
+    детали по внутреннему порядку.
+  human_verified: false
+- rule_id: R08
+  source_id: N231
+  clause: п. 80
+  summary_ru: Порядок хранения/передачи печатей, штампов, ключей и кодов определяется документами банка, исключающими
+    несанкционированное использование.
+  human_verified: false
+- rule_id: R09
+  source_id: N231
+  clause: п. 94
+  summary_ru: Представление и сверка образцов пломб для сумок при инкассации.
+  human_verified: false
+- rule_id: R10
+  source_id: N231
+  clause: п. 107, подп. 1–4
+  summary_ru: Инкассатор-сборщик при приеме от клиента проверяет целостность и пломбирование сумки, явочную карточку
+    и документы.
+  human_verified: false
+- rule_id: R11
+  source_id: N14
+  clause: п. 8
+  summary_ru: Кассовый узел изолируется от других помещений закрывающимся служебным входом.
+  human_verified: false
+- rule_id: R12
+  source_id: N14
+  clause: п. 16, подп. 1
+  summary_ru: Каждая касса имеет отдельный вход с запираемой дверью; специальный режим временного приостановления
+    п. 16 до 01.01.2027 нужно учитывать.
+  human_verified: false
+- rule_id: R13
+  source_id: N14
+  clause: п. 21
+  summary_ru: При инкассации в боксе/на площадке ограничиваются доступ и просмотр третьими лицами.
+  human_verified: false
+- rule_id: R14
+  source_id: AML191
+  clause: ст. 5, п. 3, подп. 1
+  summary_ru: Фиксируются сведения, необходимые для идентификации физического лица.
+  human_verified: false
+- rule_id: R15
+  source_id: AML191
+  clause: ст. 7, п. 1
+  summary_ru: До операции проводятся предусмотренные меры надлежащей проверки с исключениями для ранее проверенных
+    клиентов и особых случаев.
+  human_verified: false
+- rule_id: R16
+  source_id: BANK258
+  clause: ст. 69
+  summary_ru: Охрана банковской тайны и ограничения ее раскрытия третьим лицам.
+  human_verified: false
+- rule_id: R17
+  source_id: INFO53
+  clause: п. 71, подп. 9
+  summary_ru: При неактивности пользователя более 30 минут система автоматически завершает сессию либо блокирует
+    рабочую станцию/ноутбук.
+  human_verified: false
+- rule_id: R18
+  source_id: INFO53
+  clause: п. 53
+  summary_ru: Банк определяет организационные/технические меры защиты рабочих станций и ноутбуков в соответствии
+    с главой 9.
+  human_verified: false
+- rule_id: R19
+  source_id: OFFICE_OHS_SAMPLE
+  clause: пп. 3.7, 5.1.2, 5.2, 5.3
+  summary_ru: Образец запрещает оставлять некоторые включенные электроприборы без надзора; после завершения работы
+    предписывает отключать оборудование и ПК.
+  human_verified: false
+  rule_status: supplementary_nonbinding_template
+  qualifier_ru: Для T14 существенны окончание работы либо отсутствие надзора и вид электроприбора; кратковременный
+    отход не доказывает нарушения. Не установлено применение образца в ForteBank.
+- rule_id: R20
+  source_id: OFFICE_OHS_SAMPLE
+  clause: пп. 1.3, 2.1.2
+  summary_ru: Образец требует поддерживать рабочее место в чистоте и порядке и приводить его в порядок перед работой.
+  human_verified: false
+  rule_status: supplementary_indirect
+  qualifier_ru: Прямого запрета на куртку или личную сумку на кассовом столе в образце не обнаружено.
+- rule_id: R21
+  source_id: OFFICE_OHS_SAMPLE
+  clause: п. 1.4
+  summary_ru: Образец предусматривает прием пищи, курение и отдых только в специально отведенных местах.
+  human_verified: false
+  rule_status: supplementary_nonbinding_template
+  qualifier_ru: Формулировка образца прямо касается приема пищи, но сам документ не является общеобязательной инструкцией
+    для работников банка.
+violation_types:
+- type_id: T01
+  name_ru: Отсутствие видимой проверки клиента
+  observable_cue_ru: Клиент передает деньги, удостоверение не видно
+  rule_ids:
+  - R14
+  - R15
+  mapping_status: conditional
+  limitations_ru: Возможно ранее проведенное или цифровое установление личности; отсутствие удостоверения в кадре
+    не доказывает отсутствие проверки.
+- type_id: T02
+  name_ru: Отсутствие пересчета наличных
+  observable_cue_ru: Деньги принимаются, в полном видео не наблюдается пересчета
+  rule_ids:
+  - R02
+  mapping_status: direct_if_complete
+  limitations_ru: Видеофрагмент должен охватывать весь прием; исключить иной сценарий инкассации.
+- type_id: T03
+  name_ru: Смешивание денег двух клиентов
+  observable_cue_ru: После получения денег клиента А наличные остаются на столе и добавляются к деньгам клиента
+    Б
+  rule_ids:
+  - R03
+  - R04
+  mapping_status: direct_if_visible
+  limitations_ru: Основное основание — п. 20; п. 21 относится лишь к нескольким приходным документам.
+- type_id: T04
+  name_ru: Наличные предыдущего клиента не убраны в защищенное устройство
+  observable_cue_ru: После смены клиента прежние деньги остались вне закрывающегося места хранения
+  rule_ids:
+  - R03
+  - R07
+  mapping_status: direct_if_visible
+  limitations_ru: П. 20 не требует обязательно помещать деньги немедленно именно в большой сейф; существуют ящики/тумбы
+    с замком.
+- type_id: T05
+  name_ru: Оставление денег без присмотра
+  observable_cue_ru: Кассир ушел, наличные доступны и не убраны
+  rule_ids:
+  - R03
+  - R05
+  mapping_status: conditional
+  limitations_ru: П. 22 действует до завершения обслуживания; если клиент уже обслужен, ключевое основание — п.
+    20.
+- type_id: T06
+  name_ru: Частичный возврат клиенту без видимого основания
+  observable_cue_ru: Кассир возвращает часть полученных банкнот
+  rule_ids:
+  - R01
+  mapping_status: weak
+  limitations_ru: Частичный возврат может быть корректным; несовпадение с документом по видео обычно не доказать.
+- type_id: T07
+  name_ru: Сумка инкассации принята без видимой проверки
+  observable_cue_ru: Инкассаторская сумка передана, видимых действий проверки пломбы и целостности нет
+  rule_ids:
+  - R06
+  - R09
+  - R10
+  mapping_status: conditional
+  limitations_ru: 'Нужно установить роли: прием банком от инкассации (п.24) либо инкассатором от клиента (п.107).
+    Не требуется пересчет запечатанной сумки на месте во всех случаях.'
+- type_id: T08
+  name_ru: Сумка с наличными оставлена без присмотра
+  observable_cue_ru: Сумка находится без контролирующего сотрудника
+  rule_ids:
+  - R07
+  - R11
+  mapping_status: weak
+  limitations_ru: Нормы регулируют хранение/охрану, но нет подтвержденного прямого требования для любой сумки в
+    любой момент.
+- type_id: T09
+  name_ru: Открытый сейф или хранилище после ухода
+  observable_cue_ru: Дверца индивидуального сейфа/кассового устройства открыта, кассир отсутствует
+  rule_ids:
+  - R03
+  - R07
+  mapping_status: conditional
+  limitations_ru: Требуется отличать рабочий сейф от сейфовой комнаты и установить доступность содержимого.
+- type_id: T10
+  name_ru: Открытая дверь кассовой комнаты
+  observable_cue_ru: Кассир вошел/вышел; служебный вход остается открытым
+  rule_ids:
+  - R11
+  - R12
+  mapping_status: conditional
+  limitations_ru: П. 8/16 требуют конструктивно изолированное помещение и запираемую дверь, но не буквально закрытие
+    после каждого входа.
+- type_id: T11
+  name_ru: Посторонний в защищенной зоне / раскрытие сведений
+  observable_cue_ru: Посторонний вошел в кассовую зону либо видит защищенные данные текущего клиента
+  rule_ids:
+  - R11
+  - R12
+  - R16
+  - R13
+  mapping_status: conditional
+  limitations_ru: Само присутствие другого клиента рядом не нарушение; п. 21 применим только к зоне инкассации.
+- type_id: T12
+  name_ru: Не заблокирован ноутбук при уходе
+  observable_cue_ru: Кассир уходит, рабочий экран остается видимым/доступным
+  rule_ids:
+  - R17
+  - R18
+  mapping_status: conditional
+  limitations_ru: П. 71(9) устанавливает автоматическую блокировку после >30 минут бездействия, а не немедленную
+    ручную блокировку при кратком уходе.
+- type_id: T13
+  name_ru: Печати/штампы оставлены открыто
+  observable_cue_ru: Печать или именной штамп оставлены на доступном рабочем столе
+  rule_ids:
+  - R08
+  mapping_status: conditional
+  limitations_ru: Открытая тетрадь сама по себе под п. 80 не подпадает; наличие риска несанкционированного использования
+    требует оценки.
+- type_id: T14
+  name_ru: Включенное оборудование без оператора
+  observable_cue_ru: Кассир ушел, ноутбук или счетная машина остается включенной
+  rule_ids:
+  - R19
+  mapping_status: supplementary_conditional
+  limitations_ru: Инструкция — образец для офис-менеджера; отключение оборудования предписано по окончании работы.
+    Применимость в ForteBank не подтверждена. Сам факт включенного ноутбука/счетной машины при кратком уходе не
+    доказывает нарушение.
+- type_id: T15
+  name_ru: Личные вещи на кассовом столе
+  observable_cue_ru: Куртка и/или личная сумка находятся на столе
+  rule_ids:
+  - R20
+  mapping_status: supplementary_indirect
+  limitations_ru: Пункты 1.3 и 2.1.2 требуют порядка на рабочем месте, но не содержат явного запрета на личные сумки/куртки.
+    Инструкция — необязательный образец.
+- type_id: T16
+  name_ru: Прием пищи/напитков на кассовом столе
+  observable_cue_ru: Кассир ест или пьет на кассовом столе
+  rule_ids:
+  - R21
+  mapping_status: supplementary_textual_match
+  limitations_ru: П. 1.4 образца говорит о приеме пищи только в выделенных местах. Однако это не подтвержденный
+    обязательный норматив для банковского кассира; для юридического вывода требуется применимый акт или принятая
+    банком инструкция.
+- type_id: T17
+  name_ru: Отсутствие видимого учета операции
+  observable_cue_ru: Кассир не взаимодействует с ноутбуком после приема денег
+  rule_ids:
+  - R01
+  - R07
+  mapping_status: video_unverifiable
+  limitations_ru: По видео нельзя установить, проведена ли операция в банковской системе или выдан документ вне
+    кадра.
+  reviewed_supplementary_source:
+    source_id: OFFICE_OHS_SAMPLE
+    url: https://zakonpravo.kz/en/instrukciya-po-bezopasnosti-i-ohrane-truda-dlya-ofis-menedzhera?utm_source=chatgpt.com
+    applicability: not_applicable
+    note_ru: Инструкция по охране труда не содержит правила о внесении кассовой операции в банковскую систему. Сохранены
+      R01 и R07; отсутствие действий на ноутбуке не доказывает отсутствие учета.
+source_usage_policy:
+  prefer_official_law_for_legal_conclusions: true
+  sample_instructions_are_not_binding_without_adoption: true
+  do_not_mark_supplementary_matches_as_legally_verified: true
+  video_only: true

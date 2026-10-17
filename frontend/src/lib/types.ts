@@ -31,6 +31,32 @@ export type ScenarioResult = {
 
 export type SpecialistStatus = "violation" | "no_violation" | "insufficient_evidence";
 
+// Public source -> clause -> violation, from the team's legal mapping (backend legal.py).
+export type LegalSource = {
+  sourceId: string;
+  title: string;
+  url?: string;
+  // false for supplementary templates that are not normative legal acts.
+  binding: boolean;
+};
+
+export type LegalClause = {
+  ruleId: string;
+  clause: string;
+  summary?: string;
+  humanVerified: boolean;
+  qualifier?: string;
+  source: LegalSource;
+};
+
+export type LegalBasis = {
+  typeId?: string;
+  name?: string;
+  mappingStatus?: string;
+  limitations?: string;
+  clauses: LegalClause[];
+};
+
 // One specialist verdict, exactly as returned. Text fields are shown untranslated.
 export type SpecialistResult = {
   id: string;
@@ -45,6 +71,8 @@ export type SpecialistResult = {
   startSec?: number;
   endSec?: number;
   evidenceFrames: EvidenceFrame[];
+  // Undefined when the rule isn't mapped to a public source.
+  legalBasis?: LegalBasis;
   // Only for status "violation".
   reviewStatus?: ReviewStatus;
 };

@@ -204,6 +204,23 @@ export const ru = {
     badgePending: "Обнаружено AI · Ждёт проверки",
     badgeAi: "Обнаружено AI",
   },
+  legal: {
+    title: "Нормативное основание",
+    notMapped: "Нормативное основание для этого правила пока не сопоставлено.",
+    notVerified: "не проверено юристом",
+    nonBinding: "вспомогательный образец, не НПА",
+    limitations: "Ограничения",
+    mapping: {
+      direct_if_visible: "прямая связь, если действие видно",
+      direct_if_complete: "прямая связь при полной записи",
+      conditional: "условная связь",
+      weak: "слабая связь",
+      video_unverifiable: "по видео не проверить",
+      supplementary_conditional: "вспомогательный источник, условно",
+      supplementary_indirect: "вспомогательный источник, косвенно",
+      supplementary_textual_match: "вспомогательный источник, совпадение текста",
+    } as Record<string, string>,
+  },
   dashboardPage: {
     label: "Панель мониторинга",
     title: "Панель мониторинга",
