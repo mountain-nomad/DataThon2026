@@ -1,9 +1,9 @@
 "use client";
 
 import { useI18n } from "@/i18n/I18nProvider";
-import type { RegulatorySource, ReviewStatus } from "@/lib/types";
+import type { ReviewStatus } from "@/lib/types";
 
-// Small pieces shared by the inference result cards and the dashboard episode cards.
+// Small pieces of the dashboard episode cards.
 
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -11,20 +11,6 @@ export function Field({ label, children }: { label: string; children: React.Reac
       <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">{label}</dt>
       <dd className="text-sm">{children}</dd>
     </div>
-  );
-}
-
-// Never invent a norm: without a confirmed match, say so.
-export function RegulatoryReference({ source }: { source?: RegulatorySource }) {
-  const { t } = useI18n();
-  if (!source) return <span className="text-muted">{t.media.noRule}</span>;
-  const text = source.section ? `${source.documentTitle}, ${source.section}` : source.documentTitle;
-  return source.url ? (
-    <a href={source.url} target="_blank" rel="noreferrer" className="text-primary underline-offset-2 hover:underline">
-      {text}
-    </a>
-  ) : (
-    <span>{text}</span>
   );
 }
 

@@ -45,14 +45,21 @@ browser -> frontend :3000 --(next.config.ts rewrite /api/*)--> backend :8000 --(
     - The 7 router scenarios are canonical ids in `lib/types.ts` (`SCENARIOS`, `SCENARIO_CODES`). Their names and the violation types each specialist checks are in the dictionaries under `scenarios`. Specialist text (`quote`, `evidence`) is shown untranslated, and results from non-routed scenarios are dropped.
     - Stages are revealed one at a time. If the backend sends no `stages_done`, they are revealed only after `done`, with a note saying so; never fake progress.
     - When stage 3 finds a violation, the video grid animates into two columns. The right column plays `start_sec..end_sec` of the same file (`VideoPlayer segment`), falling back to the evidence frame;
-  - `/demo-dashboard` shows a 4×4 camera grid, statistics and episode cards, all from the local demo set in `lib/demo-data.ts`. Statistics are derived from that one event list. Marking a false positive changes only `reviewStatus`, never the model output.
+  - `/demo-dashboard` shows statistics and episode cards over the history of finished analyses from `GET /api/jobs?status=done`. That history is the videos uploaded on `/demo-inference`; there is no local demo set.
+    - There is no camera grid: the camera panel from `frontend_description.md` was removed on request.
+    - Every number is derived from that one list.
+    - Marking a false positive calls `PUT /api/jobs/{id}/results/{index}/review` optimistically and rolls back on error. It changes only `reviewStatus`, never the model output.
+    - Episodes play `start_sec..end_sec` of the job's `preview_url` through `components/media/EpisodeMedia.tsx`, which is shared with the inference page.
+    - Without a backend, the page shows an honest error or empty state.
 
   - **i18n (ru primary, kk, en).** Every route lives under `app/[lang]/`, the root layout included, and is prerendered for all three locales. `src/proxy.ts` serves Russian at unprefixed URLs by rewriting to `/ru/...`; `/ru/...` redirects to the unprefixed URL, and `/kk`, `/en` are prefixed. The proxy matcher skips `/api`, so video uploads are never buffered by it. Dictionaries are `src/i18n/dictionaries/*.ts`: `ru.ts` defines the shape, and the others `satisfies Dictionary`, so a missing key fails `tsc`. **The language switcher translates in place; it doesn't navigate.**
     - `I18nProvider` holds all three dictionaries on the client. `setLocale` swaps the dictionary, then updates `<html lang>`, the tab title and the URL through `history.replaceState`, so an uploaded video, analysis results and review marks survive.
     - Visible text must therefore come from `useI18n()` in client components (the landing is `components/Landing.tsx`; `PageIntro` takes a dictionary key).
     - Server `getDictionary()`, which reads `next/root-params`, is only for `generateMetadata`. Text rendered from it would not switch.
-    - Client components call `useI18n()` (`t`, `locale`, `href(path)`, `setLocale`). Build internal links with `href()` / `localePath()`, never raw `"/..."`. Pages pass `path` to `SiteHeader` instead of using `usePathname()`, which would cause a hydration mismatch behind the rewrite. Plurals use `plural()` with Intl plural forms. Demo data in `lib/demo-data.ts` is not translated.
-  Shared models are in `lib/types.ts`. Video and frames go through `components/media/` (`VideoPlayer` with timeline markers and `seekTo`, `MediaPlaceholder`, `EvidenceFrames`). Media is not added yet: `videoUrl` and `clipUrl` are undefined and placeholders render. Video is 16:9 with `object-contain`, never `cover`. The backend REST contract for all of this is `backend/backend_description.md` (not implemented yet).
+    - Client components call `useI18n()` (`t`, `locale`, `href(path)`, `setLocale`). Build internal links with `href()` / `localePath()`, never raw `"/..."`. Pages pass `path` to `SiteHeader` instead of using `usePathname()`, which would cause a hydration mismatch behind the rewrite. Plurals use `plural()` with Intl plural forms. Model text from the backend is never translated. Dates go through `formatDateTime`, which formats `kk` as `ru`, because Chrome's ICU has no Kazakh date data.
+  Shared models are in `lib/types.ts`. Video and frames go through `components/media/`:
+    - `VideoPlayer` supports timeline markers and ranges, a `segment` clip mode, `fallbackSrc` and `fallback`;
+    - `EpisodeMedia`, `EvidenceFrames` and `MediaPlaceholder`. Video is 16:9 with `object-contain`, never `cover`. The backend REST contract for all of this is `backend/backend_description.md` (not implemented yet).
 - **Design system.** Any UI work goes through the `forte-design` skill (`.claude/skills/forte-design/SKILL.md`). Its "Project direction" section is what the user approved:
   - white background, minimal, magenta (`#A31551`) only as an accent;
   - only Forte's four main colours and the two brand gradients;

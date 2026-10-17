@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { buttonClass, buttonSecondaryClass, ErrorText } from "@/components/Card";
-import { EvidenceFrames } from "@/components/media/EvidenceFrames";
-import { MediaPlaceholder } from "@/components/media/MediaPlaceholder";
+import { EpisodeMedia } from "@/components/media/EpisodeMedia";
 import { VideoPlayer } from "@/components/media/VideoPlayer";
 import { useI18n } from "@/i18n/I18nProvider";
 import { api, JobError, toPipelineResult, waitForJob } from "@/lib/api";
@@ -243,8 +242,7 @@ export function InferenceDemo() {
   );
 }
 
-// Right column: the localized episode as a clip of the original (start_sec..end_sec), or the
-// evidence frame when there is no localization or the video can't be played.
+// Right column: the localized episode of the selected violation.
 function Episode({
   violation,
   violations,
@@ -261,15 +259,6 @@ function Episode({
   const { t } = useI18n();
   const ti = t.inference;
   const { startSec, endSec } = violation;
-  const frame =
-    violation.evidenceFrames.length > 0 ? (
-      <div className="flex flex-col gap-1">
-        <p className="text-xs text-muted">{ti.episodeFrame}</p>
-        <EvidenceFrames frames={violation.evidenceFrames} single />
-      </div>
-    ) : (
-      <MediaPlaceholder tone="error" label={ti.noEpisode} />
-    );
 
   return (
     <div className="flex flex-col gap-3 motion-safe:animate-reveal">
@@ -304,17 +293,12 @@ function Episode({
           </div>
         )}
       </div>
-      {startSec === undefined ? (
-        frame
-      ) : (
-        <VideoPlayer
-          src={src}
-          fallbackSrc={fallbackSrc}
-          fallback={frame}
-          label={`${ti.episode} · ${formatTimecodePrecise(startSec)}`}
-          segment={{ start: startSec, end: endSec !== undefined && endSec > startSec ? endSec : Infinity }}
-        />
-      )}
+      <EpisodeMedia
+        result={violation}
+        src={src}
+        fallbackSrc={fallbackSrc}
+        label={startSec === undefined ? ti.episode : `${ti.episode} · ${formatTimecodePrecise(startSec)}`}
+      />
     </div>
   );
 }

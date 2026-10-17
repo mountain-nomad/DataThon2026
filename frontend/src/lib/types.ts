@@ -1,14 +1,4 @@
-// Frontend data models shared by both demos (frontend_description.md §6).
-
-export type CameraStatus = "demo" | "playing" | "unavailable";
-
-export type Camera = {
-  id: string;
-  name: string;
-  // Undefined until the demo recording is added (a placeholder is shown instead).
-  videoUrl?: string;
-  status: CameraStatus;
-};
+// Frontend data models shared by /demo-inference and /demo-dashboard.
 
 export type EvidenceFrame = {
   timestampSec: number;
@@ -16,36 +6,8 @@ export type EvidenceFrame = {
   imageBase64: string;
 };
 
-export type RegulatorySource = {
-  documentTitle: string;
-  section?: string;
-  url?: string;
-};
-
+// Human review of a detected violation. Never overwrites the model output.
 export type ReviewStatus = "pending" | "false_positive";
-
-export type ViolationEvent = {
-  id: string;
-  cameraId?: string;
-
-  processName?: string;
-  type: string;
-  description: string;
-
-  // Seconds relative to the original video.
-  timecodeSec: number;
-
-  // The clip begins at this original-video timestamp.
-  clipStartSec?: number;
-  clipUrl?: string;
-
-  evidenceFrames: EvidenceFrame[];
-
-  regulatorySource?: RegulatorySource;
-
-  // Human review. Never overwrites the model output above.
-  reviewStatus: ReviewStatus;
-};
 
 // AI pipeline of /demo-inference (frontend_description2.md): router -> specialist -> localization.
 
@@ -72,6 +34,8 @@ export type SpecialistStatus = "violation" | "no_violation" | "insufficient_evid
 // One specialist verdict, exactly as returned. Text fields are shown untranslated.
 export type SpecialistResult = {
   id: string;
+  // Position in the backend's specialist_results; addresses the result for review.
+  index: number;
   scenario?: string;
   ruleId?: string;
   status: string;
@@ -81,12 +45,22 @@ export type SpecialistResult = {
   startSec?: number;
   endSec?: number;
   evidenceFrames: EvidenceFrame[];
+  // Only for status "violation".
+  reviewStatus?: ReviewStatus;
 };
 
 export type PipelineResult = {
   scenario: ScenarioResult | null;
   results: SpecialistResult[];
   previewUrl?: string;
+};
+
+// One finished analysis from GET /api/jobs (the source of /demo-dashboard).
+export type AnalysisRecord = PipelineResult & {
+  jobId: string;
+  fileName: string;
+  createdAt: string;
+  durationSec?: number;
 };
 
 // The router's own labels (frontend_description2.md §2). Not translated: they are class names.
