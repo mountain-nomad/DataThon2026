@@ -1,0 +1,19 @@
+[project]
+name = "ml-service"
+version = "0.1.0"
+description = "ML inference API"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi[standard]>=0.115",
+    "pydantic-settings>=2.4",
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "scikit-learn>=1.5",
+    "joblib>=1.4",
+]
+
+[dependency-groups]
+dev = ["ruff>=0.6", "jupyter>=1.0"]
+
+[tool.ruff]
+line-length = 100

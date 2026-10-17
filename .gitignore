@@ -218,3 +218,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Project ---
+# The Python template's `lib/` rule would otherwise swallow the Next.js lib folder
+!frontend/src/lib/
+*.db
+data/*
+!data/.gitkeep
+ml/artifacts/*
+!ml/artifacts/.gitkeep
+.DS_Store
