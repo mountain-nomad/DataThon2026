@@ -1,5 +1,3 @@
-import type { ViolationEvent } from "./types";
-
 export function formatTimecode(sec: number | null | undefined): string {
   if (sec == null || !Number.isFinite(sec) || sec < 0) return "--:--";
   const total = Math.floor(sec);
@@ -18,12 +16,18 @@ export function formatFileSize(bytes: number, locale: string): string {
   );
 }
 
-// Time of the event inside the short clip. Not the jury API's timecode_sec, which is always
-// relative to the original recording. Clamped to the clip when its duration is known.
-export function episodeTimecodeSec(event: ViolationEvent, clipDurationSec?: number): number | null {
-  if (event.clipStartSec === undefined) return null;
-  const local = Math.max(0, event.timecodeSec - event.clipStartSec);
-  return clipDurationSec ? Math.min(local, clipDurationSec) : local;
+export function formatDateTime(iso: string, locale: string): string {
+  const date = new Date(iso);
+  if (!iso || Number.isNaN(date.getTime())) return "—";
+  // Chrome's ICU has no Kazakh date data (it prints "2026 M10 17" or "2026-10-17"), so kk uses
+  // the ru numeric format, dd.mm.yyyy, which is also how dates are written in Kazakhstan.
+  return new Intl.DateTimeFormat(locale === "kk" ? "ru" : locale, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 }
 
 export function imageSrc(imageBase64: string): string {

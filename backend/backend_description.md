@@ -23,13 +23,12 @@ jury    ──────────────────── X-API-Key �
 - **No face recognition or identification.** Nothing in the API returns or stores identities.
 - **AI output is never overwritten.** Human review (false positives) is stored separately from
   the model output.
-- **No authorisation for the UI and no history or export features.** The only secret is the jury's
-  `X-API-Key`.
+- **No authorisation for the UI and no export features.** The only secret is the jury's
+  `X-API-Key`. The history of finished analyses is kept, because it feeds the dashboard (§4.3).
 - **Errors have one shape:** FastAPI's `{"detail": "<human-readable message>"}`. The frontend
   shows `detail` as-is.
 - **JSON is `snake_case`.** The frontend converts it to its camelCase models in `lib/api.ts`.
-- **Times are seconds** (`float`). Every timecode is relative to the **original recording**,
-  except `episode_timecode_sec`.
+- **Times are seconds** (`float`). Every timecode is relative to the **original recording**.
 - **No UI language on the backend.** The UI is ru/kk/en. The backend returns ids (scenario
   ids, `status` values, `rule_id`) and the frontend translates them. Free text from the model
   (`quote`, `evidence`, `description`) is returned as generated and shown untranslated. There is
@@ -44,15 +43,13 @@ jury    ──────────────────── X-API-Key �
 | `POST` | `/api/v1/analyze` | `X-API-Key` | jury, `/demo-inference` | Upload a `.mov` and start analysis |
 | `GET` | `/api/v1/jobs/{job_id}` | `X-API-Key` | jury, `/demo-inference` | Job status and result (jury contract) |
 | `GET` | `/api/jobs/{job_id}/pipeline` | — | `/demo-inference` | Stage progress and the router/specialist output |
-| `GET` | `/api/jobs/{job_id}/preview.mp4` | — | `/demo-inference` | Browser-playable preview of the upload |
-| `GET` | `/api/demo/cameras` | — | `/demo-dashboard` | The 16 demo cameras |
-| `GET` | `/api/demo/events` | — | `/demo-dashboard` | Detected episodes (one list, the source for all stats) |
-| `PUT` | `/api/events/{event_id}/review` | — | `/demo-dashboard` | Mark or unmark a false positive |
-| `GET` | `/api/media/{path}` | — | both demos | Demo previews, clips and frames (static, supports Range) |
+| `GET` | `/api/jobs/{job_id}/preview.mp4` | — | both demos | Browser-playable preview of the upload |
+| `GET` | `/api/jobs` | — | `/demo-dashboard` | Finished analyses: the one source of all dashboard stats and episodes |
+| `PUT` | `/api/jobs/{job_id}/results/{index}/review` | — | `/demo-dashboard` | Mark or unmark a false positive |
 | `GET` | `/api/health` | — | ops | Backend + ML status (already exists) |
 
 `/api/v1/*` is the jury contract. **Don't add or rename fields there for the UI.** UI extras
-live under `/api/jobs/*`, `/api/demo/*` and `/api/events/*`.
+live under `/api/jobs*`.
 
 The existing iris endpoints (`/api/model`, `/api/predict`, `/api/predict/csv`,
 `/api/predictions`) are no longer used by the frontend. Remove them along with
@@ -164,6 +161,8 @@ moment of upload, so it answers **while the job is still running** and shows par
   "job_id": "3f0c9a1e-…",
   "status": "processing",
   "error": null,
+  "file_name": "cam3_2026-10-17.mov",
+  "created_at": "2026-10-17T14:02:11Z",
   "stages_done": 2,
   "duration_sec": 63.0,
   "preview_url": null,
@@ -177,7 +176,8 @@ moment of upload, so it answers **while the job is still running** and shows par
       "evidence": "…",
       "start_sec": 44.2,
       "end_sec": 51.0,
-      "evidence_frames": [{ "timestamp_sec": 44.2, "image_base64": "…" }]
+      "evidence_frames": [{ "timestamp_sec": 44.2, "image_base64": "…" }],
+      "review_status": "pending"
     }
   ]
 }
@@ -186,6 +186,7 @@ moment of upload, so it answers **while the job is still running** and shows par
 | Field | Notes |
 |---|---|
 | `status`, `error` | Same as in `/api/v1/jobs/{id}`. |
+| `file_name`, `created_at` | The uploaded file's original name (`UploadFile.filename`, display only, never used as a path) and the upload time, ISO 8601 UTC. |
 | `stages_done` | How many AI stages are finished: `0`, `1` (scenario), `2` (violations) or `3` (localization). `3` when `done`. **`null` if the backend doesn't track stages.** The UI then animates the stages only after `done` and says so: it never fakes progress. |
 | `scenario` | Router output, present from `stages_done >= 1`. `primary` is required. `secondary` is the second candidate, or `null`. Values are **canonical ids** of the 7 router classes (table below). The frontend also normalises labels like `"COUNTING / DEPOSIT WITHOUT CLIENT"`, and shows anything outside the 7 as-is with a note. |
 | `specialist_results` | Present from `stages_done >= 2`. **Exactly what the specialists returned, nothing invented.** |
@@ -194,6 +195,7 @@ moment of upload, so it answers **while the job is still running** and shows par
 | `[].rule_id`, `[].quote`, `[].evidence` | As returned by the specialist. `quote` is the rule text the specialist cites, and `evidence` is what it saw on the video **[assumption: check the prompt's output format]**. |
 | `[].start_sec`, `[].end_sec` | Localized episode, in seconds of the original. `null` if it wasn't localized. The UI plays this range of the original as the "violation episode" clip, so **no clip files need to be cut** for this page. Without `start_sec` it shows `evidence_frames[0]`. |
 | `[].evidence_frames` | 0–3 frames, same format as §3.3. They are the fallback when the episode can't be played. |
+| `[].review_status` | Only on `violation` results: `"pending"` or `"false_positive"`, joined from the review table (§4.4). `null` on the others. Not part of the model output. |
 | `preview_url`, `duration_sec` | `preview_url` is `null` until the preview is ready (§5). The UI uses it only when the browser can't decode the uploaded `.mov` itself. |
 
 - `404` if the job is unknown. There is no `409`: a running job returns what it has.
@@ -229,60 +231,36 @@ inside a `.mov`. The preview is for display only; inference always uses the orig
   -vf "scale='min(1280,iw)':-2" -movflags +faststart -c:a aac preview.mp4`. Aspect ratio is kept;
   never crop or pad.
 
-### 4.3 `GET /api/demo/cameras`
+### 4.3 `GET /api/jobs`
+
+The history of analyses, the one list behind `/demo-dashboard`'s statistics **and** its episodes.
+There is deliberately no stats endpoint: the frontend derives every count from this list
+(videos analysed, videos with detections, detections, pending, false positives, by scenario,
+by rule), so the numbers can't drift apart.
+
+Query: `status` (optional, `processing` | `done` | `failed`; the dashboard sends `done`).
 
 ```json
-[
-  { "id": "cam-01", "name": "CAM 01", "video_url": "/api/media/cameras/cam-01.mp4", "status": "demo" },
-  { "id": "cam-12", "name": "CAM 12", "video_url": null, "status": "unavailable" }
-]
+{
+  "items": [
+    { "job_id": "3f0c9a1e-…", "status": "done", "file_name": "…", "created_at": "…", "...": "…" }
+  ]
+}
 ```
 
-- Always 16 items, ordered `cam-01` … `cam-16`, read from `DEMO_DIR/manifest.json` (§6.1).
-- `status`: `"demo"` (prerecorded, available) or `"unavailable"` (file missing or marked so).
-  `"playing"` is a client-side state; the backend never sends it.
-- If a camera's file is listed but missing on disk, return it as `"unavailable"` with
-  `video_url: null` rather than failing the whole list.
-- `video_url` points to a **light preview** (≤ 640 px wide, ≤ 1 Mbit/s, H.264, no audio), not
-  the original. The dashboard plays up to 16 of them.
+- Each item has exactly the §4.1 `/pipeline` shape, `review_status` included.
+- Newest first (`created_at` descending). No pagination: the demo history is small. If it
+  grows, add `limit` and `before`, but then the frontend's totals must come from the server.
+- Items include `evidence_frames` (≤ 3 frames per violation, ≤ 640 px each, §3.3), so the
+  dashboard needs only one request. If the payload gets heavy, add `?frames=false` and load the
+  frames from `/pipeline` per episode.
+- An empty history returns `{"items": []}`. The UI then shows "no analyses yet".
 
-### 4.4 `GET /api/demo/events`
+### 4.4 `PUT /api/jobs/{job_id}/results/{index}/review`
 
-The one list behind the dashboard's episodes **and** all its statistics. There is deliberately no
-stats endpoint: the frontend derives every count from this list, so the numbers can't drift apart.
-
-```json
-[
-  {
-    "id": "ev-01",
-    "camera_id": "cam-03",
-    "process_name": "Cash counting",
-    "type": "cash_counted_outside_camera_view",
-    "type_label": "Cash counted outside camera view",
-    "description": "…",
-    "timecode_sec": 754.2,
-    "clip_start_sec": 744.0,
-    "clip_url": "/api/media/clips/ev-01.mp4",
-    "episode_timecode_sec": 10.2,
-    "evidence_frames": [{ "timestamp_sec": 753.8, "image_base64": "…" }],
-    "regulatory_source": null,
-    "review_status": "pending"
-  }
-]
-```
-
-- Sorted by `camera_id`, then `timecode_sec`.
-- `episode_timecode_sec = timecode_sec − clip_start_sec`, clamped to `[0, clip duration]`. It is
-  computed by the backend, which knows the clip duration. `null` if `clip_start_sec` is unknown.
-- `clip_url` is `null` if the clip file is missing (the UI shows "clip failed to load").
-- `evidence_frames` may be empty (the UI shows "no evidence frame").
-- `review_status` is joined from the review table (§4.5). The rest is the stored model output.
-- Optional query filters (the spec's "nice to have" filters): `camera_id`, `type`,
-  `review_status`. With no filters, return everything.
-
-### 4.5 `PUT /api/events/{event_id}/review`
-
-Marks or unmarks a false positive. It is idempotent, and undo is the same call with `pending`.
+Marks or unmarks a false positive on one specialist result. `index` is the result's position in
+`specialist_results` (stored, so it is stable). It is idempotent, and undo is the same call with
+`pending`.
 
 Request:
 
@@ -292,21 +270,21 @@ Request:
 
 | Case | Code | Body |
 |---|---|---|
-| OK | `200` | The full event, as in §4.4, with the new `review_status` |
-| Unknown event | `404` | `{"detail": "Event not found"}` |
+| OK | `200` | The result, as in §4.1, with the new `review_status` |
+| Unknown job, or index out of range | `404` | `{"detail": "Result not found"}` |
+| Result isn't a `violation` | `409` | `{"detail": "Only violations can be reviewed"}` |
 | Bad value | `422` | FastAPI validation error |
 
-Stored in its own table, `EventReview(event_id PK, review_status, updated_at)`. The event's
-model output is never modified. `pending` deletes the row or sets it; either way, the result
-is the same.
+Stored in its own table, `ResultReview(job_id, result_index, review_status, updated_at)`, with
+primary key `(job_id, result_index)`. The job's model output (`specialist_results`, the jury
+`result`) is never modified, so `/api/v1/jobs/{id}` stays exactly what the model produced.
 
-### 4.6 `GET /api/media/{path}`
+### 4.5 `GET /api/jobs/{job_id}/preview.mp4` on the dashboard
 
-A static mount of `DEMO_DIR/media/` (`cameras/*.mp4`, `clips/*.mp4`). It must support `Range`.
-Paths are resolved inside `DEMO_DIR/media` only, and anything that escapes it (`..`) returns 404.
-Use `fastapi.staticfiles.StaticFiles`, which already does both.
+The dashboard plays each episode from the job's preview, limited to `start_sec`–`end_sec`. Episode
+clips are never cut. Previews must therefore be kept as long as the job is (§5, step 6).
 
-### 4.7 `GET /api/health`
+### 4.6 `GET /api/health`
 
 The existing endpoint stays. Extend the `ml` part with whether the video model is loaded, and
 add `ffmpeg: "ok" | "missing"` (the result of checking `FFMPEG_PATH` at startup).
@@ -325,7 +303,7 @@ any error / timeout ─> status=failed, error="<reason>"
 ```
 
 1. **Persistence.** The `AnalysisJob` table has these columns:
-   - `id`, `status`, `stages_done`, `created_at`, `finished_at`, `error`;
+   - `id`, `status`, `stages_done`, `file_name`, `created_at`, `finished_at`, `error`;
    - `scenario` and `specialist_results` (JSON, §4.1);
    - `result` (JSON, the exact jury `done` payload);
    - `duration_sec`.
@@ -341,50 +319,22 @@ any error / timeout ─> status=failed, error="<reason>"
    job: `preview_url` stays `null`.
 5. **Restart.** On startup, jobs still marked `processing` are set to `failed` with
    `"Interrupted by a server restart"`.
-6. **Retention.** Jobs older than `JOB_RETENTION_HOURS` (default 24) are deleted, along with
-   their files, at startup. There is no history feature, so nothing needs to be kept longer.
+6. **Retention.** The history feeds the dashboard, so jobs are kept by default
+   (`JOB_RETENTION_HOURS = 0` means forever).
+   - When a job finishes, delete `original.mov` and keep `preview.mp4`: the dashboard plays
+     episodes from it, and it is much smaller.
+   - With `JOB_RETENTION_HOURS > 0`, older jobs, their reviews and their files are deleted at
+     startup.
 
 ---
 
 ## 6. Data the backend owns
 
-### 6.1 Demo set: `DEMO_DIR` (default `../data/demo`, gitignored)
+- `DATABASE_URL` (SQLite): the `AnalysisJob` table (§5) and `ResultReview` (§4.4).
+- `UPLOAD_DIR/{job_id}/`: `original.mov` while the job runs, then `preview.mp4`.
 
-```text
-data/demo/
-├── manifest.json
-├── events.json          # model output for the demo recordings, precomputed by running the pipeline
-└── media/
-    ├── cameras/cam-01.mp4 … cam-16.mp4   # light previews
-    └── clips/ev-01.mp4 …                 # short episode clips
-```
-
-`manifest.json`:
-
-```json
-{ "cameras": [ { "id": "cam-01", "name": "CAM 01", "video": "cameras/cam-01.mp4", "status": "demo" } ] }
-```
-
-`events.json` uses the §4.4 event shape without `review_status`, `type_label`,
-`regulatory_source` or `episode_timecode_sec`, which the backend adds at read time.
-Build it by running the real pipeline over the demo recordings and cutting the clips with ffmpeg,
-for example from `clip_start_sec` to `clip_start_sec + 20`. Don't hand-write events.
-
-### 6.2 Rules: `RULES_FILE` (default `../data/rules.json`)
-
-```json
-{
-  "cash_counted_outside_camera_view": {
-    "label": "Cash counted outside camera view",
-    "process_name": "Cash counting",
-    "regulatory_source": null
-  }
-}
-```
-
-- `regulatory_source` is filled in **only** when a person has confirmed the document and section:
-  `{"document_title": "…", "section": "…", "url": "…"}`.
-- Unknown types get `label = type` and `regulatory_source = null`.
+There is no precomputed demo set. The dashboard shows only what was analysed through
+`/api/v1/analyze`. For a demo, run a few recordings through `/demo-inference` beforehand.
 
 ---
 
@@ -461,7 +411,7 @@ localization (stage 3).
 
 Route handlers take precedence over `rewrites()`, so everything else under `/api/*` keeps using
 the plain rewrite. That includes `/api/jobs/{id}/pipeline`, which the UI polls after the upload
-instead of `/api/v1/jobs/{id}`.
+instead of `/api/v1/jobs/{id}`, and the dashboard's `/api/jobs`.
 
 ---
 
@@ -474,13 +424,11 @@ instead of `/api/v1/jobs/{id}`.
 | `MAX_UPLOAD_MB` | `2048` | Upload limit, enforced while streaming |
 | `MAX_CONCURRENT_JOBS` | `1` | Inference workers |
 | `JOB_TIMEOUT_SEC` | `270` | Job is marked failed after this |
-| `JOB_RETENTION_HOURS` | `24` | Cleanup at startup |
+| `JOB_RETENTION_HOURS` | `0` | `0` = keep the history; otherwise jobs older than this are deleted at startup |
 | `ML_SERVICE_URL` | `http://localhost:8001` | Existing |
 | `ML_VIDEO_TIMEOUT_SEC` | `260` | Timeout for the ML pipeline calls (`/route`, `/specialists`) |
 | `MIN_CONFIDENCE` | `0.5` | A `violation` below it becomes `insufficient_evidence` |
 | `FFMPEG_PATH` / `FFPROBE_PATH` | `ffmpeg` / `ffprobe` | Local binaries; add `ffmpeg` to the backend Dockerfile |
-| `DEMO_DIR` | `../data/demo` | Demo set (§6.1) |
-| `RULES_FILE` | `../data/rules.json` | Type labels and confirmed norms (§6.2) |
 | `DATABASE_URL`, `CORS_ORIGINS` | existing | — |
 
 ---
@@ -494,14 +442,13 @@ instead of `/api/v1/jobs/{id}`.
 - ML `/route` + `/specialists` (or a single `/analyze-video`) and the `ml_client` calls.
 - `/api/jobs/{id}/pipeline` (§4.1). Without it `/demo-inference` shows no results.
 - `/api/jobs/{id}/preview.mp4` with Range support.
-- `/api/demo/cameras`, `/api/demo/events`, `PUT /api/events/{id}/review`, `/api/media/*`.
-- Frontend Route Handler for `X-API-Key` (§8) and switching `lib/demo-data.ts` to
-  `/api/demo/*`.
+- `GET /api/jobs` and `PUT /api/jobs/{id}/results/{index}/review` (§4.3–4.4). Without them
+  `/demo-dashboard` shows only "backend unavailable".
+- Frontend Route Handler for `X-API-Key` (§8).
 
 ### If time allows
 
 - Real `stages_done` (two ML calls instead of one).
-- Filters on `/api/demo/events`.
 - `ffmpeg` and video-model status in `/api/health`.
 
 ## 11. Open questions (confirm against the task statement)

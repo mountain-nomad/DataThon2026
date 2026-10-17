@@ -4,8 +4,10 @@
 
 import {
   SCENARIOS,
+  type AnalysisRecord,
   type EvidenceFrame,
   type PipelineResult,
+  type ReviewStatus,
   type ScenarioResult,
   type SpecialistResult,
 } from "./types";
@@ -24,6 +26,7 @@ interface RawSpecialist {
   start_sec?: number | null;
   end_sec?: number | null;
   evidence_frames?: RawFrame[];
+  review_status?: ReviewStatus | null;
 }
 
 export interface RawPipelineJob {
@@ -33,6 +36,9 @@ export interface RawPipelineJob {
   // 0–3 while processing; null when the backend doesn't track stages.
   stages_done?: number | null;
   preview_url?: string | null;
+  file_name?: string | null;
+  created_at?: string | null;
+  duration_sec?: number | null;
   scenario?: { primary: string; secondary?: string | null } | null;
   specialist_results?: RawSpecialist[] | null;
 }
@@ -70,6 +76,14 @@ export const api = {
   },
   pipeline: (jobId: string, signal?: AbortSignal) =>
     request<RawPipelineJob>(`/jobs/${encodeURIComponent(jobId)}/pipeline`, { signal }),
+  // Finished analyses, newest first: the history behind /demo-dashboard.
+  jobs: (signal?: AbortSignal) => request<{ items: RawPipelineJob[] }>("/jobs?status=done", { signal }),
+  review: (jobId: string, index: number, review_status: ReviewStatus) =>
+    request<RawSpecialist>(`/jobs/${encodeURIComponent(jobId)}/results/${index}/review`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ review_status }),
+    }),
 };
 
 export const POLL_INTERVAL_MS = 2500;
@@ -149,6 +163,7 @@ export function toPipelineResult(job: RawPipelineJob): PipelineResult {
       const startSec = num(r.start_sec);
       return {
         id: String(i + 1),
+        index: i,
         scenario: r.scenario ? normalizeScenario(r.scenario) : scenario?.primary,
         ruleId: r.rule_id ?? undefined,
         status: r.status,
@@ -157,10 +172,22 @@ export function toPipelineResult(job: RawPipelineJob): PipelineResult {
         startSec,
         endSec: num(r.end_sec),
         evidenceFrames: (r.evidence_frames ?? []).slice(0, 3).map((f) => toFrame(f, startSec ?? 0)),
-      };
+        reviewStatus:
+          r.status !== "violation" ? undefined : r.review_status === "false_positive" ? "false_positive" : "pending",
+      } satisfies SpecialistResult;
     })
     .filter((r) => !scenario || (r.scenario !== undefined && routed.has(r.scenario)))
     // Chronological; results without a time go last.
     .sort((a, b) => (a.startSec ?? Infinity) - (b.startSec ?? Infinity));
   return { scenario, results, previewUrl: job.preview_url ?? undefined };
+}
+
+export function toAnalysisRecord(job: RawPipelineJob): AnalysisRecord {
+  return {
+    ...toPipelineResult(job),
+    jobId: job.job_id,
+    fileName: job.file_name ?? "",
+    createdAt: job.created_at ?? "",
+    durationSec: num(job.duration_sec),
+  };
 }

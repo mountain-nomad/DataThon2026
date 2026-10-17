@@ -1,75 +1,92 @@
 "use client";
 
 import { buttonSecondaryClass } from "@/components/Card";
+import { EpisodeMedia } from "@/components/media/EpisodeMedia";
+import { Field, ReviewBadge } from "@/components/media/EventDetails";
 import { EvidenceFrames } from "@/components/media/EvidenceFrames";
-import { Field, RegulatoryReference, ReviewBadge } from "@/components/media/EventDetails";
-import { VideoPlayer } from "@/components/media/VideoPlayer";
 import { fmt } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
-import { episodeTimecodeSec, formatTimecode } from "@/lib/format";
-import type { Camera, ViolationEvent } from "@/lib/types";
+import { formatDateTime, formatTimecodePrecise } from "@/lib/format";
+import { isScenarioId, SCENARIO_CODES, type AnalysisRecord, type SpecialistResult } from "@/lib/types";
 
+// One detected violation from an analysed video. Specialist text is shown untranslated.
 export function EpisodeCard({
-  event,
-  camera,
+  record,
+  result,
+  busy,
   onToggleFalsePositive,
 }: {
-  event: ViolationEvent;
-  camera?: Camera;
+  record: AnalysisRecord;
+  result: SpecialistResult;
+  busy: boolean;
   onToggleFalsePositive: () => void;
 }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const td = t.dashboard;
-  const falsePositive = event.reviewStatus === "false_positive";
-  const localSec = episodeTimecodeSec(event);
+  const falsePositive = result.reviewStatus === "false_positive";
+  const scenario = result.scenario ?? record.scenario?.primary;
+  const { startSec, endSec } = result;
 
   return (
     <article
-      id={`episode-${event.id}`}
+      id={`episode-${record.jobId}-${result.index}`}
       className={`grid scroll-mt-24 gap-6 rounded-2xl border border-border p-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:p-6 ${
         falsePositive ? "bg-surface-muted" : "bg-surface"
       }`}
     >
-      <VideoPlayer
-        src={event.clipUrl}
-        label={fmt(td.episodeClip, { camera: camera?.name ?? td.unknownCamera })}
-        markers={localSec === null ? [] : [{ id: event.id, sec: localSec, label: event.type }]}
+      <EpisodeMedia
+        result={result}
+        src={record.previewUrl}
+        label={fmt(td.episodeClip, { file: record.fileName || record.jobId })}
       />
 
-      <div className="flex flex-col gap-4">
-        <ReviewBadge status={event.reviewStatus} />
+      <div className="flex min-w-0 flex-col gap-4">
+        <ReviewBadge status={result.reviewStatus} />
         <div className="flex flex-col gap-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">
-            {event.processName ?? td.processUnknown}
-          </p>
-          <h3 className="text-lg font-bold">{event.type}</h3>
+          {scenario && (
+            <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">
+              {isScenarioId(scenario) ? `${SCENARIO_CODES[scenario]} · ${t.scenarios[scenario].name}` : scenario}
+            </p>
+          )}
+          <h3 className="break-words font-mono text-lg font-bold">{result.ruleId ?? td.noRuleId}</h3>
         </div>
 
-        <dl className="grid grid-cols-3 gap-4">
-          <Field label={t.fields.camera}>{camera?.name ?? "—"}</Field>
-          <Field label={t.fields.episode}>
-            <span className="tabular-nums">{formatTimecode(localSec)}</span>
+        <dl className="grid gap-4 sm:grid-cols-3">
+          <Field label={td.file}>
+            <span className="break-all">{record.fileName || "—"}</span>
           </Field>
-          <Field label={t.fields.source}>
-            <span className="tabular-nums">{formatTimecode(event.timecodeSec)}</span>
+          <Field label={td.analysedAt}>{formatDateTime(record.createdAt, locale)}</Field>
+          <Field label={td.time}>
+            <span className="tabular-nums">
+              {startSec === undefined
+                ? "—"
+                : endSec !== undefined && endSec > startSec
+                  ? `${formatTimecodePrecise(startSec)} – ${formatTimecodePrecise(endSec)}`
+                  : formatTimecodePrecise(startSec)}
+            </span>
           </Field>
         </dl>
 
         <dl className="flex flex-col gap-4">
-          <Field label={t.fields.description}>{event.description}</Field>
-          <Field label={t.fields.evidence}>
-            <EvidenceFrames frames={event.evidenceFrames} />
-          </Field>
-          <Field label={t.fields.rule}>
-            <RegulatoryReference source={event.regulatorySource} />
-          </Field>
+          {result.evidence && <Field label={td.evidence}>{result.evidence}</Field>}
+          {result.quote && (
+            <Field label={td.quote}>
+              <blockquote className="border-l-2 border-border pl-3 text-muted">{result.quote}</blockquote>
+            </Field>
+          )}
+          {result.evidenceFrames.length > 0 && (
+            <Field label={td.frames}>
+              <EvidenceFrames frames={result.evidenceFrames} />
+            </Field>
+          )}
         </dl>
 
         <button
           type="button"
           aria-pressed={falsePositive}
+          disabled={busy}
           onClick={onToggleFalsePositive}
-          className={`${buttonSecondaryClass} self-start`}
+          className={`${buttonSecondaryClass} self-start disabled:opacity-50`}
         >
           {falsePositive ? td.undoFalse : td.markFalse}
         </button>
