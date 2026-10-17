@@ -81,6 +81,7 @@ Defined in `frontend/src/app/globals.css` and exposed to Tailwind v4 through `@t
 - **Always use the official files** from `frontend/public/brand/Forte_logos/Logo Forte/`, through `<BrandMark variant="magenta" | "white" height={…} />` (`frontend/src/components/BrandMark.tsx`). The artwork is 731×218. The folder name contains a space, so URL-encode it in `src`.
 - The other folders in `Forte_logos/` are sub-brand lockups. They are not used here.
 - Never typeset "forte" as text in place of the logo.
+- **App icon (favicon):** `frontend/src/app/icon.svg` is a copy of the official `Logo Forte/forte-bank-icon.svg`. `apple-icon.png` (180×180) is rendered from it on a Dark Magenta fill. Never use the default Next.js icons.
 
 ## Layout and components (derived — the approved look)
 
