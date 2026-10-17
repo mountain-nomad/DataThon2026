@@ -8,6 +8,7 @@ dependencies = [
     "pydantic-settings>=2.4",
     "pyyaml>=6.0",
     "opencv-python-headless>=4.10",
+    "supabase>=2.33.0",
 ]
 
 [dependency-groups]

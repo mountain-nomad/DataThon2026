@@ -332,6 +332,11 @@ any error / timeout ─> status=failed, error="<reason>"
 
 - `DATABASE_URL` (SQLite): the `AnalysisJob` table (§5) and `ResultReview` (§4.4).
 - `UPLOAD_DIR/{job_id}/`: `original.mov` while the job runs, then `preview.mp4`.
+- **Implemented storage** (supersedes the line above; see `README.md`, "Video storage"):
+  `DATA_DIR/uploads/{job_id}.mov` is the analyzer's local working copy. With
+  `STORAGE_BACKEND=supabase` the same bytes go to the private Supabase bucket under
+  `{YYYY}/{MM}/{job_id}.mov`, and the job JSON stores that `storage_path`. Signed URLs come from
+  `GET /api/jobs/{id}/video-url`, never from the jury API.
 
 There is no precomputed demo set. The dashboard shows only what was analysed through
 `/api/v1/analyze`. For a demo, run a few recordings through `/demo-inference` beforehand.

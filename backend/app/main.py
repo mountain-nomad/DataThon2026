@@ -13,6 +13,7 @@ from app import jobs
 from app.api import api, frontend, ui
 from app.config import settings
 from app.legal import load_legal
+from app.storage import get_storage
 from app.worker import Worker
 
 STATIC_DIR = Path(__file__).parent / "static"
@@ -27,7 +28,7 @@ log = logging.getLogger(__name__)
 
 async def _cleanup_loop() -> None:
     while True:
-        jobs.delete_old_uploads()
+        await asyncio.to_thread(jobs.delete_old_uploads)  # may call the object store
         await asyncio.sleep(3600)
 
 
@@ -37,6 +38,7 @@ async def lifespan(app: FastAPI):
         raise RuntimeError("API_KEY is not set. Copy .env.example to .env and set it.")
     settings.uploads_dir.mkdir(parents=True, exist_ok=True)
     settings.jobs_dir.mkdir(parents=True, exist_ok=True)
+    await asyncio.to_thread(get_storage().ensure_ready)  # fails fast on a bad Supabase config
     jobs.fail_interrupted()
     app.state.worker = Worker(load_legal(settings.legal_mapping_file, settings.crosswalk_file))
     app.state.worker.start()
@@ -81,7 +83,7 @@ app.include_router(frontend)
 
 @app.get("/health", include_in_schema=False)
 async def health() -> dict:
-    out = {"status": "ok", "analyzer": settings.analyzer}
+    out = {"status": "ok", "analyzer": settings.analyzer, "storage": settings.storage_backend}
     if settings.analyzer == "http":
         try:
             async with httpx.AsyncClient(timeout=3) as client:

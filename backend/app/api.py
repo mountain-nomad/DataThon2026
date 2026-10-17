@@ -1,18 +1,23 @@
+import logging
 import secrets
+from contextlib import suppress
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse, Response
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 
 from app import jobs
 from app.config import settings
+from app.storage import StorageError, get_storage, object_key
 from app.video import probe_duration
 
 CHUNK = 1 << 20
+
+log = logging.getLogger(__name__)
 
 
 def require_api_key(x_api_key: Annotated[str | None, Header()] = None) -> None:
@@ -42,10 +47,23 @@ async def _start_job(request: Request, file: UploadFile) -> dict:
             await run_in_threadpool(probe_duration, str(path))
         except ValueError as e:
             raise HTTPException(422, str(e)) from e
+        storage = get_storage()
+        key = object_key(job_id, ext)
+        try:
+            storage_path = await run_in_threadpool(storage.save, path, key)
+        except StorageError as e:
+            log.error("Storing upload %s failed: %s", job_id, e)
+            raise HTTPException(502, "Video storage failed, try again.") from e
+        try:
+            jobs.create(job_id, path, file.filename or "", storage_path)
+        except BaseException:
+            if storage_path:
+                with suppress(StorageError):
+                    await run_in_threadpool(storage.delete, storage_path)
+            raise
     except BaseException:
         path.unlink(missing_ok=True)
         raise
-    jobs.create(job_id, path, file.filename or "")
     request.app.state.worker.submit(job_id)
     return {"job_id": job_id}
 
@@ -95,17 +113,32 @@ def ui_get_job(job_id: str) -> dict:
     return out
 
 
-def _video(job_id: str) -> FileResponse:
-    job = jobs.get(job_id)
-    if job is None or not Path(job["video_path"]).exists():
+def _signed_url(job: dict) -> str:
+    """A fresh signed URL for the stored object; the stable reference is `storage_path`."""
+    try:
+        url = get_storage().signed_url(job["storage_path"]) if job.get("storage_path") else None
+    except StorageError as e:
+        log.warning("No signed URL for job %s: %s", job["job_id"], e)
+        url = None
+    if url is None:
         raise HTTPException(404, "Video not found")
-    # FileResponse supports Range requests, which the player needs for seeking. H.264 .mov plays
-    # in browsers when served as video/mp4.
-    return FileResponse(job["video_path"], media_type="video/mp4")
+    return url
+
+
+def _video(job_id: str) -> Response:
+    job = jobs.get(job_id)
+    if job is None:
+        raise HTTPException(404, "Video not found")
+    if Path(job["video_path"]).exists():
+        # FileResponse supports Range requests, which the player needs for seeking. H.264 .mov
+        # plays in browsers when served as video/mp4.
+        return FileResponse(job["video_path"], media_type="video/mp4")
+    # The local copy is gone (retention): send the player to the stored object.
+    return RedirectResponse(_signed_url(job), status_code=307)
 
 
 @ui.get("/jobs/{job_id}/video")
-def ui_video(job_id: str) -> FileResponse:
+def ui_video(job_id: str) -> Response:
     return _video(job_id)
 
 
@@ -121,7 +154,7 @@ def _pipeline_view(job: dict) -> dict:
         | {"review_status": reviews.get(str(i), "pending") if r["status"] == "violation" else None}
         for i, r in enumerate(job.get("specialist_results") or [])
     ]
-    has_video = Path(job["video_path"]).exists()
+    has_video = Path(job["video_path"]).exists() or bool(job.get("storage_path"))
     return {
         "job_id": job["job_id"],
         "status": job["status"],
@@ -132,6 +165,7 @@ def _pipeline_view(job: dict) -> dict:
         "created_at": datetime.fromtimestamp(job["created_at"], UTC).isoformat(),
         "duration_sec": job.get("duration_sec"),
         "preview_url": f"/api/jobs/{job['job_id']}/video" if has_video else None,
+        "storage_path": job.get("storage_path"),
         "scenario": job.get("scenario"),
         "specialist_results": results,
         "limitations": job.get("limitations") or [],
@@ -150,8 +184,22 @@ def get_pipeline(job_id: str) -> dict:
 
 
 @frontend.get("/{job_id}/video")
-def get_video(job_id: str) -> FileResponse:
+def get_video(job_id: str) -> Response:
     return _video(job_id)
+
+
+@frontend.get("/{job_id}/video-url")
+def get_video_url(job_id: str) -> dict:
+    """The stored object and a short-lived signed URL to fetch it (404 with local storage)."""
+    job = jobs.get(job_id)
+    if job is None:
+        raise HTTPException(404, "Job not found")
+    return {
+        "job_id": job_id,
+        "storage_path": job.get("storage_path"),
+        "url": _signed_url(job),
+        "expires_in": settings.signed_url_ttl_sec,
+    }
 
 
 class Review(BaseModel):
