@@ -1,0 +1,18 @@
+{
+  "key": "qwen38_27b",
+  "repo": "Qwen/Qwen3.8-27B",
+  "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+  "quantization": "nf4",
+  "path": "models/qwen38_27b",
+  "prompt": "Classify the main operation in this complete surveillance video. Choose from the 7 classes below. The descriptions summarize typical workflows; some steps may be outside the recording. Focus on client presence, cash versus bag, direction of money movement, and arrival versus departure.\n\n1. ENTRY: The cashier arrives from outside: opens the office door, enters, closes the door, and switches on equipment (computer, counting machine, other devices). No client. No money handling. The office is empty at the start of the video.\n\n2. COUNTING / DEPOSIT WITHOUT CLIENT: The cashier is ALONE, counts banknotes in the counting machine and may check authenticity with a UV/counterfeit detector. The cash is already on the desk, not taken OUT of the safe. This class also includes subsequently putting the counted money INTO the safe and writing in a paper notebook/logbook. Putting money into the safe and writing are optional. No client, no sealed cash bag.\n\n3. CLIENT CASH DEPOSIT: A client ENTERS with loose cash (no bag). The client hands over an ID card, the cashier checks it, the client hands over cash, the cashier counts it in the machine, types the amount into the laptop, puts the money into the safe, returns the ID, and the client leaves. Key cues: client present + loose cash + data entry on laptop.\n\n4. COUNTING FROM SAFE: The cashier is alone, STANDS UP from the table, comes to the safe, opens the safe, TAKES money OUT of it, closes the safe, and puts the banknotes into the counting machine. Key cue: money moves FROM the safe TO the counting machine.\n\n5. OPENING A CASH BAG: The cashier is alone with a sealed cash bag: removes the seal, opens the bag, takes the money out, puts the bag aside, then opens the safe, places the money inside, and closes the safe. Key cues: sealed bag + no client.\n\n6. RECEIVING A BAG FROM CLIENT: A client enters, hands over a document, the cashier checks it, then the client hands over a sealed cash bag. The cashier breaks the seal, opens the bag, takes out the money, and puts the bag aside. Key cues: client present + sealed bag.\n\n7. EXIT / CLOSING: The cashier opens the safe, puts desk items into it (stamps, money, cash bags, black report notebook), closes and locks the safe, switches off equipment, removes the key from the safe, STANDS UP, then leaves the office and closes the door. Key cues: desk is cleared, equipment turned off, cashier leaves.\n\nReturn ONE or TWO distinct class digits from the list, concatenated without separators. Choose one class when a single operation fits. Choose two when two operations are supported or two classes are plausible. Order them by confidence, most likely first. No class has automatic priority over another. Do not repeat a digit. No explanation, spaces, punctuation or JSON.",
+  "prompt_sha256": "dc8526db63925700e97f3ec3042b5a82858a8c0d5c392d928c73ee74e115cf46",
+  "sampling_fps": 1,
+  "frame_longest_edge": 768,
+  "linear_attention": "auto",
+  "max_labels": 2,
+  "max_frames": 48,
+  "task": "routing",
+  "do_sample": false,
+  "max_new_tokens": 2,
+  "enable_thinking": false
+}
