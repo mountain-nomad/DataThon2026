@@ -3,44 +3,8 @@ import { BrandMark } from "@/components/BrandMark";
 import { buttonPrimaryLinkClass, buttonSecondaryClass } from "@/components/Card";
 import { MediaPlaceholder } from "@/components/media/MediaPlaceholder";
 import { SiteHeader } from "@/components/SiteHeader";
-
-const VALUE = [
-  {
-    title: "Spots suspicious actions",
-    body: "Local models watch the cash-desk footage and flag actions that may break cash-handling discipline.",
-  },
-  {
-    title: "Pinpoints the moment",
-    body: "Each detection comes with the exact timecode in the original recording, so nobody scrubs through hours of video.",
-  },
-  {
-    title: "Hands evidence to a person",
-    body: "Evidence frames, a description and the referenced rule go to a reviewer. The model flags; a person decides.",
-  },
-];
-
-const DEMOS = [
-  {
-    href: "/demo-inference",
-    title: "Video Inference Demo",
-    body: "Upload a CCTV recording and analyze it for potential compliance violations.",
-    action: "Open Inference Demo",
-    media: "Inference demo preview",
-  },
-  {
-    href: "/demo-dashboard",
-    title: "Monitoring Dashboard Demo",
-    body: "Explore multi-camera monitoring, detected incidents and operational analytics.",
-    action: "Open Monitoring Dashboard",
-    media: "Dashboard demo preview",
-  },
-];
-
-const PRINCIPLES = [
-  { title: "Runs locally", body: "Video and inference stay on local machines. No cloud AI APIs or external video services." },
-  { title: "No face recognition", body: "The system looks at actions around cash, never at who a person is." },
-  { title: "AI flags, people confirm", body: "Every detection is a potential violation until a person reviews it." },
-];
+import { localePath } from "@/i18n/config";
+import { getDictionary, getLocale } from "@/i18n/dictionaries";
 
 // Numbered section headings follow the brand page's own "01 · Logotype color" pattern.
 function SectionHeading({ n, label, title }: { n: string; label: string; title: string }) {
@@ -55,43 +19,51 @@ function SectionHeading({ n, label, title }: { n: string; label: string; title: 
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const locale = await getLocale();
+  const dict = await getDictionary();
+  const t = dict.landing;
+  const href = (path: string) => localePath(locale, path);
+  const demos = [
+    { href: href("/demo-inference"), ...t.demoInference },
+    { href: href("/demo-dashboard"), ...t.demoDashboard },
+  ];
+
   return (
     <>
-      <SiteHeader cta={{ href: "/demo-inference", label: "Analyze a video" }} />
+      <SiteHeader path="/" cta />
 
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-24 px-4 pt-8 pb-24 md:gap-32">
         <section className="grid gap-12 pt-8 md:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
           <div className="flex flex-col gap-6">
             <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">
-              DataThon 2026 · Prototype
+              {t.label}
             </p>
             <h1 className="text-[40px] font-extrabold leading-[1.05] tracking-tight md:text-5xl">
-              Cash Operations Monitoring
+              {t.title}
             </h1>
             <p className="max-w-md text-lg font-light text-muted">
-              AI-powered video monitoring for cash operations: it finds suspicious actions, pins them
-              to the exact moment and gives a person the evidence to check.
+              {t.lead}
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Link href="/demo-inference" className={buttonPrimaryLinkClass}>
-                Open Inference Demo
+              <Link href={href("/demo-inference")} className={buttonPrimaryLinkClass}>
+                {t.openInference}
               </Link>
-              <Link href="/demo-dashboard" className={buttonSecondaryClass}>
-                Open Monitoring Dashboard
+              <Link href={href("/demo-dashboard")} className={buttonSecondaryClass}>
+                {t.openDashboard}
               </Link>
             </div>
           </div>
-          <MediaPlaceholder label="Hero visual" hint="Image or video placeholder, 16:9" />
+          <MediaPlaceholder label={t.heroMedia} hint={t.heroMediaHint} />
         </section>
 
         <section className="flex flex-col gap-12">
-          <SectionHeading n="01" label="What it does" title="From hours of footage to a few moments worth checking." />
+          <SectionHeading n="01" label={t.whatLabel} title={t.whatTitle} />
           <div>
             {/* Primary gradient as a thin rule that rises left to right across the steps. */}
             <div aria-hidden className="bg-gradient-primary h-1 rounded-full" />
             <ol className="grid gap-10 pt-8 md:grid-cols-3 md:gap-12">
-              {VALUE.map((item) => (
+              {t.value.map((item) => (
                 <li key={item.title} className="flex flex-col gap-2">
                   <h3 className="text-xl font-bold">{item.title}</h3>
                   <p className="text-[15px] leading-relaxed text-muted">{item.body}</p>
@@ -102,11 +74,11 @@ export default function Home() {
         </section>
 
         <section id="demos" className="flex scroll-mt-24 flex-col gap-12">
-          <SectionHeading n="02" label="Demos" title="Pick a scenario." />
+          <SectionHeading n="02" label={t.demosLabel} title={t.demosTitle} />
           <div className="grid gap-6 md:grid-cols-2">
-            {DEMOS.map((demo) => (
+            {demos.map((demo) => (
               <article key={demo.href} className="flex flex-col gap-5 rounded-2xl border border-border p-4 md:p-6">
-                <MediaPlaceholder label={demo.media} hint="Screenshot placeholder" />
+                <MediaPlaceholder label={demo.media} hint={t.screenshotHint} />
                 <div className="flex flex-col gap-2">
                   <h3 className="text-xl font-bold">{demo.title}</h3>
                   <p className="text-[15px] leading-relaxed text-muted">{demo.body}</p>
@@ -120,9 +92,9 @@ export default function Home() {
         </section>
 
         <section className="flex flex-col gap-12">
-          <SectionHeading n="03" label="Ground rules" title="Built to support a reviewer, not replace one." />
+          <SectionHeading n="03" label={t.rulesLabel} title={t.rulesTitle} />
           <dl className="grid gap-10 border-t border-border pt-8 md:grid-cols-3 md:gap-12">
-            {PRINCIPLES.map((p) => (
+            {t.principles.map((p) => (
               <div key={p.title} className="flex flex-col gap-2">
                 <dt className="text-xl font-bold">{p.title}</dt>
                 <dd className="text-[15px] leading-relaxed text-muted">{p.body}</dd>
@@ -137,15 +109,15 @@ export default function Home() {
           <div className="flex max-w-sm flex-col gap-4">
             <BrandMark height={20} />
             <p className="text-sm text-muted">
-              Prototype built for DataThon 2026. Not an official ForteBank product or service.
+              {t.footerNote}
             </p>
           </div>
           <nav className="flex flex-wrap gap-x-8 gap-y-3 text-sm font-semibold text-muted">
-            <Link href="/demo-inference" className="hover:text-foreground">
-              Inference demo
+            <Link href={href("/demo-inference")} className="hover:text-foreground">
+              {dict.nav.inference}
             </Link>
-            <Link href="/demo-dashboard" className="hover:text-foreground">
-              Monitoring dashboard
+            <Link href={href("/demo-dashboard")} className="hover:text-foreground">
+              {dict.nav.dashboard}
             </Link>
           </nav>
         </div>

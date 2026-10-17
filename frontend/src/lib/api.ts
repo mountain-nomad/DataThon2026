@@ -28,6 +28,13 @@ export interface RawJob {
   detail?: string;
 }
 
+// Client-side failures, translated by the UI. Server messages (`detail`, `error`) are shown as-is.
+export class JobError extends Error {
+  constructor(readonly code: "timeout" | "network" | "jobFailed") {
+    super(code);
+  }
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -72,7 +79,7 @@ export async function waitForJob(jobId: string, signal: AbortSignal): Promise<Ra
     await sleep(POLL_INTERVAL_MS);
     signal.throwIfAborted();
     if (Date.now() - startedAt > JOB_TIMEOUT_MS) {
-      throw new Error("No result after 5 minutes. The analysis may still be running on the server.");
+      throw new JobError("timeout");
     }
     let job: RawJob;
     try {
@@ -81,12 +88,15 @@ export async function waitForJob(jobId: string, signal: AbortSignal): Promise<Ra
     } catch (e) {
       if (signal.aborted || e instanceof ApiError) throw e;
       if (++networkErrors >= MAX_NETWORK_ERRORS) {
-        throw new Error("Lost connection to the backend while waiting for the result.");
+        throw new JobError("network");
       }
       continue;
     }
     if (job.status === "done") return job;
-    if (job.status === "failed") throw new Error(job.error ?? job.detail ?? "The analysis failed on the server.");
+    if (job.status === "failed") {
+      const message = job.error ?? job.detail;
+      throw message ? new Error(message) : new JobError("jobFailed");
+    }
   }
 }
 
@@ -97,10 +107,10 @@ function toFrame(raw: RawFrame, fallbackSec: number): EvidenceFrame {
 
 // Adapts the jury response to the frontend model. Fields the jury API doesn't carry
 // (processName, clipUrl, regulatorySource) stay empty; reviewStatus starts as pending.
-export function toViolationEvents(raw: RawViolation[] | undefined): ViolationEvent[] {
+export function toViolationEvents(raw: RawViolation[] | undefined, unclassified: string): ViolationEvent[] {
   return (raw ?? []).map((v, i) => ({
     id: String(v.id ?? i + 1),
-    type: v.type ?? v.violation_type ?? "Unclassified",
+    type: v.type ?? v.violation_type ?? unclassified,
     description: v.description ?? "",
     timecodeSec: v.timecode_sec,
     evidenceFrames: (v.evidence_frames ?? []).slice(0, 3).map((f) => toFrame(f, v.timecode_sec)),

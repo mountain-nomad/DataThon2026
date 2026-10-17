@@ -10,11 +10,12 @@ export function formatTimecode(sec: number | null | undefined): string {
   return h > 0 ? `${h}:${mmss}` : mmss;
 }
 
-export function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
-  return `${(bytes / 1024 ** 3).toFixed(2)} GB`;
+export function formatFileSize(bytes: number, locale: string): string {
+  const units = ["byte", "kilobyte", "megabyte", "gigabyte"] as const;
+  const i = Math.min(units.length - 1, Math.floor(Math.log(Math.max(bytes, 1)) / Math.log(1024)));
+  return new Intl.NumberFormat(locale, { style: "unit", unit: units[i], maximumFractionDigits: 1 }).format(
+    bytes / 1024 ** i,
+  );
 }
 
 // Time of the event inside the short clip. Not the jury API's timecode_sec, which is always

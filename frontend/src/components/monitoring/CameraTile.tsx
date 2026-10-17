@@ -2,13 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MediaPlaceholder } from "@/components/media/MediaPlaceholder";
+import { fmt, plural } from "@/i18n/config";
+import { useI18n } from "@/i18n/I18nProvider";
 import type { Camera, ViolationEvent } from "@/lib/types";
 
-const STATUS: Record<"demo" | "playing" | "unavailable", { label: string; dot: string }> = {
-  demo: { label: "Demo", dot: "bg-border" },
-  playing: { label: "Playing", dot: "bg-forte-sky" },
-  unavailable: { label: "Unavailable", dot: "bg-forte-coral" },
-};
+const STATUS_DOT = { demo: "bg-border", playing: "bg-forte-sky", unavailable: "bg-forte-coral" } as const;
 
 export function CameraTile({
   camera,
@@ -19,6 +17,7 @@ export function CameraTile({
   events: ViolationEvent[];
   onOpen: () => void;
 }) {
+  const { locale, t } = useI18n();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -39,7 +38,7 @@ export function CameraTile({
   }, [camera.videoUrl]);
 
   const unavailable = camera.status === "unavailable" || failed;
-  const status = STATUS[unavailable ? "unavailable" : playing ? "playing" : "demo"];
+  const status = unavailable ? "unavailable" : playing ? "playing" : "demo";
   const flagged = events.filter((e) => e.reviewStatus === "pending");
 
   return (
@@ -47,11 +46,11 @@ export function CameraTile({
       <button
         type="button"
         onClick={onOpen}
-        aria-label={`Open ${camera.name}`}
+        aria-label={fmt(t.dashboard.open, { name: camera.name })}
         className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         {unavailable ? (
-          <MediaPlaceholder tone="error" label="Camera unavailable" />
+          <MediaPlaceholder tone="error" label={t.dashboard.cameraUnavailable} />
         ) : camera.videoUrl ? (
           <div className="aspect-video overflow-hidden rounded-xl bg-foreground">
             <video
@@ -68,7 +67,7 @@ export function CameraTile({
             />
           </div>
         ) : (
-          <MediaPlaceholder label={camera.name} hint="Video placeholder" />
+          <MediaPlaceholder label={camera.name} hint={t.media.videoPlaceholder} />
         )}
       </button>
 
@@ -76,8 +75,8 @@ export function CameraTile({
         <div className="flex min-w-0 items-center gap-2">
           <span className="text-sm font-bold tabular-nums">{camera.name}</span>
           <span className="flex items-center gap-1.5 text-xs text-muted">
-            <span aria-hidden className={`size-2 rounded-full ${status.dot}`} />
-            {status.label}
+            <span aria-hidden className={`size-2 rounded-full ${STATUS_DOT[status]}`} />
+            {t.dashboard.status[status]}
           </span>
         </div>
         {flagged.length > 0 && (
@@ -86,7 +85,7 @@ export function CameraTile({
             className="flex shrink-0 items-center gap-1.5 rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold hover:bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <span aria-hidden className="size-2 rounded-full bg-forte-coral" />
-            {flagged.length} flagged
+            {plural(locale, flagged.length, t.dashboard.flagged)}
           </a>
         )}
       </div>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useImperativeHandle, useRef, useState, type Ref } from "react";
+import { fmt } from "@/i18n/config";
+import { useI18n } from "@/i18n/I18nProvider";
 import { formatTimecode } from "@/lib/format";
 import { MediaPlaceholder } from "./MediaPlaceholder";
 
@@ -26,6 +28,7 @@ export function VideoPlayer({
   loop?: boolean;
   autoPlay?: boolean;
 }) {
+  const { t } = useI18n();
   const videoRef = useRef<HTMLVideoElement>(null);
   const pendingSeek = useRef<number | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -58,12 +61,12 @@ export function VideoPlayer({
   return (
     <div className="flex flex-col gap-2">
       {!src ? (
-        <MediaPlaceholder label={label} hint="Video placeholder" />
+        <MediaPlaceholder label={label} hint={t.media.videoPlaceholder} />
       ) : !playable ? (
         <MediaPlaceholder
           tone="error"
-          label="Video failed to load"
-          hint="The file may be missing, or the browser can't decode this codec. Serve an MP4/H.264 preview."
+          label={t.media.videoFailed}
+          hint={t.media.videoFailedHint}
         />
       ) : (
         <div className="aspect-video w-full overflow-hidden rounded-xl bg-foreground">
@@ -98,7 +101,7 @@ export function VideoPlayer({
           type="button"
           onClick={toggle}
           disabled={!playable}
-          aria-label={playing ? "Pause" : "Play"}
+          aria-label={playing ? t.media.pause : t.media.play}
           className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-surface-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {playing ? (
@@ -120,7 +123,7 @@ export function VideoPlayer({
                 key={m.id}
                 type="button"
                 title={`${m.label} · ${formatTimecode(m.sec)}`}
-                aria-label={`Jump to ${m.label} at ${formatTimecode(m.sec)}`}
+                aria-label={fmt(t.media.jumpTo, { label: m.label, time: formatTimecode(m.sec) })}
                 onClick={() => {
                   seek(m.sec);
                   onMarkerClick?.(m.id);
@@ -131,7 +134,7 @@ export function VideoPlayer({
             ))}
           <input
             type="range"
-            aria-label="Seek"
+            aria-label={t.media.seek}
             min={0}
             max={duration || 0}
             step={0.1}

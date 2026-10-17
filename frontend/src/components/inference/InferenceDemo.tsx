@@ -5,26 +5,17 @@ import { buttonClass, buttonSecondaryClass, ErrorText } from "@/components/Card"
 import { EvidenceFrames } from "@/components/media/EvidenceFrames";
 import { Field, RegulatoryReference, ReviewBadge } from "@/components/media/EventDetails";
 import { VideoPlayer, type VideoPlayerHandle } from "@/components/media/VideoPlayer";
-import { api, toViolationEvents, waitForJob } from "@/lib/api";
+import { plural } from "@/i18n/config";
+import { useI18n } from "@/i18n/I18nProvider";
+import { api, JobError, toViolationEvents, waitForJob } from "@/lib/api";
 import { formatFileSize, formatTimecode } from "@/lib/format";
 import type { ViolationEvent } from "@/lib/types";
 
 type Phase = "idle" | "uploading" | "processing" | "completed" | "failed";
 
-const PHASE_LABEL: Record<Exclude<Phase, "idle">, string> = {
-  uploading: "Uploading",
-  processing: "Processing",
-  completed: "Completed",
-  failed: "Failed",
-};
-
-function validate(file: File): string | null {
-  if (!/\.mov$/i.test(file.name)) return "Only .mov files are accepted.";
-  if (file.size === 0) return "The file is empty.";
-  return null;
-}
-
 export function InferenceDemo() {
+  const { locale, t } = useI18n();
+  const ti = t.inference;
   const [file, setFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -52,7 +43,7 @@ export function InferenceDemo() {
 
   function selectFile(next: File | undefined) {
     if (!next || busy) return;
-    const problem = validate(next);
+    const problem = !/\.mov$/i.test(next.name) ? ti.onlyMov : next.size === 0 ? ti.empty : null;
     setFileError(problem);
     if (problem) return;
     if (urlRef.current) URL.revokeObjectURL(urlRef.current);
@@ -77,11 +68,11 @@ export function InferenceDemo() {
       const { job_id } = await api.analyze(file, run.signal);
       setPhase("processing");
       const job = await waitForJob(job_id, run.signal);
-      setEvents(toViolationEvents(job.violations));
+      setEvents(toViolationEvents(job.violations, ti.unclassified));
       setPhase("completed");
     } catch (e) {
       if (run.signal.aborted) return;
-      setError(e instanceof Error ? e.message : String(e));
+      setError(e instanceof JobError ? ti.errors[e.code] : e instanceof Error ? e.message : String(e));
       setPhase("failed");
     }
   }
@@ -110,8 +101,8 @@ export function InferenceDemo() {
             dragging ? "border-primary bg-surface-muted" : "border-border"
           }`}
         >
-          <p className="text-base font-semibold">Drop a .mov recording here</p>
-          <p className="text-sm text-muted">or choose it from your computer. The file is analysed locally.</p>
+          <p className="text-base font-semibold">{ti.drop}</p>
+          <p className="text-sm text-muted">{ti.dropHint}</p>
           <input
             ref={inputRef}
             type="file"
@@ -128,20 +119,20 @@ export function InferenceDemo() {
             onClick={() => inputRef.current?.click()}
             className={`${buttonSecondaryClass} disabled:opacity-50`}
           >
-            {file ? "Replace file" : "Choose file"}
+            {file ? ti.replace : ti.choose}
           </button>
         </div>
 
-        <ErrorText error={fileError} />
+        <ErrorText error={fileError} prefix={ti.errorPrefix} />
 
         {file && (
           <div className="flex flex-col gap-4 rounded-2xl border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold">{file.name}</p>
-              <p className="text-xs tabular-nums text-muted">{formatFileSize(file.size)}</p>
+              <p className="text-xs tabular-nums text-muted">{formatFileSize(file.size, locale)}</p>
             </div>
             <button type="button" onClick={analyze} disabled={busy} className={buttonClass}>
-              Analyze Video
+              {ti.analyze}
             </button>
           </div>
         )}
@@ -151,19 +142,19 @@ export function InferenceDemo() {
       {phase !== "idle" && (
         <section aria-live="polite" className="flex flex-col gap-3">
           <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">
-            Status · <span className="text-foreground">{PHASE_LABEL[phase]}</span>
+            {ti.status} · <span className="text-foreground">{ti.phases[phase]}</span>
           </p>
           {busy && (
             <>
-              <div className="h-1 overflow-hidden rounded-full bg-surface-muted" role="progressbar" aria-label="Analysis in progress">
+              <div className="h-1 overflow-hidden rounded-full bg-surface-muted" role="progressbar" aria-label={ti.progressLabel}>
                 <div className="h-full w-2/5 rounded-full bg-primary motion-safe:animate-indeterminate" />
               </div>
               <p className="text-sm text-muted">
-                {phase === "uploading" ? "Uploading the recording…" : "AI analysis is running. This can take a few minutes."}
+                {phase === "uploading" ? ti.uploadingMsg : ti.processingMsg}
               </p>
             </>
           )}
-          {phase === "failed" && <ErrorText error={error} />}
+          {phase === "failed" && <ErrorText error={error} prefix={ti.errorPrefix} />}
         </section>
       )}
 
@@ -174,21 +165,21 @@ export function InferenceDemo() {
             <VideoPlayer
               ref={playerRef}
               src={videoUrl ?? undefined}
-              label={file?.name ?? "Uploaded recording"}
+              label={file?.name ?? ti.uploadedRecording}
               markers={events.map((e) => ({ id: e.id, sec: e.timecodeSec, label: e.type }))}
             />
           </div>
 
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2 rounded-2xl border border-border p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">Overall verdict</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">{ti.verdictLabel}</p>
               <h2 className="text-xl font-bold">
-                {events.length > 0 ? "Potential violations detected" : "No violations detected"}
+                {events.length > 0 ? ti.verdictFound : ti.verdictNone}
               </h2>
               <p className="text-sm text-muted">
                 {events.length > 0
-                  ? `The model flagged ${events.length} ${events.length === 1 ? "event" : "events"}. These are AI detections, not established violations: each one needs review by a person.`
-                  : "The model flagged nothing in this recording. This is an AI result, not a guarantee."}
+                  ? `${plural(locale, events.length, ti.flagged)} ${ti.flaggedNote}`
+                  : ti.noneNote}
               </p>
             </div>
 
@@ -200,16 +191,16 @@ export function InferenceDemo() {
                   <span className="shrink-0 text-sm font-semibold tabular-nums">{formatTimecode(event.timecodeSec)}</span>
                 </div>
                 <dl className="flex flex-col gap-4">
-                  <Field label="Description">{event.description || <span className="text-muted">No description returned.</span>}</Field>
-                  <Field label="Evidence frames">
+                  <Field label={t.fields.description}>{event.description || <span className="text-muted">{ti.noDescription}</span>}</Field>
+                  <Field label={t.fields.evidence}>
                     <EvidenceFrames frames={event.evidenceFrames} />
                   </Field>
-                  <Field label="Referenced rule">
+                  <Field label={t.fields.rule}>
                     <RegulatoryReference source={event.regulatorySource} />
                   </Field>
                 </dl>
                 <button type="button" onClick={() => jumpTo(event.timecodeSec)} className={`${buttonSecondaryClass} self-start`}>
-                  Jump to timestamp
+                  {ti.jump}
                 </button>
               </article>
             ))}

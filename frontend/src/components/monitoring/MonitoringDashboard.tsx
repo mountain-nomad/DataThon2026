@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 import { DEMO_CAMERAS, DEMO_EVENTS } from "@/lib/demo-data";
 import type { ViolationEvent } from "@/lib/types";
 import { CameraDialog } from "./CameraDialog";
@@ -21,6 +22,8 @@ function SectionTitle({ n, title, children }: { n: string; title: string; childr
 }
 
 export function MonitoringDashboard() {
+  const { t } = useI18n();
+  const td = t.dashboard;
   const cameras = DEMO_CAMERAS;
   const [events, setEvents] = useState<ViolationEvent[]>(DEMO_EVENTS);
   const [openCameraId, setOpenCameraId] = useState<string | null>(null);
@@ -40,8 +43,8 @@ export function MonitoringDashboard() {
   return (
     <div className="flex flex-col gap-16">
       <section className="flex flex-col gap-6">
-        <SectionTitle n="01" title="Cameras">
-          Prerecorded demo footage played in a loop. This is not a live stream.
+        <SectionTitle n="01" title={td.cameras}>
+          {td.camerasNote}
         </SectionTitle>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
           {cameras.map((camera) => (
@@ -56,17 +59,17 @@ export function MonitoringDashboard() {
       </section>
 
       <section className="flex flex-col gap-6">
-        <SectionTitle n="02" title="Detection statistics" />
+        <SectionTitle n="02" title={td.stats} />
         <ViolationStats events={events} />
       </section>
 
       <section className="flex flex-col gap-6">
-        <SectionTitle n="03" title="Detected episodes">
-          Every episode is an AI detection until a person reviews it.
+        <SectionTitle n="03" title={td.episodes}>
+          {td.episodesNote}
         </SectionTitle>
         {events.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border px-6 py-10 text-center text-sm text-muted">
-            No episodes detected in the demo recordings.
+            {td.noEpisodes}
           </p>
         ) : (
           <div className="flex flex-col gap-4">
