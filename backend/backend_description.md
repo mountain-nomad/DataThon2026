@@ -1,7 +1,8 @@
 # Backend Specification — AI Cash Operations Monitoring
 
 REST API (FastAPI, `backend/`, port 8000) behind the frontend described in
-`frontend/frontend_description.md`. This document is the contract between the three services:
+`frontend/frontend_description.md` and `frontend/frontend_description2.md` (the AI pipeline on
+`/demo-inference`). This document is the contract between the three services:
 
 ```text
 browser ──> frontend :3000 ──(/api/* proxy)──> backend :8000 ──> ml :8001
@@ -29,6 +30,10 @@ jury    ──────────────────── X-API-Key �
 - **JSON is `snake_case`.** The frontend converts it to its camelCase models in `lib/api.ts`.
 - **Times are seconds** (`float`). Every timecode is relative to the **original recording**,
   except `episode_timecode_sec`.
+- **No UI language on the backend.** The UI is ru/kk/en. The backend returns ids (scenario
+  ids, `status` values, `rule_id`) and the frontend translates them. Free text from the model
+  (`quote`, `evidence`, `description`) is returned as generated and shown untranslated. There is
+  no `Accept-Language` handling.
 
 ---
 
@@ -38,7 +43,7 @@ jury    ──────────────────── X-API-Key �
 |---|---|---|---|---|
 | `POST` | `/api/v1/analyze` | `X-API-Key` | jury, `/demo-inference` | Upload a `.mov` and start analysis |
 | `GET` | `/api/v1/jobs/{job_id}` | `X-API-Key` | jury, `/demo-inference` | Job status and result (jury contract) |
-| `GET` | `/api/jobs/{job_id}/details` | — | `/demo-inference` | Extra fields for the result screen |
+| `GET` | `/api/jobs/{job_id}/pipeline` | — | `/demo-inference` | Stage progress and the router/specialist output |
 | `GET` | `/api/jobs/{job_id}/preview.mp4` | — | `/demo-inference` | Browser-playable preview of the upload |
 | `GET` | `/api/demo/cameras` | — | `/demo-dashboard` | The 16 demo cameras |
 | `GET` | `/api/demo/events` | — | `/demo-dashboard` | Detected episodes (one list, the source for all stats) |
@@ -136,36 +141,81 @@ Done:
 Violations are sorted by `timecode_sec`. The response always carries the same model output for
 the same job: review marks don't change it.
 
+**Derived from the pipeline (§4.1).** `violations` holds the specialist results with
+`status == "violation"`. Each one maps as follows:
+- `type` ← `rule_id`;
+- `timecode_sec` ← `start_sec`;
+- `description` ← `evidence`;
+- `evidence_frames` ← `evidence_frames`.
+
+The jury payload carries no `no_violation` or `insufficient_evidence` results.
+
 ---
 
 ## 4. UI endpoints
 
-### 4.1 `GET /api/jobs/{job_id}/details`
+### 4.1 `GET /api/jobs/{job_id}/pipeline`
 
-Extras for the inference result screen, keyed by the violation's index in
-`/api/v1/jobs/{id}`'s `violations`:
+The source for the whole result screen of `/demo-inference`. It's polled every 2.5 s from the
+moment of upload, so it answers **while the job is still running** and shows partial results.
 
 ```json
 {
   "job_id": "3f0c9a1e-…",
-  "preview_url": "/api/jobs/3f0c9a1e-…/preview.mp4",
-  "duration_sec": 1830.4,
-  "violations": [
+  "status": "processing",
+  "error": null,
+  "stages_done": 2,
+  "duration_sec": 63.0,
+  "preview_url": null,
+  "scenario": { "primary": "CLIENT_CASH_DEPOSIT", "secondary": "COUNTING_FROM_SAFE" },
+  "specialist_results": [
     {
-      "index": 0,
-      "type_label": "Cash counted outside camera view",
-      "process_name": "Cash counting",
-      "regulatory_source": null
+      "scenario": "CLIENT_CASH_DEPOSIT",
+      "rule_id": "…",
+      "status": "violation",
+      "quote": "…",
+      "evidence": "…",
+      "start_sec": 44.2,
+      "end_sec": 51.0,
+      "evidence_frames": [{ "timestamp_sec": 44.2, "image_base64": "…" }]
     }
   ]
 }
 ```
 
-- `404` if the job is unknown, `409 {"detail": "Job is not done"}` if it hasn't finished.
-- `type_label` is a readable name for `type`, from `RULES_FILE` (§6.2).
-- `regulatory_source` is `{document_title, section?, url?}` **only if the mapping is confirmed**
-  in `RULES_FILE`, otherwise `null`. **Never generate or guess a norm.**
-- `preview_url` is `null` until the preview is ready (§5, step 4).
+| Field | Notes |
+|---|---|
+| `status`, `error` | Same as in `/api/v1/jobs/{id}`. |
+| `stages_done` | How many AI stages are finished: `0`, `1` (scenario), `2` (violations) or `3` (localization). `3` when `done`. **`null` if the backend doesn't track stages.** The UI then animates the stages only after `done` and says so: it never fakes progress. |
+| `scenario` | Router output, present from `stages_done >= 1`. `primary` is required. `secondary` is the second candidate, or `null`. Values are **canonical ids** of the 7 router classes (table below). The frontend also normalises labels like `"COUNTING / DEPOSIT WITHOUT CLIENT"`, and shows anything outside the 7 as-is with a note. |
+| `specialist_results` | Present from `stages_done >= 2`. **Exactly what the specialists returned, nothing invented.** |
+| `[].scenario` | The scenario id whose specialist produced the result. It must be `primary` or `secondary`; the UI drops anything else, because a specialist's verdict is only valid for its scenario. |
+| `[].status` | `"violation"`, `"no_violation"` or `"insufficient_evidence"`. A specialist that found nothing still returns **one** result with `no_violation` or `insufficient_evidence` (`rule_id` may be `null`), so the UI can show that outcome. |
+| `[].rule_id`, `[].quote`, `[].evidence` | As returned by the specialist. `quote` is the rule text the specialist cites, and `evidence` is what it saw on the video **[assumption: check the prompt's output format]**. |
+| `[].start_sec`, `[].end_sec` | Localized episode, in seconds of the original. `null` if it wasn't localized. The UI plays this range of the original as the "violation episode" clip, so **no clip files need to be cut** for this page. Without `start_sec` it shows `evidence_frames[0]`. |
+| `[].evidence_frames` | 0–3 frames, same format as §3.3. They are the fallback when the episode can't be played. |
+| `preview_url`, `duration_sec` | `preview_url` is `null` until the preview is ready (§5). The UI uses it only when the browser can't decode the uploaded `.mov` itself. |
+
+- `404` if the job is unknown. There is no `409`: a running job returns what it has.
+- `failed` keeps whatever partial `scenario` and `specialist_results` it had.
+- Unauthenticated, like all UI endpoints. The job id is an unguessable UUID, and the data is
+  what the jury endpoint would return.
+
+Scenario ids (router classes, `frontend_description2.md` §2):
+
+| Id | Router label |
+|---|---|
+| `ENTRY` | ENTRY |
+| `COUNTING_DEPOSIT_WITHOUT_CLIENT` | COUNTING / DEPOSIT WITHOUT CLIENT |
+| `CLIENT_CASH_DEPOSIT` | CLIENT CASH DEPOSIT |
+| `COUNTING_FROM_SAFE` | COUNTING FROM SAFE |
+| `OPENING_A_CASH_BAG` | OPENING A CASH BAG |
+| `RECEIVING_A_BAG_FROM_CLIENT` | RECEIVING A BAG FROM CLIENT |
+| `EXIT_CLOSING` | EXIT / CLOSING |
+
+The rule: id = the label in upper case, with every run of non-alphanumerics replaced by `_`.
+Scenario names in ru/kk/en, and the list of violation types each specialist checks, live in the
+frontend dictionaries (`t.scenarios`). The backend doesn't send them.
 
 ### 4.2 `GET /api/jobs/{job_id}/preview.mp4`
 
@@ -266,15 +316,22 @@ add `ffmpeg: "ok" | "missing"` (the result of checking `FFMPEG_PATH` at startup)
 ## 5. Job processing
 
 ```text
-POST /analyze ─> store file ─> job(status=processing) ─> queue
-queue worker: validate (ffprobe) ─> ML /analyze-video ─> map rules ─> save result ─> status=done
-                                 └─> build preview.mp4 (in parallel, doesn't block "done")
+POST /analyze ─> store file ─> job(status=processing, stages_done=0) ─> queue
+queue worker: validate (ffprobe) ─> ML /route ─> save scenario, stages_done=1
+                                ─> ML /specialists ─> save specialist_results, stages_done=3
+                                ─> build the jury payload (§3.3) ─> status=done
+                                └─> build preview.mp4 (in parallel, doesn't block "done")
 any error / timeout ─> status=failed, error="<reason>"
 ```
 
-1. **Persistence.** The `AnalysisJob` table has `id`, `status`, `created_at`, `finished_at`,
-   `error`, `result` (JSON, the exact jury `done` payload), `details` (JSON, §4.1) and
-   `duration_sec`. Results survive a backend restart.
+1. **Persistence.** The `AnalysisJob` table has these columns:
+   - `id`, `status`, `stages_done`, `created_at`, `finished_at`, `error`;
+   - `scenario` and `specialist_results` (JSON, §4.1);
+   - `result` (JSON, the exact jury `done` payload);
+   - `duration_sec`.
+
+   Partial results are saved after each stage, so `/pipeline` shows them during processing.
+   Results survive a backend restart.
 2. **Queue.** An in-process `asyncio.Queue` with `MAX_CONCURRENT_JOBS` workers (default 1;
    inference is CPU- or GPU-bound). The upload request only enqueues the job.
 3. **Timeout.** A job still running after `JOB_TIMEOUT_SEC` (default 270 s, under the
@@ -337,32 +394,54 @@ The ML service (`ml/`, :8001) gains a video endpoint. The backend talks to it th
 `ml_client` (503 if the service is unreachable, 502 if it returns an error). These become a
 `failed` job with a readable `error`.
 
-`POST /analyze-video` (internal, no auth, not exposed through the frontend):
+The pipeline runs as two calls (internal, no auth, not exposed through the frontend), so the
+backend can report real stage progress (§4.1 `stages_done`). The video is shared through a
+volume, so gigabytes aren't copied over HTTP.
+
+`POST /route` is the router (stage 1):
 
 ```json
-// request: the file is shared via a volume, so gigabytes aren't copied over HTTP
+// request
 { "video_path": "/data/uploads/3f0c9a1e-…/original.mov" }
-```
-
-```json
 // response
 {
   "model_version": "0.1.0",
-  "duration_sec": 1830.4,
-  "violations": [
+  "duration_sec": 63.0,
+  "scenario": { "primary": "CLIENT_CASH_DEPOSIT", "secondary": "COUNTING_FROM_SAFE" }
+}
+```
+
+`POST /specialists` runs the specialists of the routed scenarios: violations (stage 2) and their
+localization (stage 3).
+
+```json
+// request
+{ "video_path": "/data/uploads/3f0c9a1e-…/original.mov", "scenarios": ["CLIENT_CASH_DEPOSIT", "COUNTING_FROM_SAFE"] }
+// response: the §4.1 specialist_results items, plus an internal confidence
+{
+  "specialist_results": [
     {
-      "type": "cash_counted_outside_camera_view",
-      "timecode_sec": 754.2,
+      "scenario": "CLIENT_CASH_DEPOSIT",
+      "rule_id": "…",
+      "status": "violation",
+      "quote": "…",
+      "evidence": "…",
+      "start_sec": 44.2,
+      "end_sec": 51.0,
       "confidence": 0.81,
-      "description": "…",
-      "evidence_frames": [{ "timestamp_sec": 753.8, "image_base64": "…" }]
+      "evidence_frames": [{ "timestamp_sec": 44.2, "image_base64": "…" }]
     }
   ]
 }
 ```
 
-- `confidence` stays internal. The backend may filter by `MIN_CONFIDENCE`, and it is not sent to
-  the jury unless the task asks for it.
+- Only the specialists of the requested scenarios run. Violations from other scenarios are never
+  checked or returned.
+- If the pipeline can only run as one call, keep a single `/analyze-video` that returns both
+  parts. The backend then sets `stages_done = null` during processing; the UI handles that (§4.1).
+- `confidence` stays internal. The backend may turn a `violation` below `MIN_CONFIDENCE` into
+  `insufficient_evidence`, but never drops it silently. It isn't sent to the jury unless the task
+  asks for it.
 - `ml_client` needs a separate, long timeout for this call (`ML_VIDEO_TIMEOUT_SEC`, default 260 s).
   The current 30 s timeout is for tabular `/predict`.
 - In docker-compose, both `backend` and `ml` mount the same `uploads` volume at `/data/uploads`.
@@ -381,7 +460,8 @@ The ML service (`ml/`, :8001) gains a video endpoint. The backend talks to it th
 - streams the request body through (`duplex: "half"`) and does not buffer the video.
 
 Route handlers take precedence over `rewrites()`, so everything else under `/api/*` keeps using
-the plain rewrite.
+the plain rewrite. That includes `/api/jobs/{id}/pipeline`, which the UI polls after the upload
+instead of `/api/v1/jobs/{id}`.
 
 ---
 
@@ -396,8 +476,8 @@ the plain rewrite.
 | `JOB_TIMEOUT_SEC` | `270` | Job is marked failed after this |
 | `JOB_RETENTION_HOURS` | `24` | Cleanup at startup |
 | `ML_SERVICE_URL` | `http://localhost:8001` | Existing |
-| `ML_VIDEO_TIMEOUT_SEC` | `260` | Timeout for `/analyze-video` |
-| `MIN_CONFIDENCE` | `0.5` | Detections below it are dropped |
+| `ML_VIDEO_TIMEOUT_SEC` | `260` | Timeout for the ML pipeline calls (`/route`, `/specialists`) |
+| `MIN_CONFIDENCE` | `0.5` | A `violation` below it becomes `insufficient_evidence` |
 | `FFMPEG_PATH` / `FFPROBE_PATH` | `ffmpeg` / `ffprobe` | Local binaries; add `ffmpeg` to the backend Dockerfile |
 | `DEMO_DIR` | `../data/demo` | Demo set (§6.1) |
 | `RULES_FILE` | `../data/rules.json` | Type labels and confirmed norms (§6.2) |
@@ -411,7 +491,8 @@ the plain rewrite.
 
 - `/api/v1/analyze` + `/api/v1/jobs/{id}` with key auth, streaming upload, validation, queue,
   timeout and `failed` reasons.
-- ML `/analyze-video` and the `ml_client` call.
+- ML `/route` + `/specialists` (or a single `/analyze-video`) and the `ml_client` calls.
+- `/api/jobs/{id}/pipeline` (§4.1). Without it `/demo-inference` shows no results.
 - `/api/jobs/{id}/preview.mp4` with Range support.
 - `/api/demo/cameras`, `/api/demo/events`, `PUT /api/events/{id}/review`, `/api/media/*`.
 - Frontend Route Handler for `X-API-Key` (§8) and switching `lib/demo-data.ts` to
@@ -419,7 +500,7 @@ the plain rewrite.
 
 ### If time allows
 
-- `/api/jobs/{id}/details` (type labels, process names and norms on the inference screen).
+- Real `stages_done` (two ML calls instead of one).
 - Filters on `/api/demo/events`.
 - `ffmpeg` and video-model status in `/api/health`.
 
@@ -430,3 +511,7 @@ the plain rewrite.
 3. Expected status code of `POST /analyze` (200 or 202) and whether `status` can take other
    values (for example `queued`).
 4. Is there an upload size limit, or a time limit per video, that the jury will test?
+5. Specialist output: what `quote` and `evidence` contain, the full list of `rule_id`s per
+   scenario, and whether there is one result per rule or one per scenario.
+6. Does the router return the label (`"CLIENT CASH DEPOSIT"`) or an id? Does it return a
+   confidence for the second candidate?

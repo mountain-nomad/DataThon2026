@@ -23,11 +23,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
   const locale = await getLocale();
-  const dict = await getDictionary();
   return (
     <html lang={locale} data-scroll-behavior="smooth" className={`${openSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <I18nProvider locale={locale} dict={dict}>
+        <I18nProvider key={locale} locale={locale}>
           {children}
         </I18nProvider>
       </body>

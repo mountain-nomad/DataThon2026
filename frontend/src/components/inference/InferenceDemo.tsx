@@ -3,15 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import { buttonClass, buttonSecondaryClass, ErrorText } from "@/components/Card";
 import { EvidenceFrames } from "@/components/media/EvidenceFrames";
-import { Field, RegulatoryReference, ReviewBadge } from "@/components/media/EventDetails";
-import { VideoPlayer, type VideoPlayerHandle } from "@/components/media/VideoPlayer";
-import { plural } from "@/i18n/config";
+import { MediaPlaceholder } from "@/components/media/MediaPlaceholder";
+import { VideoPlayer } from "@/components/media/VideoPlayer";
 import { useI18n } from "@/i18n/I18nProvider";
-import { api, JobError, toViolationEvents, waitForJob } from "@/lib/api";
-import { formatFileSize, formatTimecode } from "@/lib/format";
-import type { ViolationEvent } from "@/lib/types";
+import { api, JobError, toPipelineResult, waitForJob } from "@/lib/api";
+import { formatFileSize, formatTimecodePrecise } from "@/lib/format";
+import type { PipelineResult, SpecialistResult } from "@/lib/types";
+import { StageProgress, type StageState } from "./StageProgress";
+import { StageResults } from "./StageResults";
 
 type Phase = "idle" | "uploading" | "processing" | "completed" | "failed";
+
+// Pause between revealing two stages, so each result appears on its own.
+const REVEAL_MS = 900;
 
 export function InferenceDemo() {
   const { locale, t } = useI18n();
@@ -22,15 +26,21 @@ export function InferenceDemo() {
   const [dragging, setDragging] = useState(false);
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [events, setEvents] = useState<ViolationEvent[]>([]);
+  const [result, setResult] = useState<PipelineResult | null>(null);
+  // Stages the backend reported as finished, and whether it reports them at all. Without that,
+  // the stages are only a presentation of the finished result, never fake milestones.
+  const [stagesDone, setStagesDone] = useState(0);
+  const [tracked, setTracked] = useState(false);
+  const [shown, setShown] = useState(0);
+  const [selectedId, setSelectedId] = useState<string>();
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const playerRef = useRef<VideoPlayerHandle>(null);
-  const playerBoxRef = useRef<HTMLDivElement>(null);
+  const videoBoxRef = useRef<HTMLElement>(null);
   const runRef = useRef<AbortController | null>(null);
   const urlRef = useRef<string | null>(null);
 
   const busy = phase === "uploading" || phase === "processing";
+  const target = phase === "completed" ? 3 : stagesDone;
 
   // Stop polling and release the local video URL when leaving the page.
   useEffect(
@@ -41,34 +51,56 @@ export function InferenceDemo() {
     [],
   );
 
+  // Reveal finished stages one at a time, left to right.
+  useEffect(() => {
+    if (shown >= target) return;
+    const id = setTimeout(() => setShown((s) => s + 1), REVEAL_MS);
+    return () => clearTimeout(id);
+  }, [shown, target]);
+
+  function reset() {
+    runRef.current?.abort();
+    setError(null);
+    setResult(null);
+    setStagesDone(0);
+    setTracked(false);
+    setShown(0);
+    setSelectedId(undefined);
+  }
+
   function selectFile(next: File | undefined) {
     if (!next || busy) return;
     const problem = !/\.mov$/i.test(next.name) ? ti.onlyMov : next.size === 0 ? ti.empty : null;
     setFileError(problem);
     if (problem) return;
     if (urlRef.current) URL.revokeObjectURL(urlRef.current);
-    // The uploaded file plays from memory; nothing leaves the machine except the upload itself.
+    // The uploaded file plays from memory right away; nothing leaves the machine except the upload.
     urlRef.current = URL.createObjectURL(next);
     setVideoUrl(urlRef.current);
     setFile(next);
     setPhase("idle");
-    setError(null);
-    setEvents([]);
+    reset();
   }
 
   async function analyze() {
     if (!file || busy) return;
-    runRef.current?.abort();
+    reset();
     const run = new AbortController();
     runRef.current = run;
-    setError(null);
-    setEvents([]);
     setPhase("uploading");
     try {
       const { job_id } = await api.analyze(file, run.signal);
       setPhase("processing");
-      const job = await waitForJob(job_id, run.signal);
-      setEvents(toViolationEvents(job.violations, ti.unclassified));
+      const job = await waitForJob(job_id, run.signal, (update) => {
+        if (run.signal.aborted || update.status !== "processing") return;
+        if (typeof update.stages_done === "number") {
+          setTracked(true);
+          setStagesDone(Math.max(0, Math.min(3, update.stages_done)));
+        }
+        setResult(toPipelineResult(update));
+      });
+      setResult(toPipelineResult(job));
+      setStagesDone(3);
       setPhase("completed");
     } catch (e) {
       if (run.signal.aborted) return;
@@ -77,14 +109,24 @@ export function InferenceDemo() {
     }
   }
 
-  function jumpTo(sec: number) {
-    playerRef.current?.seekTo(sec);
-    playerBoxRef.current?.scrollIntoView({ block: "nearest" });
+  const running = busy || shown < target;
+  const stageState = (i: number): StageState =>
+    i <= shown ? "done" : !running ? "pending" : tracked || phase === "completed" ? (i === shown + 1 ? "active" : "pending") : "active";
+  const states: [StageState, StageState, StageState, StageState] = ["done", stageState(1), stageState(2), stageState(3)];
+
+  const violations = (result?.results ?? []).filter((r) => r.status === "violation");
+  const selected = violations.find((v) => v.id === selectedId) ?? violations[0];
+  // Stage 3 is shown and something was found: the original moves left, the episode appears right.
+  const split = shown >= 3 && selected !== undefined;
+
+  function select(id: string) {
+    setSelectedId(id);
+    videoBoxRef.current?.scrollIntoView({ block: "nearest" });
   }
 
   return (
     <div className="flex flex-col gap-10">
-      {/* 4.1 Upload */}
+      {/* Upload */}
       <section className="flex flex-col gap-4">
         <div
           onDragOver={(e) => {
@@ -138,74 +180,140 @@ export function InferenceDemo() {
         )}
       </section>
 
-      {/* 4.2 Processing state. The backend reports no real progress, so the bar is indeterminate. */}
-      {phase !== "idle" && (
-        <section aria-live="polite" className="flex flex-col gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">
-            {ti.status} · <span className="text-foreground">{ti.phases[phase]}</span>
-          </p>
-          {busy && (
-            <>
-              <div className="h-1 overflow-hidden rounded-full bg-surface-muted" role="progressbar" aria-label={ti.progressLabel}>
-                <div className="h-full w-2/5 rounded-full bg-primary motion-safe:animate-indeterminate" />
-              </div>
-              <p className="text-sm text-muted">
-                {phase === "uploading" ? ti.uploadingMsg : ti.processingMsg}
-              </p>
-            </>
-          )}
-          {phase === "failed" && <ErrorText error={error} prefix={ti.errorPrefix} />}
-        </section>
-      )}
-
-      {/* 4.3 Results */}
-      {phase === "completed" && (
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-          <div ref={playerBoxRef} className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
-            <VideoPlayer
-              ref={playerRef}
-              src={videoUrl ?? undefined}
-              label={file?.name ?? ti.uploadedRecording}
-              markers={events.map((e) => ({ id: e.id, sec: e.timecodeSec, label: e.type }))}
-            />
-          </div>
-
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-2 rounded-2xl border border-border p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">{ti.verdictLabel}</p>
-              <h2 className="text-xl font-bold">
-                {events.length > 0 ? ti.verdictFound : ti.verdictNone}
-              </h2>
-              <p className="text-sm text-muted">
-                {events.length > 0
-                  ? `${plural(locale, events.length, ti.flagged)} ${ti.flaggedNote}`
-                  : ti.noneNote}
-              </p>
+      {videoUrl && file && (
+        <>
+          {/* Original video; turns into original + violation episode once stage 3 is shown. */}
+          <section
+            ref={videoBoxRef}
+            className={`grid scroll-mt-24 grid-cols-1 motion-safe:transition-[grid-template-columns,column-gap] motion-safe:duration-700 motion-safe:ease-out ${
+              split
+                ? "gap-6 md:grid-cols-[1.2fr_1fr]"
+                : "md:grid-cols-[1fr_0fr] md:gap-x-0"
+            }`}
+          >
+            <div className="min-w-0">
+              <VideoPlayer
+                src={videoUrl}
+                fallbackSrc={result?.previewUrl}
+                label={file.name}
+                ranges={
+                  shown >= 3
+                    ? violations
+                        .filter((v) => v.startSec !== undefined)
+                        .map((v) => ({
+                          id: v.id,
+                          start: v.startSec!,
+                          end: v.endSec ?? v.startSec!,
+                          label: v.ruleId ?? ti.status.violation,
+                          active: v.id === selected?.id,
+                        }))
+                    : []
+                }
+                onRangeClick={setSelectedId}
+              />
             </div>
+            <div className="min-w-0 overflow-hidden">
+              {split && (
+                <Episode
+                  key={selected.id}
+                  violation={selected}
+                  violations={violations}
+                  src={videoUrl}
+                  fallbackSrc={result?.previewUrl}
+                  onSelect={setSelectedId}
+                />
+              )}
+            </div>
+          </section>
 
-            {events.map((event) => (
-              <article key={event.id} className="flex flex-col gap-4 rounded-2xl border border-border p-6">
-                <ReviewBadge />
-                <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="text-lg font-bold">{event.type}</h3>
-                  <span className="shrink-0 text-sm font-semibold tabular-nums">{formatTimecode(event.timecodeSec)}</span>
-                </div>
-                <dl className="flex flex-col gap-4">
-                  <Field label={t.fields.description}>{event.description || <span className="text-muted">{ti.noDescription}</span>}</Field>
-                  <Field label={t.fields.evidence}>
-                    <EvidenceFrames frames={event.evidenceFrames} />
-                  </Field>
-                  <Field label={t.fields.rule}>
-                    <RegulatoryReference source={event.regulatorySource} />
-                  </Field>
-                </dl>
-                <button type="button" onClick={() => jumpTo(event.timecodeSec)} className={`${buttonSecondaryClass} self-start`}>
-                  {ti.jump}
-                </button>
-              </article>
+          {/* AI stages */}
+          <section className="flex flex-col gap-6">
+            <StageProgress states={states} />
+            <div aria-live="polite" className="flex flex-col gap-2 text-center text-sm text-muted">
+              {phase === "uploading" && <p>{ti.uploadingMsg}</p>}
+              {phase === "processing" && <p>{ti.processingMsg}</p>}
+              {phase === "completed" && !tracked && <p>{ti.replayNote}</p>}
+              {phase === "failed" && <ErrorText error={error} prefix={ti.errorPrefix} />}
+            </div>
+            <StageResults shown={shown} result={result} selectedId={selected?.id} onSelect={select} />
+          </section>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Right column: the localized episode as a clip of the original (start_sec..end_sec), or the
+// evidence frame when there is no localization or the video can't be played.
+function Episode({
+  violation,
+  violations,
+  src,
+  fallbackSrc,
+  onSelect,
+}: {
+  violation: SpecialistResult;
+  violations: SpecialistResult[];
+  src: string;
+  fallbackSrc?: string;
+  onSelect: (id: string) => void;
+}) {
+  const { t } = useI18n();
+  const ti = t.inference;
+  const { startSec, endSec } = violation;
+  const frame =
+    violation.evidenceFrames.length > 0 ? (
+      <div className="flex flex-col gap-1">
+        <p className="text-xs text-muted">{ti.episodeFrame}</p>
+        <EvidenceFrames frames={violation.evidenceFrames} single />
+      </div>
+    ) : (
+      <MediaPlaceholder tone="error" label={ti.noEpisode} />
+    );
+
+  return (
+    <div className="flex flex-col gap-3 motion-safe:animate-reveal">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">
+          {ti.episode}
+          {startSec !== undefined && (
+            <span className="tabular-nums text-foreground">
+              {" · "}
+              {formatTimecodePrecise(startSec)}
+              {endSec !== undefined && endSec > startSec && ` – ${formatTimecodePrecise(endSec)}`}
+            </span>
+          )}
+        </p>
+        {violations.length > 1 && (
+          <div role="group" aria-label={ti.selectViolation} className="flex gap-1">
+            {violations.map((v, i) => (
+              <button
+                key={v.id}
+                type="button"
+                aria-pressed={v.id === violation.id}
+                onClick={() => onSelect(v.id)}
+                className={`size-7 rounded-full border text-xs font-semibold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                  v.id === violation.id
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-surface text-foreground hover:bg-surface-muted"
+                }`}
+              >
+                {i + 1}
+              </button>
             ))}
           </div>
-        </section>
+        )}
+      </div>
+      {startSec === undefined ? (
+        frame
+      ) : (
+        <VideoPlayer
+          src={src}
+          fallbackSrc={fallbackSrc}
+          fallback={frame}
+          label={`${ti.episode} · ${formatTimecodePrecise(startSec)}`}
+          segment={{ start: startSec, end: endSec !== undefined && endSec > startSec ? endSec : Infinity }}
+        />
       )}
     </div>
   );

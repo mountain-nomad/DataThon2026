@@ -19,7 +19,7 @@ This file turns the brand book into rules for this project. **Brand book** means
 6. **Open Sans is the primary typeface**, with brand weights only.
 7. **The logo is always the official file.** Never set "forte" as text, and never redraw it.
 
-The current `frontend/` follows all of this. Before adding UI, look at `frontend/src/app/page.tsx` (landing), `frontend/src/app/demo-dashboard/page.tsx` and `frontend/src/app/demo-inference/page.tsx` as the reference implementation. Media placeholders use `components/media/MediaPlaceholder.tsx`.
+The current `frontend/` follows all of this. Before adding UI, look at `frontend/src/components/Landing.tsx` (landing), `components/monitoring/` (dashboard) and `components/inference/` (inference) as the reference implementation. Media placeholders use `components/media/MediaPlaceholder.tsx`.
 
 ## Colour
 

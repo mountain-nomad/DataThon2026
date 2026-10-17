@@ -35,14 +35,15 @@ function Frame({ frame }: { frame: EvidenceFrame }) {
   );
 }
 
-export function EvidenceFrames({ frames }: { frames: EvidenceFrame[] }) {
+// `single` shows only the first frame at full width (a stand-in for a missing video clip).
+export function EvidenceFrames({ frames, single = false }: { frames: EvidenceFrame[]; single?: boolean }) {
   const { t } = useI18n();
   if (frames.length === 0) {
     return <p className="text-sm text-muted">{t.media.noFrames}</p>;
   }
   return (
-    <ul className="grid grid-cols-3 gap-2">
-      {frames.slice(0, 3).map((frame, i) => (
+    <ul className={`grid gap-2 ${single ? "grid-cols-1" : "grid-cols-3"}`}>
+      {frames.slice(0, single ? 1 : 3).map((frame, i) => (
         <Frame key={i} frame={frame} />
       ))}
     </ul>

@@ -1,31 +1,40 @@
-// Client for the analysis API (frontend_description.md §7). The browser only calls same-origin
-// /api/*, which next.config.ts rewrites to the backend. The backend adds X-API-Key, so the key
-// never ships in the JS bundle.
+// Client for the analysis API (backend_description.md). The browser only calls same-origin
+// /api/*: the upload goes to the jury endpoint /api/v1/analyze (the Next server adds X-API-Key),
+// progress and the pipeline result come from the UI endpoint /api/jobs/{id}/pipeline.
 
-import type { EvidenceFrame, ViolationEvent } from "./types";
+import {
+  SCENARIOS,
+  type EvidenceFrame,
+  type PipelineResult,
+  type ScenarioResult,
+  type SpecialistResult,
+} from "./types";
 
 export type JobStatus = "processing" | "done" | "failed";
 
-// Jury API shapes (snake_case). Only what the UI reads is typed; frame and type field names are
-// read leniently because the final contract is not published yet.
+// snake_case shapes. Frames are read leniently because the final contract is not published yet.
 type RawFrame = string | { timestamp_sec?: number; image_base64?: string; image?: string };
 
-interface RawViolation {
-  id?: string | number;
-  type?: string;
-  violation_type?: string;
-  timecode_sec: number;
-  description?: string;
+interface RawSpecialist {
+  scenario?: string | null;
+  rule_id?: string | null;
+  status: string;
+  quote?: string | null;
+  evidence?: string | null;
+  start_sec?: number | null;
+  end_sec?: number | null;
   evidence_frames?: RawFrame[];
 }
 
-export interface RawJob {
+export interface RawPipelineJob {
   job_id: string;
   status: JobStatus;
-  verdict?: unknown;
-  violations?: RawViolation[];
-  error?: string;
-  detail?: string;
+  error?: string | null;
+  // 0–3 while processing; null when the backend doesn't track stages.
+  stages_done?: number | null;
+  preview_url?: string | null;
+  scenario?: { primary: string; secondary?: string | null } | null;
+  specialist_results?: RawSpecialist[] | null;
 }
 
 // Client-side failures, translated by the UI. Server messages (`detail`, `error`) are shown as-is.
@@ -59,8 +68,8 @@ export const api = {
     form.append("file", file);
     return request<{ job_id: string }>("/v1/analyze", { method: "POST", body: form, signal });
   },
-  job: (jobId: string, signal?: AbortSignal) =>
-    request<RawJob>(`/v1/jobs/${encodeURIComponent(jobId)}`, { signal }),
+  pipeline: (jobId: string, signal?: AbortSignal) =>
+    request<RawPipelineJob>(`/jobs/${encodeURIComponent(jobId)}/pipeline`, { signal }),
 };
 
 export const POLL_INTERVAL_MS = 2500;
@@ -71,8 +80,13 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Polls until the job is done. Throws on `failed`, on timeout, or after repeated network errors.
-export async function waitForJob(jobId: string, signal: AbortSignal): Promise<RawJob> {
+// Polls until the job is done; `onPoll` sees every intermediate state (for stage progress).
+// Throws on `failed`, on timeout, or after repeated network errors.
+export async function waitForJob(
+  jobId: string,
+  signal: AbortSignal,
+  onPoll?: (job: RawPipelineJob) => void,
+): Promise<RawPipelineJob> {
   const startedAt = Date.now();
   let networkErrors = 0;
   for (;;) {
@@ -81,9 +95,9 @@ export async function waitForJob(jobId: string, signal: AbortSignal): Promise<Ra
     if (Date.now() - startedAt > JOB_TIMEOUT_MS) {
       throw new JobError("timeout");
     }
-    let job: RawJob;
+    let job: RawPipelineJob;
     try {
-      job = await api.job(jobId, signal);
+      job = await api.pipeline(jobId, signal);
       networkErrors = 0;
     } catch (e) {
       if (signal.aborted || e instanceof ApiError) throw e;
@@ -92,10 +106,10 @@ export async function waitForJob(jobId: string, signal: AbortSignal): Promise<Ra
       }
       continue;
     }
+    onPoll?.(job);
     if (job.status === "done") return job;
     if (job.status === "failed") {
-      const message = job.error ?? job.detail;
-      throw message ? new Error(message) : new JobError("jobFailed");
+      throw job.error ? new Error(job.error) : new JobError("jobFailed");
     }
   }
 }
@@ -105,15 +119,48 @@ function toFrame(raw: RawFrame, fallbackSec: number): EvidenceFrame {
   return { timestampSec: raw.timestamp_sec ?? fallbackSec, imageBase64: raw.image_base64 ?? raw.image ?? "" };
 }
 
-// Adapts the jury response to the frontend model. Fields the jury API doesn't carry
-// (processName, clipUrl, regulatorySource) stay empty; reviewStatus starts as pending.
-export function toViolationEvents(raw: RawViolation[] | undefined, unclassified: string): ViolationEvent[] {
-  return (raw ?? []).map((v, i) => ({
-    id: String(v.id ?? i + 1),
-    type: v.type ?? v.violation_type ?? unclassified,
-    description: v.description ?? "",
-    timecodeSec: v.timecode_sec,
-    evidenceFrames: (v.evidence_frames ?? []).slice(0, 3).map((f) => toFrame(f, v.timecode_sec)),
-    reviewStatus: "pending",
-  }));
+// "COUNTING / DEPOSIT WITHOUT CLIENT" or "counting_deposit_without_client" -> the canonical id.
+// Labels outside the 7 router classes are returned unchanged and shown as-is.
+export function normalizeScenario(raw: string): string {
+  const id = raw
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "_")
+    .replace(/^_|_$/g, "");
+  return (SCENARIOS as readonly string[]).includes(id) ? id : raw;
+}
+
+const num = (v: number | null | undefined) => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
+
+function toScenario(raw: RawPipelineJob["scenario"]): ScenarioResult | null {
+  if (!raw?.primary) return null;
+  const primary = normalizeScenario(raw.primary);
+  const secondary = raw.secondary ? normalizeScenario(raw.secondary) : undefined;
+  return { primary, secondary: secondary !== primary ? secondary : undefined };
+}
+
+// Only results that belong to a routed scenario are kept: a specialist's verdict is meaningful
+// only for the scenario it checks. Results without a scenario belong to the primary one.
+export function toPipelineResult(job: RawPipelineJob): PipelineResult {
+  const scenario = toScenario(job.scenario);
+  const routed = new Set([scenario?.primary, scenario?.secondary].filter(Boolean));
+  const results: SpecialistResult[] = (job.specialist_results ?? [])
+    .map((r, i) => {
+      const startSec = num(r.start_sec);
+      return {
+        id: String(i + 1),
+        scenario: r.scenario ? normalizeScenario(r.scenario) : scenario?.primary,
+        ruleId: r.rule_id ?? undefined,
+        status: r.status,
+        quote: r.quote ?? "",
+        evidence: r.evidence ?? "",
+        startSec,
+        endSec: num(r.end_sec),
+        evidenceFrames: (r.evidence_frames ?? []).slice(0, 3).map((f) => toFrame(f, startSec ?? 0)),
+      };
+    })
+    .filter((r) => !scenario || (r.scenario !== undefined && routed.has(r.scenario)))
+    // Chronological; results without a time go last.
+    .sort((a, b) => (a.startSec ?? Infinity) - (b.startSec ?? Infinity));
+  return { scenario, results, previewUrl: job.preview_url ?? undefined };
 }

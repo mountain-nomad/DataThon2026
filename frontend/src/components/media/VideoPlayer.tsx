@@ -1,42 +1,60 @@
 "use client";
 
-import { useImperativeHandle, useRef, useState, type Ref } from "react";
+import { useImperativeHandle, useRef, useState, type ReactNode, type Ref } from "react";
 import { fmt } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
 import { formatTimecode } from "@/lib/format";
 import { MediaPlaceholder } from "./MediaPlaceholder";
 
 export type VideoMarker = { id: string; sec: number; label: string };
+export type VideoRange = { id: string; start: number; end: number; label: string; active?: boolean };
+export type VideoSegment = { start: number; end: number };
 export type VideoPlayerHandle = { seekTo: (sec: number) => void };
 
 // 16:9 frame, object-contain (CCTV footage is never cropped or stretched), custom controls so
-// event markers can sit on the timeline. Without `src` it renders a placeholder.
+// event markers and highlighted ranges can sit on the timeline. Without `src` it renders a
+// placeholder. `fallbackSrc` is tried when `src` can't be decoded (e.g. a .mov codec the browser
+// lacks); `fallback` replaces the error placeholder when neither plays. `segment` turns the
+// player into a clip view of one part of the source: playback and the timeline stay inside it.
 export function VideoPlayer({
   ref,
   src,
+  fallbackSrc,
+  fallback,
   label,
   markers = [],
   onMarkerClick,
+  ranges = [],
+  onRangeClick,
+  segment,
   loop = false,
   autoPlay = false,
 }: {
   ref?: Ref<VideoPlayerHandle>;
   src?: string;
+  fallbackSrc?: string;
+  fallback?: ReactNode;
   label: string;
   markers?: VideoMarker[];
   onMarkerClick?: (id: string) => void;
+  ranges?: VideoRange[];
+  onRangeClick?: (id: string) => void;
+  segment?: VideoSegment;
   loop?: boolean;
   autoPlay?: boolean;
 }) {
   const { t } = useI18n();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const pendingSeek = useRef<number | null>(null);
+  const pendingSeek = useRef<number | null>(segment ? segment.start : null);
   const [playing, setPlaying] = useState(false);
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(segment?.start ?? 0);
   const [duration, setDuration] = useState(0);
-  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const [failed, setFailed] = useState<string[]>([]);
 
-  const playable = Boolean(src) && failedSrc !== src;
+  const current = [src, fallbackSrc].find((s): s is string => Boolean(s) && !failed.includes(s!));
+  const playable = current !== undefined;
+  const lo = segment ? Math.min(segment.start, duration || segment.start) : 0;
+  const hi = segment ? Math.min(segment.end, duration || segment.end) : duration;
 
   const seek = (sec: number) => {
     const video = videoRef.current;
@@ -46,7 +64,8 @@ export function VideoPlayer({
       pendingSeek.current = sec;
       return;
     }
-    video.currentTime = Math.min(Math.max(0, sec), video.duration || sec);
+    const max = segment ? Math.min(segment.end, video.duration || segment.end) : video.duration || sec;
+    video.currentTime = Math.min(Math.max(segment?.start ?? 0, sec), max);
   };
 
   useImperativeHandle(ref, () => ({ seekTo: seek }), []);
@@ -54,16 +73,19 @@ export function VideoPlayer({
   const toggle = () => {
     const video = videoRef.current;
     if (!video) return;
-    if (video.paused) video.play().catch(() => {});
-    else video.pause();
+    if (video.paused) {
+      // A finished clip restarts from the beginning of its segment.
+      if (segment && video.currentTime >= hi - 0.05) video.currentTime = segment.start;
+      video.play().catch(() => {});
+    } else video.pause();
   };
 
   return (
     <div className="flex flex-col gap-2">
-      {!src ? (
+      {!src && !fallbackSrc ? (
         <MediaPlaceholder label={label} hint={t.media.videoPlaceholder} />
       ) : !playable ? (
-        <MediaPlaceholder
+        fallback ?? <MediaPlaceholder
           tone="error"
           label={t.media.videoFailed}
           hint={t.media.videoFailedHint}
@@ -72,7 +94,7 @@ export function VideoPlayer({
         <div className="aspect-video w-full overflow-hidden rounded-xl bg-foreground">
           <video
             ref={videoRef}
-            src={src}
+            src={current}
             aria-label={label}
             className="size-full object-contain"
             preload="metadata"
@@ -83,7 +105,14 @@ export function VideoPlayer({
             onClick={toggle}
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
-            onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+            onTimeUpdate={(e) => {
+              const video = e.currentTarget;
+              if (segment && video.currentTime >= segment.end) {
+                video.pause();
+                video.currentTime = segment.end;
+              }
+              setTime(video.currentTime);
+            }}
             onLoadedMetadata={(e) => {
               setDuration(e.currentTarget.duration);
               if (pendingSeek.current !== null) {
@@ -91,7 +120,7 @@ export function VideoPlayer({
                 pendingSeek.current = null;
               }
             }}
-            onError={() => setFailedSrc(src ?? null)}
+            onError={() => setFailed((list) => [...list, current!])}
           />
         </div>
       )}
@@ -118,6 +147,29 @@ export function VideoPlayer({
 
         <div className="relative flex-1">
           {duration > 0 &&
+            !segment &&
+            ranges.map((r) => {
+              const start = Math.min(r.start, duration);
+              const end = Math.min(Math.max(r.end, r.start), duration);
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  title={`${r.label} · ${formatTimecode(r.start)}–${formatTimecode(r.end)}`}
+                  aria-label={fmt(t.media.jumpTo, { label: r.label, time: formatTimecode(r.start) })}
+                  aria-pressed={r.active}
+                  onClick={() => {
+                    seek(r.start);
+                    onRangeClick?.(r.id);
+                  }}
+                  style={{ left: `${(start / duration) * 100}%`, width: `${((end - start) / duration) * 100}%` }}
+                  className={`absolute -top-2.5 z-10 h-1.5 min-w-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                    r.active ? "bg-primary" : "bg-primary/35 hover:bg-primary/60"
+                  }`}
+                />
+              );
+            })}
+          {duration > 0 &&
             markers.map((m) => (
               <button
                 key={m.id}
@@ -135,10 +187,10 @@ export function VideoPlayer({
           <input
             type="range"
             aria-label={t.media.seek}
-            min={0}
-            max={duration || 0}
+            min={lo}
+            max={hi || 0}
             step={0.1}
-            value={Math.min(time, duration || 0)}
+            value={Math.min(Math.max(time, lo), hi || 0)}
             disabled={!playable || duration === 0}
             onChange={(e) => seek(Number(e.target.value))}
             className="w-full accent-primary disabled:opacity-40"
@@ -146,7 +198,7 @@ export function VideoPlayer({
         </div>
 
         <span className="shrink-0 text-xs tabular-nums text-muted">
-          {formatTimecode(playable ? time : null)} / {formatTimecode(playable ? duration : null)}
+          {formatTimecode(playable ? time : null)} / {formatTimecode(playable ? (segment ? hi : duration) : null)}
         </span>
       </div>
     </div>
