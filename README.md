@@ -22,23 +22,80 @@ with LGPL FFmpeg bundled, Next.js/React: MIT).
 
 ## Run locally
 
+### 1. Prerequisites (once)
+
+- **uv**, the Python package manager: `curl -LsSf https://astral.sh/uv/install.sh | sh`. It
+  installs the right Python by itself.
+- **Node.js 20 or newer**: from [nodejs.org](https://nodejs.org) or `brew install node`.
+- **git** and **make**: preinstalled on macOS (`xcode-select --install` if missing).
+
+No ffmpeg, Docker or GPU is needed.
+
+### 2. Get the code
+
 ```bash
-cp backend/.env.example backend/.env           # set API_KEY to a long random string
-cp frontend/.env.example frontend/.env.local   # ANALYSIS_API_KEY = the same value
-make install                                   # needs uv and Node 20+
-make dev                                       # backend :8000 + frontend :3000
+git clone https://github.com/mountain-nomad/DataThon2026.git
+cd DataThon2026
+git switch feature/backend-jury-api   # until this branch is merged into main
+```
+
+### 3. Create the two config files
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
+```
+
+Put **the same key** in both files:
+
+| File | Line |
+|---|---|
+| `backend/.env` | `API_KEY=<long random string>` |
+| `frontend/.env.local` | `ANALYSIS_API_KEY=<the same string>` |
+
+`python3 -c "import secrets; print(secrets.token_hex(16))"` generates one. Both files are
+gitignored: each person creates their own, and keys never go through git.
+
+### 4. Install and run
+
+```bash
+make install    # backend deps (uv) + frontend deps (npm)
+make dev        # backend :8000 + frontend :3000; Ctrl+C stops both
 ```
 
 | Address | What's there |
 |---|---|
-| http://localhost:3000/demo-inference | Upload a video and watch the stages |
-| http://localhost:3000/demo-dashboard | History of finished analyses |
+| http://localhost:3000/demo-inference | Upload a `.mov` and watch the stages |
+| http://localhost:3000/demo-dashboard | History and statistics of finished analyses |
 | http://localhost:8000 | The simple built-in page |
 | http://localhost:8000/docs | API docs |
 
-The frontend uses `npm ci --legacy-peer-deps`, because `package.json` pins
-`eslint-config-next@14` next to Next 16. Docker (`docker compose up --build`) runs the backend
-only.
+### Things that might trip you up
+
+- **Results are fake by default.** `ANALYZER=mock`, and the evidence text says `[MOCK]`. For
+  real results, connect the ML service: `ANALYZER=http` and `ML_SERVICE_URL` in `backend/.env`
+  (see [below](#plugging-in-the-ml-microservice)).
+- **Port 3000 already in use:** Next.js silently moves to 3001. Stop the other program, or
+  open the address Next.js prints.
+- **The first backend start takes about 20 seconds.** Uploads before it's ready fail with
+  "connection refused".
+- **Don't run plain `npm install`.** It fails with ERESOLVE, because `package.json` pins
+  `eslint-config-next@14` next to Next 16. `make install` uses `npm ci --legacy-peer-deps`.
+- **Test videos are not in the repo.** Share them separately, and keep them private.
+
+### Windows (no `make`)
+
+Run in two terminals:
+
+```bash
+cd backend && uv sync && uv run fastapi dev app/main.py --port 8000
+cd frontend && npm ci --legacy-peer-deps && npm run dev -- --port 3000
+```
+
+### API only, in Docker
+
+No uv or Node needed: create `backend/.env` as in step 3, then run `docker compose up --build`.
+It starts the backend on :8000, without the frontend.
 
 ## Jury API
 
