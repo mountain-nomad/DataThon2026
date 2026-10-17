@@ -255,6 +255,56 @@ Without a separate service, a Python class works too:
 - `ctx.time_left()` and `ctx.report(partial)` play the same roles as `deadline_sec` and the
   partial events.
 
+## Inference (`inference/`)
+
+`run_inference(video_url, prompt=None, job_id=None)` takes a video **link** (e.g. a Supabase
+Storage signed URL) and returns the result **in the jury API format**:
+
+```json
+{"job_id": "48d247dd…", "status": "done", "verdict": "violation",
+ "violations": [{"type": "…", "timecode_sec": 35.8, "description": "…",
+                 "evidence_frames": [{"timestamp_sec": 35.8, "image_base64": "/9j/4AAQ…"}]}]}
+```
+
+- **The video is never saved.** OpenCV's FFmpeg reads the link over HTTP and requests only the
+  byte ranges around each moment it needs. The link must support HTTP `Range`, which Supabase
+  does. Frames are decoded in memory and sent to the model as images, each labeled with its
+  second, so the model can answer with timecodes. Measured on a 142 s, 28.7 MB video: 8 frames
+  take 0.3 s and ~33% of the file crosses the network; 16 frames, ~66%.
+- **Failures:** an expired link, or a link that isn't a video, returns
+  `{"job_id": …, "status": "failed", "error": "…"}`.
+- **`job_id`:** defaults to the file name in the link.
+
+**The pipeline is a PLACEHOLDER for now.** It reads real frames but doesn't call the model (no
+endpoint cost), and returns one violation marked `PLACEHOLDER` at the middle of the video, with
+3 real evidence frames. When `ml/pipeline.py` is ready, its code replaces `run_pipeline()` in
+the `PIPELINE` section of `inference/inference.py`. The building blocks:
+- `video.sample(n)` and `video.frames_at([seconds])`: frames from the link;
+- `frame_parts(frames, prompt)`: message parts for the model (labeled frames + prompt);
+- `call_model(parts)`: one OpenAI-compatible `/chat/completions` request; returns the text.
+
+The real pipeline returns the violations in the same shape.
+
+Endpoint settings (see `inference/.env.example`):
+
+| Setting | Meaning |
+|---|---|
+| `INFERENCE_ENDPOINT_URL` | Endpoint address, e.g. `https://api.runpod.ai/v2/<id>/openai/v1` |
+| `INFERENCE_API_KEY` | Endpoint key. Never commit it. |
+| `INFERENCE_MODEL` | `qwen/qwen3.8-27b` |
+| `INFERENCE_TIMEOUT_SEC` | Request timeout |
+| `INFERENCE_MAX_TOKENS` | Answer length limit |
+| `INFERENCE_FRAMES` | Frames per video, for the real pipeline |
+
+Needs OpenCV (`inference/requirements.txt`); the backend's environment already has it. Try it
+from the repo root:
+
+```bash
+backend/.venv/bin/python -m inference "https://<project>.supabase.co/storage/v1/object/sign/videos/….mov?token=…" --short
+```
+
+From Python: `from inference import run_inference, VideoStream, frame_parts, call_model`.
+
 ## Legal sources (task §6)
 
 Each detected violation is linked: **public source → clause → violation type → regulation rule →
