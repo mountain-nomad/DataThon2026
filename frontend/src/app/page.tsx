@@ -78,8 +78,8 @@ export default function Home() {
         <section id="how" className="flex scroll-mt-24 flex-col gap-12">
           <SectionHeading n="01" label="How it works" title="Three steps, no setup on your side." />
           <div>
-            {/* Swatch form of the primary gradient: a thin rule that rises left to right across the steps. */}
-            <div aria-hidden className="bg-hero-line h-1 rounded-full" />
+            {/* Primary gradient as a thin rule that rises left to right across the steps. */}
+            <div aria-hidden className="bg-gradient-primary h-1 rounded-full" />
             <ol className="grid gap-10 pt-8 md:grid-cols-3 md:gap-12">
               {STEPS.map((step) => (
                 <li key={step.title} className="flex flex-col gap-2">

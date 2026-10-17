@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 // Official Forte logotype files (frontend/public/brand/Forte_logos/Logo Forte/).
-// Approved variants only: magenta on white, white on dark #270111 or on magenta. Never recolour.
+// Approved variants only: magenta logo on white, white logo on Forte Magenta. Never recolour.
 const LOGO = {
   magenta: "/brand/Forte_logos/Logo%20Forte/Group%202087330514%20(1).svg",
   white: "/brand/Forte_logos/Logo%20Forte/Group%202087330521.svg",

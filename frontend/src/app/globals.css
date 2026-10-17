@@ -4,14 +4,12 @@
    Brand colours come from the Forte brand book; neutrals/states are derived. Light only by design. */
 
 :root {
-  /* Brand palette */
+  /* Forte master palette — the only brand colours used (brand book §4). */
   --forte-magenta: #a31551;
   --forte-dark-magenta: #4a0221;
   --forte-coral: #fc9385;
   --forte-sky: #61cfff;
-  --forte-pink: #f03785; /* official secondary-gradient stop (forte.kz/en/logo) */
-  --forte-hero-mid: #b8335f; /* official mid tone of the key-visual gradient */
-  --forte-logo-dark-bg: #270111; /* approved dark background for the white logo */
+  --forte-pink: #f03785; /* end stop of the secondary gradient only */
 
   /* Semantic — white page, neutral greys taken from forte.kz's own UI, magenta as accent only. */
   color-scheme: light;
@@ -35,7 +33,6 @@
   --color-forte-coral: var(--forte-coral);
   --color-forte-sky: var(--forte-sky);
   --color-forte-pink: var(--forte-pink);
-  --color-forte-night: var(--forte-logo-dark-bg);
 
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -53,30 +50,19 @@
   --font-sans: var(--font-open-sans);
 }
 
-/* Primary brand gradient, key-visual form: Dark Magenta → #B8335F → Coral.
-   Keep text on the left (dark) ~60%. */
-@utility bg-hero {
-  background-image: linear-gradient(
-    115deg,
-    var(--forte-dark-magenta) 0%,
-    var(--forte-hero-mid) 55%,
-    var(--forte-coral) 100%
-  );
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-open-sans), "Open Sans", Arial, sans-serif;
 }
 
-/* Secondary brand gradient: Magenta → Pink. Body text on the left ~70%. */
-@utility bg-hero-secondary {
+/* Secondary gradient: Magenta → Pink. */
+@utility bg-gradient-secondary {
   background-image: linear-gradient(90deg, var(--forte-magenta) 0%, var(--forte-pink) 100%);
 }
 
-/* Primary gradient, swatch form (90deg) — for thin bands, rules and stripes only. */
-@utility bg-hero-line {
+/* Primary gradient: Dark Magenta → Coral. On this project only as a thin line. */
+@utility bg-gradient-primary {
   background-image: linear-gradient(90deg, var(--forte-dark-magenta) 0%, var(--forte-coral) 100%);
 }
 

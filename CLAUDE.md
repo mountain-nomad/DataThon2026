@@ -41,7 +41,8 @@ browser -> frontend :3000 --(next.config.ts rewrite /api/*)--> backend :8000 --(
 - **Frontend.** Next.js 16 with `cacheComponents` enabled and `output: "standalone"`. Routes: `/` is the branded landing page (its sections fetch live model and health data once through `ModelProvider` in `components/landing/useModel.tsx`); `/dashboard` is the working ML dashboard. Both are client components that fetch in `useEffect`. `Dashboard` bumps a `refreshKey` after each prediction so `HistoryTable` refetches.
 - **Design system.** Any UI work goes through the `forte-design` skill (`.claude/skills/forte-design/SKILL.md`). Its "Project direction" section is what the user approved:
   - white background, minimal, magenta (`#A31551`) only as an accent;
-  - no gradient blocks (one thin `bg-hero-line` at most);
+  - only Forte's four main colours and the two brand gradients;
+  - no gradient blocks (one thin `bg-gradient-primary` line at most);
   - light theme only;
   - Open Sans with weights 300/400/600/700/800;
   - only real data, never filler.

@@ -5,7 +5,7 @@ description: ForteBank (forte.kz) brand and design system — colours, gradients
 
 # Forte design system
 
-**Source:** `references/brandbook.md`, the brand book from https://forte.kz/en/logo, including exact values taken from the page data and the logo files. A copy also sits at the repo root as `forte-brandbook.md`; keep the two identical.
+**Source:** `references/brandbook.md`, the master-brand part of https://forte.kz/en/logo. A copy also sits at the repo root as `forte-brandbook.md`; keep the two identical.
 
 This file turns the brand book into rules for this project. **Brand book** means an official value. **Derived** means a choice made here to fill a gap (neutrals, states, layout). Don't present derived values as official Forte guidance.
 
@@ -13,43 +13,37 @@ This file turns the brand book into rules for this project. **Brand book** means
 
 1. **The page background is white.** Neutrals are the greys forte.kz uses in its own UI: text `#1D1D1D`, secondary text `#6C6C6C`, borders `#EAEBEF`, subtle fills `#F7F6F6`.
 2. **Minimal, with magenta as an accent only.** Use it for the logo, primary buttons, small labels (such as section numbers) and the one highlighted data series. Don't tint backgrounds, borders or text pink or red, and don't use magenta for big numbers or headings.
-3. **No large gradient blocks**: no gradient hero, CTA band or dark footer. The brand gradient appears at most once per page, as a thin swatch-form line (`bg-hero-line`).
+3. **No large gradient blocks**: no gradient hero, CTA band or dark footer. The brand gradient appears at most once per page, as a thin line (`bg-gradient-primary`).
 4. **Light theme only.** There's no dark mode; `color-scheme: light` is set.
-5. **Open Sans is the primary typeface**, with brand weights only.
-6. **The logo is always the official file.** Never set "forte" as text, and never redraw it.
+5. **Only Forte's main colours**: Forte Magenta, Sky Blue, Dark Magenta, Coral Sunshine, plus the two brand gradients. No sub-brand colours and no other hues. The neutral greys below are UI greys, not brand colours.
+6. **Open Sans is the primary typeface**, with brand weights only.
+7. **The logo is always the official file.** Never set "forte" as text, and never redraw it.
 
 The current `frontend/` follows all of this. Before adding UI, look at `frontend/src/app/page.tsx` (landing) and `frontend/src/app/dashboard/page.tsx` as the reference implementation.
 
 ## Colour
 
-### Master brand palette (brand book)
+### Main colours (brand book §3) — the only brand colours
 
-| Token | HEX | Role here |
-|---|---|---|
-| `forte-magenta` | `#A31551` | The single accent: logo, primary buttons, section numbers, highlighted series, links |
-| `forte-sky` | `#61CFFF` | Focus ring and the "live/ok" status dot. Never use it as text on white |
-| `forte-coral` | `#FC9385` | "Down/attention" status dot, and the end of the gradient line. Never use it as text on white |
-| `forte-dark-magenta` | `#4A0221` | The start of the gradient line. Otherwise unused on white pages |
+| Token | Colour | HEX | Role here |
+|---|---|---|---|
+| `forte-magenta` | Forte Magenta | `#A31551` | Master brand colour and the single accent: logo, primary buttons, section numbers, highlighted series, links |
+| `forte-sky` | Sky Blue | `#61CFFF` | Focus ring and the "live/ok" status dot. Never use it as text on white |
+| `forte-coral` | Coral Sunshine | `#FC9385` | "Down/attention" status dot and the end of the primary gradient. Never use it as text on white |
+| `forte-dark-magenta` | Dark Magenta | `#4A0221` | Start of the primary gradient |
 
-Pink `#F03785` exists only as the end of the secondary gradient, and there's no RGB/CMYK for it.
-
-**Gradients (brand book)**, all available as utilities in `globals.css`:
+### Gradients (brand book §3.2)
 
 | Name | Value | Utility | Use here |
 |---|---|---|---|
-| Primary, swatch form | `90deg #4A0221 → #FC9385` | `bg-hero-line` | ✅ One thin rule per page (for example, above the steps) |
-| Primary, key visual | `115deg #4A0221 0% → #B8335F 55% → #FC9385 100%` | `bg-hero` | ❌ Not used unless the user asks |
-| Secondary | `90deg #A31551 → #F03785` | `bg-hero-secondary` | ❌ Not used unless the user asks |
+| Primary: Dark Magenta → Coral | `90deg #4A0221 → #FC9385` | `bg-gradient-primary` | ✅ One thin rule per page (for example, above the steps) |
+| Secondary: Magenta → Pink | `90deg #A31551 → #F03785` | `bg-gradient-secondary` | Only if the user asks |
 
-If a gradient surface ever does carry text, white text passes 4.5:1 only over the dark ~60% of the primary gradient and ~70% of the secondary one. Keep text on that side.
-
-### Sub-brands (brand book §3)
-
-Each sub-brand has its own palette, gradients and lockup files (full table in `references/brandbook.md` §3.2 and §2.3). **One colour family per screen.** This project is master-brand Forte, so don't bring in Premier green/gold or the Business/Corporate/Leasing blues. To build a sub-brand look, add its palette as a separate token set and use its own lockup file.
+Pink `#F03785` exists only as the end stop of the secondary gradient; never use it on its own. If a gradient surface ever carries text, keep the text on the dark start of the gradient.
 
 ### Semantic tokens (derived)
 
-Defined in `frontend/src/app/globals.css` and exposed to Tailwind v4 through `@theme inline`. Use the Tailwind names (`bg-surface`, `text-muted`, `border-border`, `bg-primary text-primary-foreground`, `bg-hero-line`…). **Never hard-code hex values in components.**
+Defined in `frontend/src/app/globals.css` and exposed to Tailwind v4 through `@theme inline`. Use the Tailwind names (`bg-surface`, `text-muted`, `border-border`, `bg-primary text-primary-foreground`, `bg-gradient-primary`…). **Never hard-code hex values in components.**
 
 | Token | Value | Contrast on white | Source |
 |---|---|---|---|
@@ -83,10 +77,10 @@ Defined in `frontend/src/app/globals.css` and exposed to Tailwind v4 through `@t
 
 ## Logo (brand book §2)
 
-- **Approved variants only:** magenta logo on white, white logo on `#270111`, white logo on Magenta. Never recolour, stretch or add effects, and keep clear space around it.
-- **Always use the official files** in `frontend/public/brand/Forte_logos/` through `<BrandMark variant="magenta" | "white" height={…} />` (`frontend/src/components/BrandMark.tsx`). The master artwork is 731×218.
-- Each logo folder holds a full-colour file (for light backgrounds) and a white file (for dark backgrounds). The file-by-file map for every sub-brand, including Market and Mobile, is in `references/brandbook.md` §2.3. Folder names contain spaces; URL-encode them in `src`.
-- Never typeset "forte" or a sub-brand descriptor as text in place of the logo.
+- **Approved variants:** the Forte Magenta logo on white (the one used on this project), or the white logo on Forte Magenta. Never recolour, stretch or add effects, and keep clear space around it.
+- **Always use the official files** from `frontend/public/brand/Forte_logos/Logo Forte/`, through `<BrandMark variant="magenta" | "white" height={…} />` (`frontend/src/components/BrandMark.tsx`). The artwork is 731×218. The folder name contains a space, so URL-encode it in `src`.
+- The other folders in `Forte_logos/` are sub-brand lockups. They are not used here.
+- Never typeset "forte" as text in place of the logo.
 
 ## Layout and components (derived — the approved look)
 
@@ -106,17 +100,17 @@ Defined in `frontend/src/app/globals.css` and exposed to Tailwind v4 through `@t
 - No emoji, decorative icon grids, gradient text, blobs or entrance animations. Smooth scrolling only under `prefers-reduced-motion: no-preference`.
 - Don't use repeated identical cards when plain text columns will do.
 
-## Legal copy (brand book §7–8)
+## Legal copy (brand book §6–7)
 
-Screens that show payment cards must carry the disclaimer in §8. Use contacts and links only from §7. Never invent licence numbers or contact details, and never present the prototype as an official ForteBank product.
+Screens that show payment cards must carry the disclaimer in §7. Use contacts and links only from §6. Never invent licence numbers or contact details, and never present the prototype as an official ForteBank product.
 
 ## Checklist before finishing a UI change
 
-1. The background is white; magenta appears only as an accent; there are no gradient blocks and at most one `bg-hero-line`.
+1. The background is white; magenta appears only as an accent; there are no gradient blocks and at most one `bg-gradient-primary` line.
 2. Only tokens are used: no raw hex in components (comments excepted).
 3. Everything is in Open Sans, with weights 300/400/600/700/800 only; monospace only for raw JSON.
-4. The logo is the official file through `BrandMark`, in an approved variant.
+4. The logo is the official master file through `BrandMark`, in an approved variant.
 5. Text passes the contrast in the token table; Sky and Coral are never used as text on white.
 6. All data shown is real or honestly empty; there's no filler copy.
-7. One colour family per screen (master Forte).
+7. Only Forte's four main colours and the two brand gradients; no sub-brand or other hues.
 8. Before finishing, check the page at 390px width with no horizontal scroll, and the build passes.
