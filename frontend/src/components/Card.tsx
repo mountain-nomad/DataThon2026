@@ -1,6 +1,6 @@
 export function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
+    <section className="rounded-2xl border border-border bg-surface p-6 flex flex-col gap-4">
       <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">{title}</h2>
       {children}
     </section>
@@ -20,6 +20,12 @@ const focusRing =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 export const buttonClass = `self-start rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:opacity-50 disabled:hover:bg-primary ${focusRing}`;
+
+const pill = "inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition-colors";
+
+export const buttonSecondaryClass = `${pill} border border-border text-foreground hover:bg-surface-muted ${focusRing}`;
+
+export const buttonPrimaryLinkClass = `${pill} bg-primary text-primary-foreground hover:bg-primary-hover ${focusRing}`;
 
 export const inputClass = `rounded-xl border border-border bg-surface-muted/60 p-3 text-sm ${focusRing}`;
 

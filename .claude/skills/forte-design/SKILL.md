@@ -1,125 +1,116 @@
 ---
 name: forte-design
-description: ForteBank (forte.kz) brand and design system — colours, gradients, typography, logo rules and ready-made design tokens. Use whenever building or restyling any UI, page, component, chart, slide or visual for this project or for anything Forte-branded (frontend/, dashboards, demo screens, pitch materials), or when the user mentions Forte, ForteBank, the brand book, brand colours or "make it look like Forte".
+description: ForteBank (forte.kz) brand and design system — colours, gradients, typography (Open Sans), official logo files and the project's approved white, minimal look. Use whenever building or restyling any UI, page, component, chart, slide or visual for this project or for anything Forte-branded (frontend/, landing, dashboards, demo screens, pitch materials), or when the user mentions Forte, ForteBank, the brand book, brand colours or "make it look like Forte".
 ---
 
 # Forte design system
 
-Sources:
-- `references/brandbook.md` is the brand book as written from the visible text of https://forte.kz/en/logo.
-- `references/primary-source.md` holds the exact values pulled from that page's data: the official Pink, the approved logo variants and all sub-brand palettes. Where the two differ, `primary-source.md` wins.
+**Source:** `references/brandbook.md`, the master-brand part of https://forte.kz/en/logo. A copy also sits at the repo root as `forte-brandbook.md`; keep the two identical.
 
-This file turns them into rules and tokens. **Brand book** below means an official value from either source. **Derived** means a choice made here to fill a gap the sources leave open (neutrals, states, most of dark mode). Keep derived values consistent, but don't present them as official Forte guidance.
+This file turns the brand book into rules for this project. **Brand book** means an official value. **Derived** means a choice made here to fill a gap (neutrals, states, layout). Don't present derived values as official Forte guidance.
 
-## Brand idea
+## Project direction (approved by the user — these override everything below)
 
-A rising sunrise: a new beginning, growth, progress. Designs should feel warm, optimistic and forward-looking. Gradient light rises from deep magenta into coral. For the master brand, avoid cold, grey, corporate-blue looks. Blue and grey belong to the Business, Corporate, Leasing and Finance sub-brands, not to Forte itself.
+1. **The page background is white.** Neutrals are the greys forte.kz uses in its own UI: text `#1D1D1D`, secondary text `#6C6C6C`, borders `#EAEBEF`, subtle fills `#F7F6F6`.
+2. **Minimal, with magenta as an accent only.** Use it for the logo, primary buttons, small labels (such as section numbers) and the one highlighted data series. Don't tint backgrounds, borders or text pink or red, and don't use magenta for big numbers or headings.
+3. **No large gradient blocks**: no gradient hero, CTA band or dark footer. The brand gradient appears at most once per page, as a thin line (`bg-gradient-primary`).
+4. **Light theme only.** There's no dark mode; `color-scheme: light` is set.
+5. **Only Forte's main colours**: Forte Magenta, Sky Blue, Dark Magenta, Coral Sunshine, plus the two brand gradients. No sub-brand colours and no other hues. The neutral greys below are UI greys, not brand colours.
+6. **Open Sans is the primary typeface**, with brand weights only.
+7. **The logo is always the official file.** Never set "forte" as text, and never redraw it.
+
+The current `frontend/` follows all of this. Before adding UI, look at `frontend/src/app/page.tsx` (landing) and `frontend/src/app/dashboard/page.tsx` as the reference implementation.
 
 ## Colour
 
-### Master brand palette (brand book)
+### Main colours (brand book §3) — the only brand colours
 
-| Token | HEX | Role |
-|---|---|---|
-| `forte-magenta` | `#A31551` | Master brand colour. Logotype, primary actions, key highlights |
-| `forte-dark-magenta` | `#4A0221` | Deep backgrounds, hero bands, dark-mode surfaces, strong text |
-| `forte-coral` | `#FC9385` | Warm accent. Gradient end, highlights on dark, dark-mode primary |
-| `forte-sky` | `#61CFFF` | Cool accent for contrast. Positive/"live" states, data series, focus |
-
-Gradients (brand book):
-- **Primary:** Dark Magenta → Coral.
-  - Swatch form: `linear-gradient(90deg, #4A0221, #FC9385)`. Use it for thin bands, bars and stripes.
-  - Key-visual form (Forte Presentation): `linear-gradient(115deg, #4A0221 0%, #B8335F 55%, #FC9385 100%)`. `#B8335F` is the official mid tone; the logo icon's gradient uses it too. This is `bg-hero`. Use it for hero bands and the main visual moment of a page, once or twice per screen, not on every card.
-  - Contrast: white text stays ≥ 4.5:1 over roughly the first 65% (≈5.7:1 at the `#B8335F` stop) and drops to 2.2:1 on Coral. Keep text left-aligned on the dark side.
-- **Secondary:** Magenta → Pink: `linear-gradient(90deg, #A31551, #F03785)`, available as `bg-hero-secondary`. **Pink = `#F03785`** (primary source; the page gives only this gradient stop, no RGB/CMYK). Use it for secondary emphasis such as promo cards, highlighted tiles, progress or badges, and in places where the primary gradient would compete with the hero.
-  - Contrast: white text stays ≥ 4.5:1 over roughly the first 70% and drops to ≈3.8:1 on pure Pink. Keep body text on the Magenta side; large or bold text (≥24px, or ≥19px bold) is fine anywhere on it.
-
-Don't add new hues to a master-brand (Forte) screen: no greens, oranges, purples or corporate blues. If you need more chart colours, use tints and shades of the four master colours plus Pink.
-
-### Sub-brands (primary source)
-
-Each sub-brand keeps the Forte logotype and adds a descriptor in its own colour. Each has its own palette and gradients. **Use one sub-brand's palette per screen, and never mix colour families** (for example, no Premier gold on a Business screen). Full swatches with RGB/CMYK are in `references/primary-source.md`.
-
-| Sub-brand | Key colour | Primary gradient | Secondary gradient |
+| Token | Colour | HEX | Role here |
 |---|---|---|---|
-| Solo | Dark Magenta `#4A0221` (+ master palette) | `#4A0221 → #A31551` | `#4A0221 → #FC9385` |
-| Premier | Dark Green `#08342A`, Forte Gold `#C9B07E` | `#08342A → #3A8171` | `#234E44 → #C9B07E` |
-| Business | Dark Blue `#072146` | `#072146 → #61CFFF` | `#61CFFF → #FFFFFF` |
-| Corporate | Medium Blue `#043263` | `#043263 → #61CFFF` | `#072146 → #1464A5` |
-| Leasing | Light Blue `#1464A5` | `#1464A5 → #61CFFF` | `#61CFFF → #FFFFFF` |
-| Finance | Medium Grey `#878787` | `#C6C6C6 → #F6F6F6` | `#3C3C3B → #878787` |
+| `forte-magenta` | Forte Magenta | `#A31551` | Master brand colour and the single accent: logo, primary buttons, section numbers, highlighted series, links |
+| `forte-sky` | Sky Blue | `#61CFFF` | Focus ring and the "live/ok" status dot. Never use it as text on white |
+| `forte-coral` | Coral Sunshine | `#FC9385` | "Down/attention" status dot and the end of the primary gradient. Never use it as text on white |
+| `forte-dark-magenta` | Dark Magenta | `#4A0221` | Start of the primary gradient |
 
-The current `frontend/` tokens are master brand only. To build a sub-brand look, add that sub-brand's palette as a separate token set rather than editing the master tokens. Market and Mobile appear as lockups on the page but have no published palette, so ask before styling them.
+### Gradients (brand book §3.2)
 
-### Contrast rules (derived, checked against WCAG)
+| Name | Value | Utility | Use here |
+|---|---|---|---|
+| Primary: Dark Magenta → Coral | `90deg #4A0221 → #FC9385` | `bg-gradient-primary` | ✅ One thin rule per page (for example, above the steps) |
+| Secondary: Magenta → Pink | `90deg #A31551 → #F03785` | `bg-gradient-secondary` | Only if the user asks |
 
-- White on Magenta ≈ 7.5:1 ✅ and white on Dark Magenta ≈ 16:1 ✅, so these work for button text and hero text.
-- Dark Magenta on Coral ≈ 7.3:1 ✅. This is the primary button in dark mode.
-- Magenta text on white ≈ 7.5:1 ✅. Use it for links and emphasised text in light mode.
-- **Coral and Sky Blue fail as text on white** (≈2.2:1 and ≈1.7:1). In light mode use them only as fills, dots, bars or borders, always paired with a text label.
-- On the primary gradient, white text stays above 4.5:1 only over roughly the first 60% (the dark-magenta side). Keep text left-aligned on that side.
-- Magenta as a fill on Dark-Magenta-black surfaces is too weak (≈2.6:1). In dark mode use Coral for primary actions and links.
+Pink `#F03785` exists only as the end stop of the secondary gradient; never use it on its own. If a gradient surface ever carries text, keep the text on the dark start of the gradient.
 
 ### Semantic tokens (derived)
 
-Implemented in `frontend/src/app/globals.css` as CSS variables and exposed to Tailwind v4 through `@theme inline`. Use the Tailwind names in markup: `bg-surface`, `text-muted`, `border-border`, `bg-primary text-primary-foreground`, `bg-hero`, `bg-hero-secondary`, and so on. Never hard-code hex values in components.
+Defined in `frontend/src/app/globals.css` and exposed to Tailwind v4 through `@theme inline`. Use the Tailwind names (`bg-surface`, `text-muted`, `border-border`, `bg-primary text-primary-foreground`, `bg-gradient-primary`…). **Never hard-code hex values in components.**
 
-| Token | Light | Dark |
-|---|---|---|
-| `background` | `#FAF6F8` (warm off-white) | `#270111` (official dark logo background) |
-| `surface` | `#FFFFFF` | `#360A1F` |
-| `surface-muted` | `#F5EDF1` | `#45122B` |
-| `foreground` | `#2B0716` | `#F8EEF3` |
-| `muted` | `#6E5663` | `#C4A9B7` |
-| `border` | `#EBDFE5` | `#5C1D3C` |
-| `primary` / `primary-foreground` | Magenta / white | Coral / Dark Magenta |
-| `primary-hover` | `#8A1145` | `#FDA99E` |
-| `accent` | Sky `#61CFFF` | Sky `#61CFFF` |
-| `danger-bg` / `danger-fg` | `#FDECEA` / `#8A1145` | `#4A0F28` / `#FC9385` |
-
-Errors use magenta/coral tones rather than an off-brand red. Pair them with an icon or a clear message so they don't read as decoration.
+| Token | Value | Contrast on white | Source |
+|---|---|---|---|
+| `background`, `surface` | `#FFFFFF` | — | Project direction |
+| `surface-muted` | `#F7F6F6` | — | forte.kz UI fill |
+| `foreground` | `#1D1D1D` | 16.9:1 | forte.kz body text |
+| `muted` | `#6C6C6C` | 5.3:1 | forte.kz UI grey |
+| `border` | `#EAEBEF` | — | forte.kz UI border |
+| `primary` / `primary-foreground` | `#A31551` / `#FFFFFF` | 7.5:1 | Brand book |
+| `primary-hover` | `#8A1145` | 9.4:1 | Derived |
+| `accent` | `#61CFFF` | 1.8:1 (fill only) | Brand book |
+| `danger-bg` / `danger-fg` | `#FDF1F4` / `#8A1145` | — | Derived; errors use the brand's magenta, not off-brand red |
 
 ## Typography (brand book)
 
-- **Open Sans only**, for UI, display, body and captions. In Next.js: `next/font/google` → `Open_Sans({ subsets: ["latin", "cyrillic"], variable: "--font-open-sans" })`. Include **cyrillic**, because the product is used in Kazakhstan (RU/KZ text).
-- Weights: 300 Light · 400 Regular · 600 Semibold · 700 Bold · 800 Extrabold. Don't use 500 or 900.
-- Suggested scale (derived): display 40–48px/800 · H1 28–32px/700 · H2 20px/700 · section label 12–13px/600 uppercase with 0.06em letter spacing · body 15–16px/400 · caption 13px/400 in `muted`.
-- Numbers in tables and metrics: `tabular-nums`. Use monospace only for raw code or JSON.
+- **Open Sans is the primary typeface**, for UI, display, body and captions. It's loaded in `layout.tsx` with `next/font/google` → `Open_Sans({ subsets: ["latin", "cyrillic"], variable: "--font-open-sans" })` and set as Tailwind's `--font-sans` and on `body`, so every element defaults to it. Keep **cyrillic**, because the product is used in Kazakhstan.
+- **Weights: 300 · 400 · 600 · 700 · 800 only.** Don't use `font-medium` (500), `font-black` (900), `font-thin` or `font-extralight`.
+- Scale (derived, as used on the landing):
 
-## Logo (brand book + primary source)
-
-- The master logotype is **Forte Magenta**. Keep clear space around it. Never stretch it, never add effects, and never recolour it outside the approved set.
-- **The approved set is exactly three variants:**
-
-  | Background | Logo |
+  | Role | Style |
   |---|---|
-  | White `#FFFFFF` | Forte Magenta `#A31551` |
-  | Dark `#270111` | White |
-  | Forte Magenta `#A31551` | White |
+  | Display / hero | 40–48px, 800, tight tracking, `foreground` |
+  | Section title | 28–32px, 700 |
+  | Card / step title | 20px, 700 |
+  | Lead | 18px, 300, `muted` |
+  | Section label | 12px, 600, uppercase, `0.06em` letter spacing, `muted`; its number in `primary` |
+  | Body | 15–16px, 400 |
+  | Caption | 13px, 400, `muted` |
 
-  On any dark or gradient surface the logo is **white**: never Coral, Sky or a gradient fill. In dark mode, switch to the white variant.
-- **Never redraw or approximate the logo** in SVG or CSS. Use the official files from https://forte.kz/docs/forte-logos.zip and put them in `frontend/public/brand/`. Until they're there, use a plain text placeholder clearly marked as one (see `frontend/src/components/BrandMark.tsx`).
-- Sub-brand lockups (Solo, Premier, Business, Corporate, Leasing, Finance, plus Market and Mobile) keep the Forte logotype and add a descriptor in the sub-brand's colour. Their palettes are in the Sub-brands section above. Use the official lockup files; don't typeset the descriptor yourself.
+- Numbers in metrics and tables use `tabular-nums`. Monospace is only for raw JSON or code.
 
-## Layout and components (derived, applied in `frontend/`)
+## Logo (brand book §2)
 
-- Warm off-white page, white surface cards, 1px `border`, radius 16px for cards and 12px for controls, very soft shadow (`shadow-sm` at most). The gradient carries the visual weight, not the shadows.
-- One **hero band** with the primary gradient at the top of a page: an Extrabold title and a short subtitle on the dark side.
-- Primary button: pill-shaped (`rounded-full`), `bg-primary text-primary-foreground`, Semibold. Secondary button: `border-border` outline. Focus ring: `accent` (sky).
-- Status: a Sky dot means live/ok, a Coral dot means down/attention, and the dot always comes with a text label.
-- Charts and probabilities: Magenta for the main series, then Sky, Coral, Dark Magenta. Light-mode bars sit on a `surface-muted` track.
-- Use generous whitespace and keep it calm. One accent moment per section.
+- **Approved variants:** the Forte Magenta logo on white (the one used on this project), or the white logo on Forte Magenta. Never recolour, stretch or add effects, and keep clear space around it.
+- **Always use the official files** from `frontend/public/brand/Forte_logos/Logo Forte/`, through `<BrandMark variant="magenta" | "white" height={…} />` (`frontend/src/components/BrandMark.tsx`). The artwork is 731×218. The folder name contains a space, so URL-encode it in `src`.
+- The other folders in `Forte_logos/` are sub-brand lockups. They are not used here.
+- Never typeset "forte" as text in place of the logo.
 
-## Legal copy
+## Layout and components (derived — the approved look)
 
-Forte-facing screens that show payment cards must carry the brand book's disclaimer (see `references/brandbook.md` §8). Contacts and links are in §7. Don't invent licence numbers or contact details.
+- **Surfaces:** white page and white cards with a 1px `border`. Radius is 16px for cards and 12px for controls. **No shadows, no blur, no glass effects.** Whitespace and type carry the hierarchy, with large vertical gaps between sections (`gap-24`/`gap-32`).
+- **Header:** white, a bottom `border`, the magenta logo on the left, muted text nav, one primary pill CTA on the right.
+- **Hero:** white and type-led. An Extrabold headline, a Light muted lead, one primary pill button and one outline secondary. If there's a supporting card on the right, it shows real data.
+- **Sections:** start each with a numbered label (`01 · How it works`), echoing the numbered sections on forte.kz's brand page. Below it, a 28–32px Bold title and an optional muted lead.
+- **Buttons:** pill shape (`rounded-full`), Semibold. Primary is `bg-primary text-primary-foreground`; secondary is a `border-border` outline. The focus ring is `accent`. Use the helpers in `components/Card.tsx`: `buttonClass`, `buttonPrimaryLinkClass`, `buttonSecondaryClass`.
+- **Status:** a Sky dot means live/ok, a Coral dot means down. The dot always comes with a text label.
+- **Charts and probability bars:** the highlighted series is `bg-primary` and the rest are neutral (`bg-muted/40`), on a `surface-muted` track. Bring in Sky, Coral or Dark Magenta only when several series genuinely need to be told apart.
+- **Footer:** white, a top `border`, the magenta logo, a muted honest note ("Prototype built for DataThon 2026. Not an official ForteBank product or service."), and text links.
+
+### Content rules (keep it from looking like AI slop)
+
+- Every number, metric and status on a page comes from the API, never a placeholder figure. When data is missing, say so honestly (for example, "The backend isn't reachable. Start the services with make dev.").
+- No invented stats, testimonials, partner logos, slogans or marketing claims. The copy describes what the system actually does.
+- No emoji, decorative icon grids, gradient text, blobs or entrance animations. Smooth scrolling only under `prefers-reduced-motion: no-preference`.
+- Don't use repeated identical cards when plain text columns will do.
+
+## Legal copy (brand book §6–7)
+
+Screens that show payment cards must carry the disclaimer in §7. Use contacts and links only from §6. Never invent licence numbers or contact details, and never present the prototype as an official ForteBank product.
 
 ## Checklist before finishing a UI change
 
-1. Only tokens are used; there are no raw hex values in components.
-2. Open Sans is loaded with the cyrillic subset, and only brand weights are used.
-3. Light and dark mode both pass the contrast rules above.
-4. There's no fake logo, and any placeholder is marked as one.
-5. Gradients are used sparingly: primary for the hero, secondary for supporting emphasis, never both competing in one section. Text sits on the dark side.
-6. The logo (or placeholder) uses only an approved variant: Magenta on light, white on dark, magenta or gradient backgrounds.
-7. One colour family per screen: master Forte, or a single sub-brand's palette.
+1. The background is white; magenta appears only as an accent; there are no gradient blocks and at most one `bg-gradient-primary` line.
+2. Only tokens are used: no raw hex in components (comments excepted).
+3. Everything is in Open Sans, with weights 300/400/600/700/800 only; monospace only for raw JSON.
+4. The logo is the official master file through `BrandMark`, in an approved variant.
+5. Text passes the contrast in the token table; Sky and Coral are never used as text on white.
+6. All data shown is real or honestly empty; there's no filler copy.
+7. Only Forte's four main colours and the two brand gradients; no sub-brand or other hues.
+8. Before finishing, check the page at 390px width with no horizontal scroll, and the build passes.

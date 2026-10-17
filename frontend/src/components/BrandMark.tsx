@@ -1,11 +1,22 @@
-// PLACEHOLDER — not the Forte logo. Brand rules forbid redrawing the logotype:
-// drop the official SVG from https://forte.kz/docs/forte-logos.zip into public/brand/
-// and replace this with <Image src="/brand/forte-logo.svg" ... />.
-// Approved variants only: Magenta on light, white on dark (never coral/sky).
-export function BrandMark() {
+import Image from "next/image";
+
+// Official Forte logotype files (frontend/public/brand/Forte_logos/Logo Forte/).
+// Approved variants only: magenta logo on white, white logo on Forte Magenta. Never recolour.
+const LOGO = {
+  magenta: "/brand/Forte_logos/Logo%20Forte/Group%202087330514%20(1).svg",
+  white: "/brand/Forte_logos/Logo%20Forte/Group%202087330521.svg",
+};
+
+export function BrandMark({ variant = "magenta", height = 24 }: { variant?: keyof typeof LOGO; height?: number }) {
+  // Source artwork is 731×218.
   return (
-    <span className="text-xl font-extrabold tracking-tight text-forte-magenta dark:text-white">
-      forte
-    </span>
+    <Image
+      src={LOGO[variant]}
+      alt="Forte"
+      width={Math.round((height * 731) / 218)}
+      height={height}
+      unoptimized
+      priority
+    />
   );
 }

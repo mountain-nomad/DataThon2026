@@ -1,6 +1,6 @@
 # Forte Brand Book
 
-Source: https://forte.kz/en/logo
+Source: https://forte.kz/en/logo, checked 2026-10-17. Only the master brand (Forte) is covered: this project uses Forte's main colours and nothing else.
 
 ---
 
@@ -16,31 +16,27 @@ The logo's contemporary and dynamic design expresses a positive and future-orien
 
 The master logotype is **Forte Magenta**. It reads clearly on light and dark surfaces. Keep clear space around the mark and never recolour it outside the approved set.
 
----
+| Background | Logo colour |
+|---|---|
+| White | Forte Magenta `#A31551` |
+| Forte Magenta `#A31551` | White |
 
-## 3. Brand Architecture
+### 2.2 Logo files
 
-Every sub-brand keeps the Forte logotype and adds a descriptor in its own colour. Four colour families organise the group.
+Package: https://forte.kz/docs/forte-logos.zip, unpacked to `frontend/public/brand/Forte_logos/`. The master logo is in `Logo Forte/`:
 
-### 3.1 Sub-brands
+| File (SVG + PNG) | Variant | Artwork |
+|---|---|---|
+| `Group 2087330514 (1)` | Forte Magenta, for white backgrounds | 731×218 |
+| `Group 2087330521` | White, for Forte Magenta backgrounds | 730×218 |
 
-| Sub-brand |
-|-----------|
-| Forte (master brand) |
-| Solo |
-| Premier |
-| Business |
-| Corporate |
-| Leasing |
-| Finance |
-
-Each sub-brand has its own lockup, primary palette and primary gradient.
+The other folders in the package are sub-brand lockups and are not used in this project.
 
 ---
 
-## 4. Colour Palette
+## 3. Colour Palette
 
-### 4.1 Master brand
+### 3.1 Main colours
 
 | Colour | HEX | RGB | CMYK |
 |--------|-----|-----|------|
@@ -49,14 +45,16 @@ Each sub-brand has its own lockup, primary palette and primary gradient.
 | Dark Magenta | `#4A0221` | 74 / 2 / 33 | 0 / 97 / 56 / 71 |
 | Coral Sunshine | `#FC9385` | 252 / 147 / 133 | 0 / 42 / 47 / 1 |
 
-### 4.2 Gradients
+Forte Magenta `#A31551` is the master brand colour.
 
-- **Primary gradient:** Dark Magenta → Coral
-- **Secondary gradient:** Magenta → Pink
+### 3.2 Gradients
+
+- **Primary gradient:** Dark Magenta → Coral: `linear-gradient(90deg, #4A0221 0%, #FC9385 100%)`
+- **Secondary gradient:** Magenta → Pink: `linear-gradient(90deg, #A31551 0%, #F03785 100%)`. Pink `#F03785` is only the end stop of this gradient, not a palette colour; the source gives no RGB or CMYK for it.
 
 ---
 
-## 5. Typography
+## 4. Typography
 
 **Typeface:** Open Sans
 
@@ -72,22 +70,14 @@ Download: https://forte.kz/docs/open-sans.zip
 
 ---
 
-## 6. Downloads
+## 5. Downloads
 
-### 6.1 Logo package
-
-Logo package and ready-made presentation templates that apply the identity correctly.
-
-- Logo: https://forte.kz/docs/forte-logos.zip
-
-### 6.2 Presentation templates
-
+- Logo: https://forte.kz/docs/forte-logos.zip (unpacked in this repo, see §2.2)
 - Forte Presentation: https://forte.kz/docs/forte-presentation.pptx
-- Business Presentation: https://forte.kz/docs/forte-business-presentation.pptx
 
 ---
 
-## 7. Contacts and Links
+## 6. Contacts and Links
 
 - Website: https://forte.kz/en
 - Individuals: 7575
@@ -97,7 +87,7 @@ Logo package and ready-made presentation templates that apply the identity corre
 
 ---
 
-## 8. Disclaimer
+## 7. Disclaimer
 
 Displayed payment card designs are for illustrative purposes only. The actual design of issued payment cards may differ from those shown. You can obtain more accurate information from a Bank manager.
 
