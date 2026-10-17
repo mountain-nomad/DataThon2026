@@ -41,7 +41,7 @@ export function HistoryTable({ refreshKey }: { refreshKey: number }) {
                   <td className="px-2 py-2 whitespace-nowrap">
                     {new Date(r.created_at).toLocaleTimeString()}
                   </td>
-                  <td className="px-2 py-2 font-semibold text-primary">{String(r.output.prediction)}</td>
+                  <td className="px-2 py-2 font-semibold">{String(r.output.prediction)}</td>
                   <td className="max-w-md truncate px-2 py-2 font-mono text-xs text-muted">
                     {JSON.stringify(r.input)}
                   </td>

@@ -38,7 +38,15 @@ browser -> frontend :3000 --(next.config.ts rewrite /api/*)--> backend :8000 --(
 - **Model artifact contract.** `ml/training/train.py` saves a joblib **dict** (not a bare estimator): `model` (sklearn Pipeline), `version`, `task`, `target`, `features`, `metrics`, `example`. `ml/app/model.py: ModelService` depends on these keys: it reindexes incoming records to `features` (missing -> NaN, extras dropped), only emits `probabilities` when `task == "classification"`, and `/model` exposes `metrics`/`example` — the frontend uses `example` to prefill the JSON form. If no artifact exists the service serves dummy predictions (`version="dummy"`) instead of failing. When swapping in another framework, keep `ModelService.predict(records) -> list[Prediction]`.
 - **Training baseline.** `train.py` auto-splits numeric vs. other columns into a ColumnTransformer + HistGradientBoosting, infers task (object/category dtype or ≤20 unique values -> classification), reports holdout metrics, then refits on all data before saving.
 - **Backend persistence.** SQLModel; `init_db()` runs `create_all` at startup (no migrations). Every prediction is logged to `PredictionLog` (input/output as JSON columns), capped at `MAX_LOGGED_ROWS` per request. CSV uploads are parsed with pandas and NaN is converted to `null` before forwarding (NaN isn't valid JSON).
-- **Frontend.** Styled to the ForteBank brand — use the `forte-design` skill (`.claude/skills/forte-design/`) for any UI work. Colours/fonts are CSS-variable tokens in `src/app/globals.css` exposed to Tailwind via `@theme inline` (`bg-primary`, `text-muted`, `bg-hero`…); don't hard-code hex in components. `BrandMark.tsx` is a text placeholder until the official logo SVG is added. Next.js 16 with `cacheComponents` enabled and `output: "standalone"`. The dashboard is entirely client components (`"use client"`, data fetched in `useEffect`); `Dashboard` passes a `refreshKey` that is bumped after each prediction so `HistoryTable` refetches.
+- **Frontend.** Next.js 16 with `cacheComponents` enabled and `output: "standalone"`. Routes: `/` is the branded landing page (its sections fetch live model and health data once through `ModelProvider` in `components/landing/useModel.tsx`); `/dashboard` is the working ML dashboard. Both are client components that fetch in `useEffect`. `Dashboard` bumps a `refreshKey` after each prediction so `HistoryTable` refetches.
+- **Design system.** Any UI work goes through the `forte-design` skill (`.claude/skills/forte-design/SKILL.md`). Its "Project direction" section is what the user approved:
+  - white background, minimal, magenta (`#A31551`) only as an accent;
+  - no gradient blocks (one thin `bg-hero-line` at most);
+  - light theme only;
+  - Open Sans with weights 300/400/600/700/800;
+  - only real data, never filler.
+
+  Colours are CSS-variable tokens in `src/app/globals.css`, exposed to Tailwind via `@theme inline`. Don't hard-code hex in components. `BrandMark.tsx` renders the official logo files from `public/brand/Forte_logos/`; never a text logo. The brand book lives in `forte-brandbook.md`, with an identical copy at `.claude/skills/forte-design/references/brandbook.md`; edit both together.
 - **Config.** Each Python service uses pydantic-settings reading env vars / `.env` (see `.env.example` in each folder). In docker-compose, the backend reaches ML at `http://ml:8001`, SQLite lives on a named volume, and `ml/artifacts` is bind-mounted so you can retrain on the host and hit `/model/reload`.
 
 ## Conventions / gotchas
@@ -47,3 +55,4 @@ browser -> frontend :3000 --(next.config.ts rewrite /api/*)--> backend :8000 --(
 - The root `.gitignore` is the GitHub Python template, whose `lib/` rule would ignore `frontend/src/lib/`; an explicit `!frontend/src/lib/` exception keeps it tracked. `data/*` and `ml/artifacts/*` are gitignored (only `.gitkeep` is tracked), so trained models and datasets live locally.
 - `frontend/public/.gitkeep` must stay: the frontend Dockerfile copies `public/`.
 - Ruff line length is 100 in both Python services.
+- `eslint-config-next` must match the installed `next` major (16.x). `npm audit fix --force` downgrades it to 14.x, which breaks `npm run lint` with `ERR_MODULE_NOT_FOUND` while the build still passes.

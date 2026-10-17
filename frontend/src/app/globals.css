@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Forte design tokens — see .claude/skills/forte-design/SKILL.md.
-   Brand colours come from the Forte brand book; neutrals/states/dark mode are derived. */
+   Brand colours come from the Forte brand book; neutrals/states are derived. Light only by design. */
 
 :root {
   /* Brand palette */
@@ -13,36 +13,20 @@
   --forte-hero-mid: #b8335f; /* official mid tone of the key-visual gradient */
   --forte-logo-dark-bg: #270111; /* approved dark background for the white logo */
 
-  /* Semantic (light) */
-  --background: #faf6f8;
+  /* Semantic — white page, neutral greys taken from forte.kz's own UI, magenta as accent only. */
+  color-scheme: light;
+  --background: #ffffff;
   --surface: #ffffff;
-  --surface-muted: #f5edf1;
-  --foreground: #2b0716;
-  --muted: #6e5663;
-  --border: #ebdfe5;
+  --surface-muted: #f7f6f6;
+  --foreground: #1d1d1d;
+  --muted: #6c6c6c;
+  --border: #eaebef;
   --primary: var(--forte-magenta);
   --primary-hover: #8a1145;
   --primary-foreground: #ffffff;
   --accent: var(--forte-sky);
-  --danger-bg: #fdecea;
+  --danger-bg: #fdf1f4;
   --danger-fg: #8a1145;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--forte-logo-dark-bg);
-    --surface: #360a1f;
-    --surface-muted: #45122b;
-    --foreground: #f8eef3;
-    --muted: #c4a9b7;
-    --border: #5c1d3c;
-    /* Magenta is too weak on near-black — coral carries primary actions in dark mode. */
-    --primary: var(--forte-coral);
-    --primary-hover: #fda99e;
-    --primary-foreground: var(--forte-dark-magenta);
-    --danger-bg: #4a0f28;
-    --danger-fg: var(--forte-coral);
-  }
 }
 
 @theme inline {
@@ -51,6 +35,7 @@
   --color-forte-coral: var(--forte-coral);
   --color-forte-sky: var(--forte-sky);
   --color-forte-pink: var(--forte-pink);
+  --color-forte-night: var(--forte-logo-dark-bg);
 
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -88,4 +73,15 @@ body {
 /* Secondary brand gradient: Magenta → Pink. Body text on the left ~70%. */
 @utility bg-hero-secondary {
   background-image: linear-gradient(90deg, var(--forte-magenta) 0%, var(--forte-pink) 100%);
+}
+
+/* Primary gradient, swatch form (90deg) — for thin bands, rules and stripes only. */
+@utility bg-hero-line {
+  background-image: linear-gradient(90deg, var(--forte-dark-magenta) 0%, var(--forte-coral) 100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

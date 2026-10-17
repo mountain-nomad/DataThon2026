@@ -45,7 +45,7 @@ export function StatusPanel() {
         {model &&
           Object.entries(model.metrics).map(([k, v]) => (
             <Stat key={k} label={k}>
-              <span className="text-2xl font-bold text-primary">{v.toFixed(4)}</span>
+              <span className="text-2xl font-bold">{v.toFixed(4)}</span>
             </Stat>
           ))}
       </dl>
