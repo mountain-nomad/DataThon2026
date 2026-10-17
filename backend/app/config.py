@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -8,7 +9,7 @@ class Settings(BaseSettings):
 
     api_key: str = ""  # required; the app refuses to start without it
     # "mock", "http" (the ML microservice at ML_SERVICE_URL) or "package.module:ClassName"
-    analyzer: str = "mock"
+    analyzer: str = "http"
     ml_service_url: str = "http://localhost:8001"
     data_dir: Path = Path("./data")  # uploads/ and jobs/ live here
     legal_mapping_file: Path = Path("./fortebank_violation_legal_mapping_updated.yaml")
@@ -27,6 +28,14 @@ class Settings(BaseSettings):
     local_only_ui: bool = True
     # Delete uploaded videos (not results) older than this; 0 keeps them.
     upload_retention_hours: float = 0
+    # "supabase": every upload is also stored in a private Supabase Storage bucket (the local
+    # copy stays as the analyzer's working file). "local": DATA_DIR/uploads only.
+    storage_backend: Literal["supabase", "local"] = "supabase"
+    supabase_url: str = ""
+    supabase_key: str = ""  # service role / secret key: backend only, never sent to a browser
+    supabase_bucket: str = "videos"
+    signed_url_ttl_sec: int = 3600
+    storage_timeout_sec: float = 120.0
 
     @property
     def uploads_dir(self) -> Path:

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Hackathon (DataThon 2026): detect possible cashier violations in top-down bank CCTV videos. The **platform is deliberately minimal: one FastAPI service in `backend/`** (API + a simple web page + background jobs), plus the Next.js `frontend/` (`/demo-inference` and `/demo-dashboard` both talk to it). `docker-compose.yml` runs only the backend. `ml/` (iris demo) is unused; the real model will be a **separate ML microservice the team builds**, reached through `ANALYZER=http` and the contract in `README.md` ("Plugging in the ML microservice"). Don't build that service or add a model unless asked. `backend/backend_description.md` describes a bigger contract (router/specialists pipeline, demo dashboard) that is **not** what's implemented; `README.md` documents what is.
+Hackathon (DataThon 2026): detect possible cashier violations in top-down bank CCTV videos. The **platform is deliberately minimal: one FastAPI service in `backend/`** (API + a simple web page + background jobs), plus the Next.js `frontend/` (`/demo-inference` and `/demo-dashboard` both talk to it). `docker-compose.yml` runs only the backend. `ml/` (iris demo) is unused; the real model will be a **separate ML microservice the team builds**, reached through `ANALYZER=http` (the default; `mock` only when set explicitly) and the contract in `README.md` ("Plugging in the ML microservice"). Don't build that service or add a model unless asked. `backend/backend_description.md` describes a bigger contract (router/specialists pipeline, demo dashboard) that is **not** what's implemented; `README.md` documents what is.
 
 Note: `~/Desktop/CLAUDE.md` (an ancestor directory) describes an unrelated thesis project (histogram cardinality estimators) — ignore it for this repo.
 
@@ -42,6 +42,7 @@ There is no test suite. Python commands run from inside `backend/` (imports are 
     4. the legal basis;
     5. the jury `type` (the catalog quote minus `Нарушение:`, else the legal type name) and `description` (evidence + "Почему…" + "Основание: …"; the simple page splits on `\nОснование:`);
     6. the verdict.
+- `storage.py`: `get_storage()` → `SupabaseStorage` (`STORAGE_BACKEND=supabase`, default) or `LocalStorage`. After local validation `_start_job` uploads the file to a private bucket as `{YYYY}/{MM}/{job_id}{ext}` and the job keeps `storage_path` beside `video_path`; the analyzer always reads the local copy. A storage failure is `502` and creates no job. Signed URLs come only from the local-only `GET /api/jobs/{id}/video-url`; `SUPABASE_KEY` must be the secret/service_role key (the bucket is created at startup).
 - `legal.py`: `LegalIndex.resolve(rule_id, type_hint)` returns the legal basis for a result.
   - The chain is crosswalk (`specialist_crosswalk.yaml`: rule_id → `T..` or an inline entry) → `violation_types` → `rules` (`R..`) → `sources` in the team's `fortebank_violation_legal_mapping_updated.yaml`.
   - Unmapped means `None`; never guess. Source URLs drop `utm_*` and prefer `alternate_url`. `binding` is false for non-normative sources.

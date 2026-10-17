@@ -13,8 +13,10 @@ cashier violations:
 | `frontend/` | Next.js UI: `/demo-inference` (upload, AI pipeline stages, violation episode) and `/demo-dashboard` (history, statistics, false-positive review) |
 | `ml/` | The old iris demo skeleton. The real model will be a separate ML microservice, see [the contract below](#plugging-in-the-ml-microservice) |
 
-The analysis sits behind a swappable interface. Until the model is ready, `ANALYZER=mock`
-returns **fake** results: real rule ids and quotes, but the evidence text is marked `[MOCK]`.
+The analysis sits behind a swappable interface. By default `ANALYZER=http` sends each video to
+the ML microservice; until it runs, uploads are still stored but the job ends `failed` ("ML
+service unreachable"), never with invented results. `ANALYZER=mock` (fake results marked
+`[MOCK]`) is for UI development only and must be set explicitly.
 
 Fully local: no cloud services, works offline once installed. Dependencies are open source with
 licences that allow commercial use (FastAPI/Pydantic/PyYAML/httpx: MIT/BSD, OpenCV: Apache 2.0
@@ -72,9 +74,9 @@ make dev        # backend :8000 + frontend :3000; Ctrl+C stops both
 
 ### Things that might trip you up
 
-- **Results are fake by default.** `ANALYZER=mock`, and the evidence text says `[MOCK]`. For
-  real results, connect the ML service: `ANALYZER=http` and `ML_SERVICE_URL` in `backend/.env`
-  (see [below](#plugging-in-the-ml-microservice)).
+- **No ML service, no results.** `ANALYZER=http` is the default: without the ML service at
+  `ML_SERVICE_URL` (see [below](#plugging-in-the-ml-microservice)) every job ends `failed` with
+  "ML service unreachable". The video is still stored. Fake results need `ANALYZER=mock`.
 - **Port 3000 already in use:** Next.js silently moves to 3001. Stop the other program, or
   open the address Next.js prints.
 - **The first backend start takes about 20 seconds.** Uploads before it's ready fail with
@@ -135,7 +137,44 @@ curl https://<address>/api/v1/jobs/3f2a9c1e... -H "X-API-Key: <key>"
   There is always at least one: if the frames at the timecode can't be read, the middle or start
   of the video is used.
 - **Upload errors:** `415` wrong extension, `400` empty file, `413` too large, `422` no readable
-  video stream. An unknown job returns `404`.
+  video stream, `502` the video couldn't be stored in Supabase (no job is created). An unknown
+  job returns `404`.
+
+### Video storage (Supabase)
+
+With `STORAGE_BACKEND=supabase` (the default), the upload flow is:
+
+1. `POST /api/v1/analyze` streams the file to `DATA_DIR/uploads/{job_id}.mov` and validates it.
+2. The backend uploads the file unchanged to the private bucket `SUPABASE_BUCKET` as
+   `{YYYY}/{MM}/{job_id}.mov`. The bucket is created on the first start.
+3. The job stores that stable `storage_path` next to the local `video_path`. The analyzer keeps
+   reading the local copy.
+
+The jury response stays `{"job_id": ...}`. Signed URLs come from an internal endpoint, which is
+local-only and needs no key:
+
+```bash
+curl -s -X POST localhost:8000/api/v1/analyze -H "X-API-Key: $API_KEY" -F "file=@video.mov"
+# {"job_id":"b5badd7120e3429b8e3c575b58eafd1a"}
+curl -s localhost:8000/api/jobs/b5badd7120e3429b8e3c575b58eafd1a/video-url
+# {"job_id":"b5ba…","storage_path":"2026/10/b5ba….mov",
+#  "url":"https://<project>.supabase.co/storage/v1/object/sign/videos/2026/10/b5ba….mov?token=…",
+#  "expires_in":3600}
+```
+
+- **Signed URLs:** every call mints a new one. `/api/jobs/{id}/pipeline` also returns
+  `storage_path`.
+- **After the local copy is deleted** (`UPLOAD_RETENTION_HOURS`), `/api/jobs/{id}/video`
+  redirects (`307`) to a signed URL. Retention deletes the stored object too.
+- **`SUPABASE_KEY` must be the secret (`sb_secret_…`) / service_role key.** The publishable or
+  anon key fails at startup with a row-level security error. The key stays on the backend and is
+  never sent to the frontend.
+- **File size:** the Supabase free plan caps a file at 50 MB. That covers the ~29 MB sample
+  clips, but not the default `MAX_UPLOAD_MB=500`. Raise the project's limit or lower
+  `MAX_UPLOAD_MB` to match.
+- **Contest rules:** the ТЗ forbids passing jury test videos to third parties without the
+  organiser's permission. Without that permission, run the jury build with
+  `STORAGE_BACKEND=local`, which keeps videos only in `DATA_DIR/uploads`.
 
 ### Time limit
 
@@ -165,8 +204,9 @@ The jury counts a video as unprocessed after 5 minutes.
    - Tunnels and proxies pass the real client address in `X-Forwarded-For` /
      `Cf-Connecting-Ip`, and those requests count as remote.
    - So the test videos can't be seen or downloaded through the public address.
-4. **Test videos must not be used for training, published or passed on.** They are stored only
-   in `backend/data/uploads/`. `UPLOAD_RETENTION_HOURS` deletes them (results stay) after the
+4. **Test videos must not be used for training, published or passed on.** With
+   `STORAGE_BACKEND=local` they are stored only in `backend/data/uploads/`; the default
+   `supabase` also copies them to Supabase (see Video storage). `UPLOAD_RETENTION_HOURS` deletes them (results stay) after the
    given time; keep it `0` until the jury has collected the results. Never add them to a dataset.
 
 ## Plugging in the ML microservice
@@ -337,7 +377,7 @@ Sources used:
 | Var | Default | Purpose |
 |---|---|---|
 | `API_KEY` | — (required) | Jury key; the service won't start without it |
-| `ANALYZER` | `mock` | `mock`, `http` (the ML microservice) or `module.path:ClassName` |
+| `ANALYZER` | `http` | `http` (the ML microservice), `mock` (fake results, UI dev only) or `module.path:ClassName` |
 | `ML_SERVICE_URL` | `http://localhost:8001` | ML microservice, for `ANALYZER=http` |
 | `MOCK_DELAY_SEC` | `3` | Fake processing time of the mock |
 | `JOB_TIMEOUT_SEC` | `270` | Upload to done/failed, queue included |
@@ -350,5 +390,10 @@ Sources used:
 | `LOCAL_ONLY_UI` | `true` | Key-less endpoints and pages answer local clients only |
 | `UPLOAD_RETENTION_HOURS` | `0` | Delete uploaded videos after N hours (`0` keeps them) |
 | `UI_ENABLED` | `true` | The simple page and `/ui/*` |
+| `STORAGE_BACKEND` | `supabase` | `supabase` (also store uploads in a private bucket) or `local` |
+| `SUPABASE_URL` | — | `https://<project>.supabase.co`, required for `supabase` |
+| `SUPABASE_KEY` | — | Secret / service_role key, backend only, required for `supabase` |
+| `SUPABASE_BUCKET` | `videos` | Private bucket, created on start if missing |
+| `SIGNED_URL_TTL_SEC` | `3600` | Lifetime of signed video URLs |
 
 Jobs that are still `processing` when the service restarts are marked `failed`.

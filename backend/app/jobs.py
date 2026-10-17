@@ -8,6 +8,7 @@ import uuid
 from pathlib import Path
 
 from app.config import settings
+from app.storage import StorageError, get_storage
 
 _lock = threading.Lock()  # the worker thread and request handlers both write
 
@@ -40,14 +41,15 @@ def save(job: dict) -> None:
         _write(job)
 
 
-def create(job_id: str, video_path: Path, filename: str) -> dict:
+def create(job_id: str, video_path: Path, filename: str, storage_path: str | None = None) -> dict:
     job = {
         "job_id": job_id,
         "status": "processing",
         "created_at": time.time(),
         "deadline": time.time() + settings.job_timeout_sec,
         "filename": filename,
-        "video_path": str(video_path),
+        "video_path": str(video_path),  # local working copy, what the analyzer reads
+        "storage_path": storage_path,  # object key in the Supabase bucket, None for local storage
     }
     save(job)
     return job
@@ -106,13 +108,23 @@ def list_jobs(status: str | None = None) -> list[dict]:
 
 
 def delete_old_uploads() -> None:
-    """Remove uploaded videos (not results) older than UPLOAD_RETENTION_HOURS."""
+    """Remove uploaded videos (local and stored copies, not results) older than
+    UPLOAD_RETENTION_HOURS."""
     if settings.upload_retention_hours <= 0:
         return
     cutoff = time.time() - settings.upload_retention_hours * 3600
     for job in list_jobs():
         if job["status"] != "processing" and job["created_at"] < cutoff:
             Path(job["video_path"]).unlink(missing_ok=True)
+            if job.get("storage_path"):
+                try:
+                    get_storage().delete(job["storage_path"])
+                except StorageError:
+                    continue  # retried next hour
+                with _lock:
+                    if current := get(job["job_id"]):
+                        current["storage_path"] = None
+                        _write(current)
 
 
 def expire_if_overdue(job: dict) -> dict:
