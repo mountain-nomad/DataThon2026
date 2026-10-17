@@ -4,7 +4,7 @@
    Brand colours come from the Forte brand book; neutrals/states are derived. Light only by design. */
 
 :root {
-  /* Forte master palette — the only brand colours used (brand book §4). */
+  /* Forte master palette — the only brand colours used (brand book §3). */
   --forte-magenta: #a31551;
   --forte-dark-magenta: #4a0221;
   --forte-coral: #fc9385;
@@ -69,5 +69,19 @@ body {
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+  }
+}
+
+/* Indeterminate progress bar (used only while a job runs; callers gate it with motion-safe:). */
+@theme {
+  --animate-indeterminate: indeterminate 1.4s ease-in-out infinite;
+
+  @keyframes indeterminate {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(250%);
+    }
   }
 }

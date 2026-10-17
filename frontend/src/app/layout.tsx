@@ -9,8 +9,8 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "DataThon 2026",
-  description: "ML hackathon app",
+  title: "Cash Operations Monitoring · DataThon 2026",
+  description: "AI-powered video monitoring for cash operations.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
