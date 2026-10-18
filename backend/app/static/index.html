@@ -156,19 +156,23 @@ function renderViolation(v) {
     el("span", { className: "type", textContent: v.type }),
     el("span", { className: "time", textContent: fmtTime(v.timecode_sec) })));
   // The server appends the legal citation to the description; it's shown as links below.
-  const citation = v.description.lastIndexOf("\nОснование:");
+  const citation = v.description.lastIndexOf("\nИсточник:");
   card.append(el("p", { textContent: citation >= 0 ? v.description.slice(0, citation) : v.description }));
   const basis = v.legal_basis;
-  if (basis?.rules?.length) {
-    for (const c of basis.rules) {
+  if (basis) {
+    // The mapping's rules: limitations first, no source when show_source is false.
+    if (basis.limitations) card.append(el("p", { className: "rule", textContent: `Ограничения: ${basis.limitations}` }));
+    if (basis.show_source === false) {
+      card.append(el("p", { className: "rule", textContent: "Источник не выводится: подтверждённого или сверенного основания нет" }));
+    }
+    for (const c of basis.show_source === false ? [] : basis.rules || []) {
       const s = c.source || {};
       const line = el("p", { className: "rule" }, `Основание: ${s.title || s.source_id}, ${c.clause}`);
       if (s.url) line.append(" ", el("a", { href: s.url, target: "_blank", rel: "noopener", textContent: "источник" }));
-      if (!s.binding) line.append(" — вспомогательный образец, не НПА");
+      if (c.binding === false || !s.binding) line.append(" — вспомогательный материал, не НПА");
       if (!c.human_verified) line.append(" (не проверено юристом)");
       card.append(line);
     }
-    if (basis.limitations) card.append(el("p", { className: "rule", textContent: `Ограничения: ${basis.limitations}` }));
   } else if (v.rule_id) {
     card.append(el("p", { className: "rule", textContent: `Правило ${v.rule_id}: нормативное основание не сопоставлено` }));
   }

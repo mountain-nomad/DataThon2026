@@ -12,6 +12,7 @@ import { isScenarioId, SCENARIO_CODES, type PipelineResult, type SpecialistResul
 const STATUS_DOT: Record<string, string> = {
   violation: "bg-forte-coral",
   no_violation: "bg-forte-sky",
+  warning: "bg-forte-dark-magenta",
 };
 
 function StageCard({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
@@ -42,12 +43,14 @@ function Scenario({ id, secondary = false }: { id: string; secondary?: boolean }
 function ResultItem({ result }: { result: SpecialistResult }) {
   const { t } = useI18n();
   const ti = t.inference;
-  const status = ti.status[result.status as keyof typeof ti.status] ?? result.status;
+  // A violation the legal mapping caps at "warning" is shown as a warning.
+  const level = result.status === "violation" && result.severity === "warning" ? "warning" : result.status;
+  const status = ti.status[level as keyof typeof ti.status] ?? result.status;
   return (
     <li className="flex flex-col gap-3 border-t border-border pt-4">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold">
         <span className="inline-flex items-center gap-2">
-          <span aria-hidden className={`size-2 rounded-full ${STATUS_DOT[result.status] ?? "bg-muted"}`} />
+          <span aria-hidden className={`size-2 rounded-full ${STATUS_DOT[level] ?? "bg-muted"}`} />
           {status}
         </span>
         {result.ruleId && (

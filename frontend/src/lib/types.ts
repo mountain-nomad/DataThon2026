@@ -29,6 +29,8 @@ export type ScenarioResult = {
   secondary?: string;
 };
 
+export type Severity = "violation" | "warning";
+
 export type SpecialistStatus = "violation" | "no_violation" | "insufficient_evidence";
 
 // Public source -> clause -> violation, from the team's legal mapping (backend legal.py).
@@ -46,6 +48,8 @@ export type LegalClause = {
   summary?: string;
   humanVerified: boolean;
   qualifier?: string;
+  // false when the clause itself or its source is not a binding normative act.
+  binding: boolean;
   source: LegalSource;
 };
 
@@ -53,6 +57,10 @@ export type LegalBasis = {
   typeId?: string;
   name?: string;
   mappingStatus?: string;
+  // The mapping caps the model's level: "warning" means it can't be called a violation.
+  maxSeverity: Severity;
+  // false: the mapping forbids showing a source (unconfirmed or unverified clause).
+  showSource: boolean;
   limitations?: string;
   clauses: LegalClause[];
 };
@@ -65,6 +73,8 @@ export type SpecialistResult = {
   scenario?: string;
   ruleId?: string;
   status: string;
+  // For status "violation": the level after the backend applied the mapping's max_severity.
+  severity?: Severity;
   quote: string;
   evidence: string;
   // Seconds relative to the original video. Missing until localized.
