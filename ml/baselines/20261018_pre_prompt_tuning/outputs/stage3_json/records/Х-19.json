@@ -1,0 +1,34 @@
+{
+  "id": "Х-19",
+  "job_id": "57f8e0ba82c5ad13",
+  "categories": [
+    "3"
+  ],
+  "timeline_sha256": "f2d072366e9633bf168c482ed6e3c14ace8a145d9d223e8e62eb9684f5162038",
+  "prompt_sha256": "33e4e5c5420fa65513e9c01bf02e4cc157139278ea99d99016b3ec3f80eb888b",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4375,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается вход клиента, передача удостоверения, проверка на детекторе и помещение предмета в сейф, но передача денег не зафиксирована в таймлайне."
+    ],
+    "limitations": [
+      "В описании нет упоминания передачи денег клиентом, поэтому проверка этапов, связанных с деньгами (подсчет, внесение в сейф), не применима к наблюдаемым фактам."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "57f8e0ba82c5ad13",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 10.504920896026306
+}

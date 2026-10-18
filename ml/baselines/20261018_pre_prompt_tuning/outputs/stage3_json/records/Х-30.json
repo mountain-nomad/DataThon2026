@@ -1,0 +1,35 @@
+{
+  "id": "Х-30",
+  "job_id": "b7353a7a82a02374",
+  "categories": [
+    "1",
+    "2"
+  ],
+  "timeline_sha256": "5af487399c8f962ae1404c6ac4ced6090e83484a93ade35b47871d4c532fe2dd",
+  "prompt_sha256": "8561354c7c940bc2c86a068cf0dca56eb4b914dfbdb33d340ba56c0e7211d5e5",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4695,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается вход двух клиентов в кабинет, но кассир не виден в таймлайне, поэтому проверка его действий по разделу 1 невозможна."
+    ],
+    "limitations": [
+      "В предоставленном таймлайне отсутствуют наблюдения за действиями кассира, что исключает проверку соблюдения правил раздела 1 и 2."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "b7353a7a82a02374",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 9.525141393998638
+}

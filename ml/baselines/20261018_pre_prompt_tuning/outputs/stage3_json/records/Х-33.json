@@ -1,0 +1,35 @@
+{
+  "id": "Х-33",
+  "job_id": "3de7a549c9287546",
+  "categories": [
+    "1",
+    "2"
+  ],
+  "timeline_sha256": "ccf24be8e470db4defd4ddd744f913eb0bc36523c84d065cfe4502519b7899a1",
+  "prompt_sha256": "5dfe0273b324cd67cfaac56b1093e6af95665cbbebb808a087085a5ebf4428de",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4659,
+  "parsed": {
+    "evidence_check": [
+      "Кассир входит, закрывает дверь, садится и начинает работу со счётчиком; личные вещи (телефон) видны на столе до начала работы, но не перемещаются кассиром в зону работы в наблюдаемом фрагменте."
+    ],
+    "limitations": [
+      "Ролик является отрезком (14 сек), не показано внесение денег в сейф или завершение операции, поэтому проверка раздела 6 невозможна."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "3de7a549c9287546",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 11.18409250502009
+}

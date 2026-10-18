@@ -1,0 +1,34 @@
+{
+  "id": "Х-38",
+  "job_id": "e3fcc2695987d8a4",
+  "categories": [
+    "3"
+  ],
+  "timeline_sha256": "6dda81370a4fd5a4c297e63c7145d01c3e478da0521d0eecac1705e2f558ebe1",
+  "prompt_sha256": "b33aca246fddcc335efb6ec53054383429b261b514a58825b994c0223745ab3e",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4377,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается передача денег клиентом (t=35.4) после предварительной проверки удостоверения (t=6-7), что соответствует порядку идеального сценария."
+    ],
+    "limitations": [
+      "Видео обрывается на выходе клиента (t=55.0), поэтому невозможно подтвердить или опровергнуть последующее внесение денег в сейф."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "e3fcc2695987d8a4",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 10.034982512996066
+}

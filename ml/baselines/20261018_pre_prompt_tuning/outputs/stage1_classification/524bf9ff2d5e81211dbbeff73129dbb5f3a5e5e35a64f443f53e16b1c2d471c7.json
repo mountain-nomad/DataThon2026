@@ -1,0 +1,85 @@
+{
+  "id": "Х-45",
+  "sha256": "524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7",
+  "model": "qwen38_27b",
+  "synthetic_control_passed": true,
+  "raw_output": "24",
+  "predicted_label": "2",
+  "predicted_labels": [
+    "2",
+    "4"
+  ],
+  "predicted_code": "24",
+  "status": "done",
+  "input_shapes": {
+    "input_ids": [
+      1,
+      6081
+    ],
+    "attention_mask": [
+      1,
+      6081
+    ],
+    "mm_token_type_ids": [
+      1,
+      6081
+    ],
+    "pixel_values_videos": [
+      21216,
+      1536
+    ],
+    "video_grid_thw": [
+      1,
+      3
+    ]
+  },
+  "input_tokens": 6081,
+  "output_tokens": 2,
+  "sampled_frames": 34,
+  "vision_forward_calls": 1,
+  "video_grid_thw": [
+    [
+      17,
+      48,
+      26
+    ]
+  ],
+  "sample_timestamps_sec": [
+    0.0,
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    11.0,
+    12.0,
+    13.0,
+    14.0,
+    15.0,
+    16.0,
+    17.0,
+    18.0,
+    19.0,
+    20.0,
+    21.0,
+    22.0,
+    23.0,
+    24.0,
+    25.0,
+    26.0,
+    27.0,
+    28.0,
+    29.0,
+    30.0,
+    31.0,
+    32.0,
+    33.0
+  ],
+  "elapsed_sec": 2.9277889489894733,
+  "peak_allocated_bytes": 20678497280
+}

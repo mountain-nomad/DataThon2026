@@ -1,0 +1,99 @@
+{
+  "id": "Х-35",
+  "sha256": "26430119e074d6f0eb5dbc7ec3e26bbc31cf18903265bb4372bd7d7104908640",
+  "model": "qwen38_27b",
+  "synthetic_control_passed": true,
+  "raw_output": "37",
+  "predicted_label": "3",
+  "predicted_labels": [
+    "3",
+    "7"
+  ],
+  "predicted_code": "37",
+  "status": "done",
+  "input_shapes": {
+    "input_ids": [
+      1,
+      8329
+    ],
+    "attention_mask": [
+      1,
+      8329
+    ],
+    "mm_token_type_ids": [
+      1,
+      8329
+    ],
+    "pixel_values_videos": [
+      29952,
+      1536
+    ],
+    "video_grid_thw": [
+      1,
+      3
+    ]
+  },
+  "input_tokens": 8329,
+  "output_tokens": 2,
+  "sampled_frames": 48,
+  "vision_forward_calls": 1,
+  "video_grid_thw": [
+    [
+      24,
+      48,
+      26
+    ]
+  ],
+  "sample_timestamps_sec": [
+    0.0,
+    1.0,
+    2.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    10.0,
+    11.0,
+    12.0,
+    13.0,
+    14.0,
+    15.0,
+    17.0,
+    18.0,
+    19.0,
+    20.0,
+    21.0,
+    23.0,
+    24.0,
+    25.0,
+    26.0,
+    27.0,
+    29.0,
+    30.0,
+    31.0,
+    32.0,
+    33.0,
+    35.0,
+    36.0,
+    37.0,
+    38.0,
+    39.0,
+    41.0,
+    42.0,
+    43.0,
+    44.0,
+    45.0,
+    46.0,
+    48.0,
+    49.0,
+    50.0,
+    51.0,
+    52.0,
+    54.0,
+    55.0,
+    56.0
+  ],
+  "elapsed_sec": 4.068815378996078,
+  "peak_allocated_bytes": 21659703808
+}

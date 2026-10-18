@@ -1,0 +1,35 @@
+{
+  "id": "Х-37",
+  "job_id": "4a894af855f67e51",
+  "categories": [
+    "3",
+    "2"
+  ],
+  "timeline_sha256": "66e8efd235e23da2276bc7dd52941abfa628fdc2c13bad85ba30f32a1b7f9259",
+  "prompt_sha256": "08ab8deb00e80affd81247f0248da706ec969dd01fba0d0d0087440a798d6ad7",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4663,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается вход клиента, передача удостоверения и его возврат, а также нажатие кнопки на счётчике, но передача денег не зафиксирована."
+    ],
+    "limitations": [
+      "Видео является отрезком (15.8 сек), поэтому отсутствие передачи денег и внесения в сейф может быть связано с обрезкой фрагмента."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "4a894af855f67e51",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 9.722163015045226
+}

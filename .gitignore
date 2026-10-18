@@ -228,3 +228,9 @@ data/*
 ml/artifacts/*
 !ml/artifacts/.gitkeep
 .DS_Store
+
+# Local deployment runtime, uploads, credentials and per-job runs
+/local/
+/.venv-web/
+/backend/.env
+/frontend/.env.local

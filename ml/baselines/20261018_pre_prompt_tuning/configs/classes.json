@@ -1,0 +1,44 @@
+[
+  {
+    "label": "1",
+    "name": "ENTRY",
+    "name_ru": "Вход в кабинет",
+    "description": "The cashier arrives from outside: opens the office door, enters, closes the door, and switches on equipment (computer, counting machine, other devices). No client. No money handling. The office is empty at the start of the video."
+  },
+  {
+    "label": "2",
+    "name": "COUNTING / DEPOSIT WITHOUT CLIENT",
+    "name_ru": "Подсчет суммы / внесение без клиента",
+    "description": "The cashier is ALONE, counts banknotes in the counting machine and may check authenticity with a UV/counterfeit detector. The cash is already on the desk, not taken OUT of the safe. This class also includes subsequently putting the counted money INTO the safe and writing in a paper notebook/logbook. Putting money into the safe and writing are optional. No client, no sealed cash bag."
+  },
+  {
+    "label": "3",
+    "name": "CLIENT CASH DEPOSIT",
+    "name_ru": "Подсчет суммы и внесение с клиентом",
+    "description": "A client ENTERS with loose cash (no bag). The client hands over an ID card, the cashier checks it, the client hands over cash, the cashier counts it in the machine, types the amount into the laptop, puts the money into the safe, returns the ID, and the client leaves. Key cues: client present + loose cash + data entry on laptop."
+  },
+  {
+    "label": "4",
+    "name": "COUNTING FROM SAFE",
+    "name_ru": "Подсчет суммы из сейфа",
+    "description": "The cashier is alone, STANDS UP from the table, comes to the safe, opens the safe, TAKES money OUT of it, closes the safe, and puts the banknotes into the counting machine. Key cue: money moves FROM the safe TO the counting machine."
+  },
+  {
+    "label": "5",
+    "name": "OPENING A CASH BAG",
+    "name_ru": "Получение денег из мешка",
+    "description": "The cashier is alone with a sealed cash bag: removes the seal, opens the bag, takes the money out, puts the bag aside, then opens the safe, places the money inside, and closes the safe. Key cues: sealed bag + no client."
+  },
+  {
+    "label": "6",
+    "name": "RECEIVING A BAG FROM CLIENT",
+    "name_ru": "Получение мешка от клиента",
+    "description": "A client enters, hands over a document, the cashier checks it, then the client hands over a sealed cash bag. The cashier breaks the seal, opens the bag, takes out the money, and puts the bag aside. Key cues: client present + sealed bag."
+  },
+  {
+    "label": "7",
+    "name": "EXIT / CLOSING",
+    "name_ru": "Выход из кабинета",
+    "description": "The cashier opens the safe, puts desk items into it (stamps, money, cash bags, black report notebook), closes and locks the safe, switches off equipment, removes the key from the safe, STANDS UP, then leaves the office and closes the door. Key cues: desk is cleared, equipment turned off, cashier leaves."
+  }
+]

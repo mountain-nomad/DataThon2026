@@ -85,3 +85,11 @@ After a complete run, reuse its saved timelines and router provenance:
 ```
 
 The router historically scored **39/40 (97.5%)** on one dataset. Those videos, labels and predictions are excluded, so this package alone cannot verify that percentage. The timeline/final-audit prompts and on-demand quality repair are later experiments, not the historical routing metric. Two-pass review tests removed the long self-dialogue and money/keys confusion in the observed problematic output, but a residual warning based on an unobserved counting step remained questionable. Do not treat JSON validity, brevity or repair as proof of factual accuracy. Report actual outputs and differences without editing answers to match expectations.
+
+## Local API catalogue and legal formatting (18 October 2026)
+
+The deployed local integration adds a reviewed fixed catalogue in `configs/finding_types.json` for all 70 scenario rules. Final `type` generation is constrained to catalogue strings; validation rejects a type that belongs to a different rule. The backend validates the same pair again. This prevents arbitrary type names; it does not establish factual correctness of a finding. Free observation text remains model-generated.
+
+The operation router now masks generation to the seven class tokens, allows EOS only after a class and forbids repeated class digits. This is a decoding change from the historical router; its old accuracy figure has not been re-evaluated for this implementation. Synthetic video control remains enabled.
+
+Internal rule IDs and model limitations are passed to the backend without changing the public JSON shape. The backend adds blank lines before `Ограничения:` and, only if a suitable verified official source is mapped, `Источник:`. Unmapped types remain valid and get no source line. See `../deploy/legal_mapping_review.md` and `../backend/legal_source_checks.json`. Historical runs were preserved.

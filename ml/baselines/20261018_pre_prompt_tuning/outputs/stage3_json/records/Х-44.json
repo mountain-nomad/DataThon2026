@@ -1,0 +1,35 @@
+{
+  "id": "Х-44",
+  "job_id": "ac34812072464651",
+  "categories": [
+    "2"
+  ],
+  "timeline_sha256": "652e56bf8c9b847bd83d6209bedacdd9f8f0c69bba291fded5c41738cd03b647",
+  "prompt_sha256": "86e45ef307d7ed3b6dfa86812ab7cf98c90221ac1e35d8e5c92fc8a80fa8d7e7",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4229,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается самостоятельный подсчет купюр кассиром на счетной машинке без присутствия клиента (раздел 2, вариант Б).",
+      "Кассир выполняет пересчет двух частей денег, после чего складывает их на столе; клиентские этапы и внесение в сейф не требуются."
+    ],
+    "limitations": [
+      "Видео является отрезком, поэтому неизвестно, были ли выполнены действия до начала или после конца фрагмента."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "ac34812072464651",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 11.539450491021853
+}

@@ -1,0 +1,35 @@
+{
+  "id": "Х-16",
+  "job_id": "fe19975e78cdf406",
+  "categories": [
+    "6"
+  ],
+  "timeline_sha256": "a63bec7ee18ae1c386addc7550c13d6790578b1ce40e7bd29a055ef12c59fac0",
+  "prompt_sha256": "df4546f303892038f1e03ed34499c0ee50e1a8529737aad660b7ef49f4a1605e",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 3578,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается вход клиента, передача удостоверения кассиру и его возврат клиенту (t=8-14), что соответствует этапу проверки документа до передачи мешка (t=15-16).",
+      "Кассир принимает сумку после того, как клиент вернул ей удостоверение, что исключает нарушение порядка действий."
+    ],
+    "limitations": [
+      "Видео является отрезком длительностью 22 секунды, финальные действия с содержимым сумки не показаны."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "fe19975e78cdf406",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 11.726807127008215
+}

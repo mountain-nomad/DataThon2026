@@ -40,6 +40,9 @@ class LegalIndex:
                 "title": s.get("title", sid),
                 "url": _clean_url(s.get("alternate_url") or s.get("url") or ""),
                 "binding": s.get("normative_status") not in NOT_BINDING,
+                "official": bool(s.get("official")),
+                "text_verified": bool(s.get("text_verified")),
+                "citation_title": s.get("citation_title") or s.get("title", sid),
             }
             for sid, s in (mapping.get("sources") or {}).items()
         }
@@ -74,6 +77,7 @@ class LegalIndex:
                     "clause": rule.get("clause"),
                     "summary": rule.get("summary_ru"),
                     "human_verified": bool(rule.get("human_verified")),
+                    "text_verified": bool(rule.get("text_verified")),
                     "qualifier": rule.get("qualifier_ru"),
                     "source": source,
                 }
@@ -93,19 +97,22 @@ def citation(basis: dict) -> str:
     by_source: dict[str, list[str]] = {}
     sources: dict[str, dict] = {}
     for c in basis["rules"]:
+        source = c["source"]
+        if not (source.get("binding") and source.get("official") and source.get("text_verified") and c.get("text_verified")):
+            continue
         sid = c["source"].get("source_id", "")
         by_source.setdefault(sid, []).append(c["clause"])
         sources[sid] = c["source"]
     parts = []
     for sid, clauses in by_source.items():
         s = sources[sid]
-        text = f"{s.get('title', sid)}, {'; '.join(clauses)}"
+        text = f"{s.get('citation_title') or s.get('title', sid)}, {'; '.join(clauses)}"
         if s.get("url"):
             text += f" ({s['url']})"
         if not s.get("binding", True):
             text += " — вспомогательный образец, не НПА"
         parts.append(text)
-    return "Основание: " + " | ".join(parts) if parts else ""
+    return "Источник: " + " | ".join(parts) if parts else ""
 
 
 def load_legal(mapping_file: Path, crosswalk_file: Path) -> LegalIndex:

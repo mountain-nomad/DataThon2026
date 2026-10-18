@@ -1,0 +1,34 @@
+{
+  "id": "Х-12",
+  "job_id": "9145604b010c8598",
+  "categories": [
+    "7"
+  ],
+  "timeline_sha256": "deb2737f65711c63e49a99d3a100785a3c62ac5382e59f31ef3d44377b34e970",
+  "prompt_sha256": "91b3b55d91856f96b12f9123e5433ca4026ed2e36ff8d95778da55fd46b2f6da",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 3628,
+  "parsed": {
+    "evidence_check": [
+      "Кассир закрывает ноутбук, нажимает кнопку на устройстве, подходит к шкафу, открывает и закрывает его, затем выходит из кабинета, закрывая дверь."
+    ],
+    "limitations": [
+      "Не видно, что именно находится внутри шкафа и были ли там деньги или документы до/после осмотра."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "9145604b010c8598",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 9.082518490962684
+}

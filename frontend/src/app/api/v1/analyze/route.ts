@@ -1,3 +1,6 @@
+import type { NextRequest } from "next/server";
+import { authEnabled, validSession, validApiKey, SESSION_COOKIE } from "@/lib/site-auth";
+
 // Upload proxy for /demo-inference (backend_description.md §8). The backend's /api/v1 needs
 // X-API-Key, which must never reach the browser, so this server-side handler adds it.
 // It's a static route on purpose: the /api/:path* rewrite in next.config.ts runs before
@@ -5,8 +8,16 @@
 
 const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:8000";
 
-export async function POST(request: Request) {
-  const apiKey = process.env.ANALYSIS_API_KEY;
+export async function POST(request: NextRequest) {
+  const suppliedKey = request.headers.get("x-api-key");
+  if (suppliedKey !== null) {
+    if (!validApiKey(suppliedKey)) {
+      return Response.json({ detail: "Invalid or missing API key" }, { status: 401 });
+    }
+  } else if (authEnabled() && !validSession(request.cookies.get(SESSION_COOKIE)?.value)) {
+    return Response.json({ detail: "Invalid or missing API key" }, { status: 401 });
+  }
+  const apiKey = suppliedKey ?? process.env.ANALYSIS_API_KEY;
   if (!apiKey) {
     return Response.json({ detail: "ANALYSIS_API_KEY is not set on the frontend server." }, { status: 500 });
   }

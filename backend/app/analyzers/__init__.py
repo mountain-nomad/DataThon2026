@@ -46,6 +46,7 @@ class Scenario(BaseModel):
 
 
 class SpecialistResult(BaseModel):
+    limitations: list[str] = []  # actual model limitations, preserved separately from facts
     scenario: str | None = None  # the scenario whose specialist produced it
     status: str  # "violation" | "no_violation" | "insufficient_evidence"
     rule_id: str | None = None

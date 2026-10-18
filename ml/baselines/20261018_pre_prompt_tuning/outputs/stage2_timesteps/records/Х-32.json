@@ -1,0 +1,736 @@
+{
+  "id": "Х-32",
+  "sha256": "bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9",
+  "duration_sec": 21.3,
+  "status": "done",
+  "synthetic_control_passed": true,
+  "prompt_sha256": "362646955cc096bdbeb285e27881a2ef6c4e02622e966d00a38dc51c60ee55b4",
+  "full": {
+    "start": 0,
+    "end": 21.3,
+    "events": [
+      {
+        "t": 0.0,
+        "action": "setup",
+        "event": "Видимая сцена: пустой офисный кабинет с деревянным столом, на котором лежат черные электронные устройства и провода, рядом стоит белый стул, в центре переднего плана видна белая столешница, стеклянная дверь в коридор закрыта."
+      },
+      {
+        "t": 1.6,
+        "action": "client_enter",
+        "event": "В кабинет через стеклянную дверь входит клиент, закрывая за собой дверь."
+      },
+      {
+        "t": 5.0,
+        "action": "other",
+        "event": "Клиент подходит к рабочему столу, поправляет белый стул, пододвигая его к столешнице."
+      },
+      {
+        "t": 9.8,
+        "action": "other",
+        "event": "Клиент садится на стул за столом, опираясь руками на столешницу."
+      },
+      {
+        "t": 12.8,
+        "action": "other",
+        "event": "Клиент встает со стула и наклоняется к черному устройству на столе, чтобы рассмотреть его."
+      },
+      {
+        "t": 15.8,
+        "action": "other",
+        "event": "Клиент стоит у стола, наклонившись, и манипулирует руками с черным устройством и проводами на столешнице."
+      },
+      {
+        "t": 19.8,
+        "action": "other",
+        "event": "Клиент продолжает наклоняться к столу, поправляя провода и устройство, в конце кадра он все еще стоит у стола, взаимодействуя с оборудованием."
+      }
+    ],
+    "original_events": [
+      {
+        "t": 0.0,
+        "action": "setup",
+        "event": "Видимая сцена: пустой офисный кабинет с деревянным столом, на котором лежат черные электронные устройства и провода, рядом стоит белый стул, в центре переднего плана видна белая столешница, стеклянная дверь в коридор закрыта."
+      },
+      {
+        "t": 1.6,
+        "action": "client_enter",
+        "event": "В кабинет через стеклянную дверь входит женщина в розовой блузке и черных брюках, закрывая за собой дверь."
+      },
+      {
+        "t": 5.0,
+        "action": "other",
+        "event": "Женщина подходит к рабочему столу, поправляет белый стул, пододвигая его к столешнице."
+      },
+      {
+        "t": 9.8,
+        "action": "other",
+        "event": "Женщина садится на стул за столом, опираясь руками на столешницу."
+      },
+      {
+        "t": 12.8,
+        "action": "other",
+        "event": "Женщина встает со стула и наклоняется к черному устройству на столе, чтобы рассмотреть его."
+      },
+      {
+        "t": 15.8,
+        "action": "other",
+        "event": "Женщина стоит у стола, наклонившись, и манипулирует руками с черным устройством и проводами на столешнице."
+      },
+      {
+        "t": 19.8,
+        "action": "other",
+        "event": "Женщина продолжает наклоняться к столу, поправляя провода и устройство, в конце кадра она все еще стоит у стола, взаимодействуя с оборудованием."
+      }
+    ],
+    "samples": [
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00000.png",
+        "source_index": 0,
+        "timestamp_sec": 0.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00001.png",
+        "source_index": 6,
+        "timestamp_sec": 0.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00002.png",
+        "source_index": 12,
+        "timestamp_sec": 0.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00003.png",
+        "source_index": 18,
+        "timestamp_sec": 0.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00004.png",
+        "source_index": 24,
+        "timestamp_sec": 0.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00005.png",
+        "source_index": 30,
+        "timestamp_sec": 1.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00006.png",
+        "source_index": 36,
+        "timestamp_sec": 1.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00007.png",
+        "source_index": 42,
+        "timestamp_sec": 1.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00008.png",
+        "source_index": 48,
+        "timestamp_sec": 1.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00009.png",
+        "source_index": 54,
+        "timestamp_sec": 1.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00010.png",
+        "source_index": 60,
+        "timestamp_sec": 2.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00011.png",
+        "source_index": 66,
+        "timestamp_sec": 2.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00012.png",
+        "source_index": 72,
+        "timestamp_sec": 2.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00013.png",
+        "source_index": 78,
+        "timestamp_sec": 2.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00014.png",
+        "source_index": 84,
+        "timestamp_sec": 2.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00015.png",
+        "source_index": 90,
+        "timestamp_sec": 3.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00016.png",
+        "source_index": 96,
+        "timestamp_sec": 3.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00017.png",
+        "source_index": 102,
+        "timestamp_sec": 3.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00018.png",
+        "source_index": 108,
+        "timestamp_sec": 3.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00019.png",
+        "source_index": 114,
+        "timestamp_sec": 3.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00020.png",
+        "source_index": 120,
+        "timestamp_sec": 4.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00021.png",
+        "source_index": 126,
+        "timestamp_sec": 4.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00022.png",
+        "source_index": 132,
+        "timestamp_sec": 4.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00023.png",
+        "source_index": 138,
+        "timestamp_sec": 4.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00024.png",
+        "source_index": 144,
+        "timestamp_sec": 4.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00025.png",
+        "source_index": 150,
+        "timestamp_sec": 5.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00026.png",
+        "source_index": 156,
+        "timestamp_sec": 5.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00027.png",
+        "source_index": 162,
+        "timestamp_sec": 5.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00028.png",
+        "source_index": 168,
+        "timestamp_sec": 5.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00029.png",
+        "source_index": 174,
+        "timestamp_sec": 5.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00030.png",
+        "source_index": 180,
+        "timestamp_sec": 6.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00031.png",
+        "source_index": 186,
+        "timestamp_sec": 6.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00032.png",
+        "source_index": 192,
+        "timestamp_sec": 6.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00033.png",
+        "source_index": 198,
+        "timestamp_sec": 6.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00034.png",
+        "source_index": 204,
+        "timestamp_sec": 6.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00035.png",
+        "source_index": 210,
+        "timestamp_sec": 7.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00036.png",
+        "source_index": 216,
+        "timestamp_sec": 7.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00037.png",
+        "source_index": 222,
+        "timestamp_sec": 7.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00038.png",
+        "source_index": 228,
+        "timestamp_sec": 7.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00039.png",
+        "source_index": 234,
+        "timestamp_sec": 7.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00040.png",
+        "source_index": 240,
+        "timestamp_sec": 8.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00041.png",
+        "source_index": 246,
+        "timestamp_sec": 8.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00042.png",
+        "source_index": 252,
+        "timestamp_sec": 8.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00043.png",
+        "source_index": 258,
+        "timestamp_sec": 8.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00044.png",
+        "source_index": 264,
+        "timestamp_sec": 8.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00045.png",
+        "source_index": 270,
+        "timestamp_sec": 9.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00046.png",
+        "source_index": 276,
+        "timestamp_sec": 9.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00047.png",
+        "source_index": 282,
+        "timestamp_sec": 9.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00048.png",
+        "source_index": 288,
+        "timestamp_sec": 9.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00049.png",
+        "source_index": 294,
+        "timestamp_sec": 9.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00050.png",
+        "source_index": 300,
+        "timestamp_sec": 10.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00051.png",
+        "source_index": 306,
+        "timestamp_sec": 10.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00052.png",
+        "source_index": 312,
+        "timestamp_sec": 10.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00053.png",
+        "source_index": 318,
+        "timestamp_sec": 10.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00054.png",
+        "source_index": 324,
+        "timestamp_sec": 10.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00055.png",
+        "source_index": 330,
+        "timestamp_sec": 11.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00056.png",
+        "source_index": 336,
+        "timestamp_sec": 11.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00057.png",
+        "source_index": 342,
+        "timestamp_sec": 11.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00058.png",
+        "source_index": 348,
+        "timestamp_sec": 11.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00059.png",
+        "source_index": 354,
+        "timestamp_sec": 11.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00060.png",
+        "source_index": 360,
+        "timestamp_sec": 12.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00061.png",
+        "source_index": 366,
+        "timestamp_sec": 12.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00062.png",
+        "source_index": 372,
+        "timestamp_sec": 12.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00063.png",
+        "source_index": 378,
+        "timestamp_sec": 12.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00064.png",
+        "source_index": 384,
+        "timestamp_sec": 12.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00065.png",
+        "source_index": 390,
+        "timestamp_sec": 13.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00066.png",
+        "source_index": 396,
+        "timestamp_sec": 13.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00067.png",
+        "source_index": 402,
+        "timestamp_sec": 13.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00068.png",
+        "source_index": 408,
+        "timestamp_sec": 13.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00069.png",
+        "source_index": 414,
+        "timestamp_sec": 13.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00070.png",
+        "source_index": 420,
+        "timestamp_sec": 14.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00071.png",
+        "source_index": 426,
+        "timestamp_sec": 14.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00072.png",
+        "source_index": 432,
+        "timestamp_sec": 14.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00073.png",
+        "source_index": 438,
+        "timestamp_sec": 14.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00074.png",
+        "source_index": 444,
+        "timestamp_sec": 14.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00075.png",
+        "source_index": 450,
+        "timestamp_sec": 15.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00076.png",
+        "source_index": 456,
+        "timestamp_sec": 15.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00077.png",
+        "source_index": 462,
+        "timestamp_sec": 15.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00078.png",
+        "source_index": 468,
+        "timestamp_sec": 15.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00079.png",
+        "source_index": 473,
+        "timestamp_sec": 15.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00080.png",
+        "source_index": 478,
+        "timestamp_sec": 16.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00081.png",
+        "source_index": 484,
+        "timestamp_sec": 16.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00082.png",
+        "source_index": 490,
+        "timestamp_sec": 16.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00083.png",
+        "source_index": 496,
+        "timestamp_sec": 16.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00084.png",
+        "source_index": 502,
+        "timestamp_sec": 16.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00085.png",
+        "source_index": 508,
+        "timestamp_sec": 17.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00086.png",
+        "source_index": 514,
+        "timestamp_sec": 17.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00087.png",
+        "source_index": 520,
+        "timestamp_sec": 17.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00088.png",
+        "source_index": 526,
+        "timestamp_sec": 17.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00089.png",
+        "source_index": 532,
+        "timestamp_sec": 17.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00090.png",
+        "source_index": 538,
+        "timestamp_sec": 18.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00091.png",
+        "source_index": 544,
+        "timestamp_sec": 18.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00092.png",
+        "source_index": 550,
+        "timestamp_sec": 18.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00093.png",
+        "source_index": 556,
+        "timestamp_sec": 18.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00094.png",
+        "source_index": 562,
+        "timestamp_sec": 18.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00095.png",
+        "source_index": 568,
+        "timestamp_sec": 19.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00096.png",
+        "source_index": 574,
+        "timestamp_sec": 19.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00097.png",
+        "source_index": 580,
+        "timestamp_sec": 19.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00098.png",
+        "source_index": 586,
+        "timestamp_sec": 19.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00099.png",
+        "source_index": 592,
+        "timestamp_sec": 19.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00100.png",
+        "source_index": 598,
+        "timestamp_sec": 20.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00101.png",
+        "source_index": 604,
+        "timestamp_sec": 20.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00102.png",
+        "source_index": 610,
+        "timestamp_sec": 20.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00103.png",
+        "source_index": 616,
+        "timestamp_sec": 20.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00104.png",
+        "source_index": 622,
+        "timestamp_sec": 20.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00105.png",
+        "source_index": 628,
+        "timestamp_sec": 21.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00106.png",
+        "source_index": 634,
+        "timestamp_sec": 21.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/bcc277cbf1a36245156b2bb9a0e0b826432390b42040c0b82201a8c21ab23ce9/00106.png",
+        "source_index": 634,
+        "timestamp_sec": 21.2
+      }
+    ],
+    "stats": {
+      "input_shapes": {
+        "input_ids": [
+          1,
+          22275
+        ],
+        "attention_mask": [
+          1,
+          22275
+        ],
+        "mm_token_type_ids": [
+          1,
+          22275
+        ],
+        "pixel_values_videos": [
+          78624,
+          1536
+        ],
+        "video_grid_thw": [
+          1,
+          3
+        ]
+      },
+      "input_tokens": 22275,
+      "output_tokens": 444,
+      "sampled_frames": 108,
+      "vision_forward_calls": 1,
+      "video_grid_thw": [
+        [
+          54,
+          52,
+          28
+        ]
+      ]
+    },
+    "text_input_keys": [
+      "input_ids",
+      "attention_mask"
+    ]
+  },
+  "focus_windows": [],
+  "observations": [
+    {
+      "t": 0.0,
+      "action": "setup",
+      "event": "Видимая сцена: пустой офисный кабинет с деревянным столом, на котором лежат черные электронные устройства и провода, рядом стоит белый стул, в центре переднего плана видна белая столешница, стеклянная дверь в коридор закрыта."
+    },
+    {
+      "t": 1.6,
+      "action": "client_enter",
+      "event": "В кабинет через стеклянную дверь входит клиент, закрывая за собой дверь."
+    },
+    {
+      "t": 5.0,
+      "action": "other",
+      "event": "Клиент подходит к рабочему столу, поправляет белый стул, пододвигая его к столешнице."
+    },
+    {
+      "t": 9.8,
+      "action": "other",
+      "event": "Клиент садится на стул за столом, опираясь руками на столешницу."
+    },
+    {
+      "t": 12.8,
+      "action": "other",
+      "event": "Клиент встает со стула и наклоняется к черному устройству на столе, чтобы рассмотреть его."
+    },
+    {
+      "t": 15.8,
+      "action": "other",
+      "event": "Клиент стоит у стола, наклонившись, и манипулирует руками с черным устройством и проводами на столешнице."
+    },
+    {
+      "t": 19.8,
+      "action": "other",
+      "event": "Клиент продолжает наклоняться к столу, поправляя провода и устройство, в конце кадра он все еще стоит у стола, взаимодействуя с оборудованием."
+    }
+  ],
+  "timeline": [
+    {
+      "t": 0.0,
+      "event": "Видимая сцена: пустой офисный кабинет с деревянным столом, на котором лежат черные электронные устройства и провода, рядом стоит белый стул, в центре переднего плана видна белая столешница, стеклянная дверь в коридор закрыта."
+    },
+    {
+      "t": 1.6,
+      "event": "В кабинет через стеклянную дверь входит клиент, закрывая за собой дверь."
+    },
+    {
+      "t": 5.0,
+      "event": "Клиент подходит к рабочему столу, поправляет белый стул, пододвигая его к столешнице."
+    },
+    {
+      "t": 9.8,
+      "event": "Клиент садится на стул за столом, опираясь руками на столешницу."
+    },
+    {
+      "t": 12.8,
+      "event": "Клиент встает со стула и наклоняется к черному устройству на столе, чтобы рассмотреть его."
+    },
+    {
+      "t": 15.8,
+      "event": "Клиент стоит у стола, наклонившись, и манипулирует руками с черным устройством и проводами на столешнице."
+    },
+    {
+      "t": 19.8,
+      "event": "Клиент продолжает наклоняться к столу, поправляя провода и устройство, в конце кадра он все еще стоит у стола, взаимодействуя с оборудованием."
+    }
+  ],
+  "elapsed_sec": 72.58605052001076
+}

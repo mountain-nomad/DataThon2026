@@ -134,6 +134,10 @@ def _type_name(basis: dict | None, r: dict) -> str:
     The regulation's own wording comes first: it is what the organizers' violation types are
     written in. The legal mapping's type name is the fallback.
     """
+    if r.get("rule_id") and r.get("type"):
+        from app.finding_catalog import require_type
+        require_type(r["rule_id"], r["type"])
+        return r["type"]
     if text := _rule_text(r).rstrip("."):
         return text[:1].upper() + text[1:]
     if basis and basis.get("name"):
@@ -145,10 +149,20 @@ def _description(r: dict, basis: dict | None) -> str:
     """What is visible, why it may be a violation, and the public source."""
     lines = [r.get("evidence") or "Признаки нарушения на видео."]
     if text := _rule_text(r):
-        lines.append(f"Почему это может быть нарушением: по регламенту — {text}")
+        lines.append(f"Сценарное правило: {text}")
+    limitations = list(r.get("limitations") or [])
+    if basis:
+        if basis.get("limitations"):
+            limitations.append(basis["limitations"])
+        for clause in basis.get("rules", []):
+            if clause.get("qualifier"):
+                limitations.append(clause["qualifier"])
+    limitations = list(dict.fromkeys(text.strip() for text in limitations if text and text.strip()))
+    if limitations:
+        lines.append("Ограничения: " + " ".join(limitations))
     if basis and (cite := citation(basis)):
         lines.append(cite)
-    return "\n".join(lines)
+    return "\n\n".join(lines)
 
 
 PIPELINE_FIELDS = ("scenario", "rule_id", "status", "quote", "evidence", "start_sec", "end_sec")

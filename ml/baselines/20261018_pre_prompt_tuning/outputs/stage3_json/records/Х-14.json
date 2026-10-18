@@ -1,0 +1,35 @@
+{
+  "id": "Х-14",
+  "job_id": "845b0cfc71ce2c7f",
+  "categories": [
+    "5",
+    "2"
+  ],
+  "timeline_sha256": "54766fcf468a5958e5be8f03af29b0df5d25722c530255e3b92adabc6773b966",
+  "prompt_sha256": "34d16a034685a3251e4010badaef7db3005a76bed763810a241ed44274a0097a",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 5134,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается извлечение денег из сумки, их пересчет на столе и последующее помещение в шкаф (сейф) без клиента. Клиентские этапы не применимы."
+    ],
+    "limitations": [
+      "Видео может быть отрезком; не показано, была ли проверка подлинности купюр или запись в учетную тетрадь после закрытия сейфа."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "845b0cfc71ce2c7f",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 10.282153817010112
+}

@@ -1,0 +1,36 @@
+{
+  "id": "Х-8",
+  "job_id": "91dce174ea3b4618",
+  "categories": [
+    "2",
+    "4"
+  ],
+  "timeline_sha256": "d4aec140db2e9231c32c83795f33db15fe46c38c8368bd2e915aebd69e6e4abc",
+  "prompt_sha256": "1df28c1ef191db8f745fd0c422ad52e6f504f7de173f9b0b63d8a9ed2b4ed6d5",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4654,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается самостоятельный подсчет купюр кассиром без клиента, последующее внесение денег в сейф и закрытие дверцы (разделы 2Б и 6).",
+      "Клиент отсутствует, поэтому клиентские этапы (проверка документов, внесение в присутствии клиента) не применяются."
+    ],
+    "limitations": [
+      "Видео является фрагментом, начало и конец полной операции не видны."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "91dce174ea3b4618",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 11.13045484398026
+}

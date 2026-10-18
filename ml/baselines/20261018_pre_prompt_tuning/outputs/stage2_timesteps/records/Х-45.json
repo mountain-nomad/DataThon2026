@@ -1,0 +1,979 @@
+{
+  "id": "Х-45",
+  "sha256": "524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7",
+  "duration_sec": 33.333020833333336,
+  "status": "done",
+  "synthetic_control_passed": true,
+  "prompt_sha256": "362646955cc096bdbeb285e27881a2ef6c4e02622e966d00a38dc51c60ee55b4",
+  "full": {
+    "start": 0,
+    "end": 33.333020833333336,
+    "events": [
+      {
+        "t": 0.0,
+        "action": "setup",
+        "event": "Кассир в белой блузе сидит за деревянным столом в кабинете с белыми стенами и стеклянной перегородкой, на столе перед ней лежат деньги и документы, справа стоит счётчик банкнот, слева — ноутбук и детектор, напротив пустое синее кресло."
+      },
+      {
+        "t": 1.0,
+        "action": "other",
+        "event": "Кассир поднимает правую руку и нажимает кнопку на верхней панели счётчика банкнот."
+      },
+      {
+        "t": 3.4,
+        "action": "other",
+        "event": "Кассир опускает руку на стол и смотрит на устройство."
+      },
+      {
+        "t": 8.0,
+        "action": "other",
+        "event": "Кассир берёт со стола деньги и перекладывает их перед собой."
+      },
+      {
+        "t": 10.0,
+        "action": "other",
+        "event": "Кассир держит деньги в руках и рассматривает их."
+      },
+      {
+        "t": 12.0,
+        "action": "counter_load",
+        "event": "Кассир берёт часть денег и загружает их в приёмный лоток счётчика банкнот."
+      },
+      {
+        "t": 13.0,
+        "action": "counter_load",
+        "event": "Кассир продолжает загружать деньги в счётчик, выравнивая их в лотке."
+      },
+      {
+        "t": 15.0,
+        "action": "other",
+        "event": "Кассир запускает процесс подсчёта, нажимая на панель управления."
+      },
+      {
+        "t": 18.0,
+        "action": "counter_unload",
+        "event": "Кассир извлекает отсчитанные деньги из нижнего лотка счётчика."
+      },
+      {
+        "t": 20.0,
+        "action": "other",
+        "event": "Кассир кладёт извлечённые деньги на стол перед собой."
+      },
+      {
+        "t": 22.0,
+        "action": "other",
+        "event": "Кассир берёт оставшиеся деньги и рассматривает их в руках."
+      },
+      {
+        "t": 25.0,
+        "action": "other",
+        "event": "Кассир складывает деньги в стопку на столе."
+      },
+      {
+        "t": 28.0,
+        "action": "other",
+        "event": "Кассир выравнивает стопку денег на столе."
+      },
+      {
+        "t": 33.0,
+        "action": "other",
+        "event": "Кассир сидит за столом, перед ней лежит стопка денег, она смотрит на них."
+      }
+    ],
+    "original_events": [
+      {
+        "t": 0.0,
+        "action": "setup",
+        "event": "Кассир в белой блузе сидит за деревянным столом в кабинете с белыми стенами и стеклянной перегородкой, на столе перед ней лежат пачка денег и документы, справа стоит счётчик банкнот, слева — ноутбук и детектор, напротив пустое синее кресло."
+      },
+      {
+        "t": 1.0,
+        "action": "other",
+        "event": "Кассир поднимает правую руку и нажимает кнопку на верхней панели счётчика банкнот."
+      },
+      {
+        "t": 3.4,
+        "action": "other",
+        "event": "Кассир опускает руку на стол и смотрит на устройство."
+      },
+      {
+        "t": 8.0,
+        "action": "other",
+        "event": "Кассир берёт со стола пачку денег и перекладывает её перед собой."
+      },
+      {
+        "t": 10.0,
+        "action": "other",
+        "event": "Кассир держит пачку денег в руках и рассматривает её."
+      },
+      {
+        "t": 12.0,
+        "action": "counter_load",
+        "event": "Кассир берёт часть купюр из пачки и загружает их в приёмный лоток счётчика банкнот."
+      },
+      {
+        "t": 13.0,
+        "action": "counter_load",
+        "event": "Кассир продолжает загружать купюры в счётчик, выравнивая их в лотке."
+      },
+      {
+        "t": 15.0,
+        "action": "other",
+        "event": "Кассир запускает процесс подсчёта, нажимая на панель управления."
+      },
+      {
+        "t": 18.0,
+        "action": "counter_unload",
+        "event": "Кассир извлекает отсчитанные купюры из нижнего лотка счётчика."
+      },
+      {
+        "t": 20.0,
+        "action": "other",
+        "event": "Кассир кладёт извлечённые купюры на стол перед собой."
+      },
+      {
+        "t": 22.0,
+        "action": "other",
+        "event": "Кассир берёт оставшиеся купюры из пачки и рассматривает их в руках."
+      },
+      {
+        "t": 25.0,
+        "action": "other",
+        "event": "Кассир складывает купюры в стопку на столе."
+      },
+      {
+        "t": 28.0,
+        "action": "other",
+        "event": "Кассир выравнивает стопку денег на столе."
+      },
+      {
+        "t": 33.0,
+        "action": "other",
+        "event": "Кассир сидит за столом, перед ней лежит стопка денег, она смотрит на них."
+      }
+    ],
+    "samples": [
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00000.png",
+        "source_index": 0,
+        "timestamp_sec": 0.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00001.png",
+        "source_index": 6,
+        "timestamp_sec": 0.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00003.png",
+        "source_index": 18,
+        "timestamp_sec": 0.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00004.png",
+        "source_index": 24,
+        "timestamp_sec": 0.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00005.png",
+        "source_index": 30,
+        "timestamp_sec": 1.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00006.png",
+        "source_index": 36,
+        "timestamp_sec": 1.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00008.png",
+        "source_index": 48,
+        "timestamp_sec": 1.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00009.png",
+        "source_index": 54,
+        "timestamp_sec": 1.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00010.png",
+        "source_index": 60,
+        "timestamp_sec": 2.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00012.png",
+        "source_index": 72,
+        "timestamp_sec": 2.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00013.png",
+        "source_index": 78,
+        "timestamp_sec": 2.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00014.png",
+        "source_index": 84,
+        "timestamp_sec": 2.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00015.png",
+        "source_index": 90,
+        "timestamp_sec": 3.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00017.png",
+        "source_index": 102,
+        "timestamp_sec": 3.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00018.png",
+        "source_index": 108,
+        "timestamp_sec": 3.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00019.png",
+        "source_index": 114,
+        "timestamp_sec": 3.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00021.png",
+        "source_index": 126,
+        "timestamp_sec": 4.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00022.png",
+        "source_index": 132,
+        "timestamp_sec": 4.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00023.png",
+        "source_index": 138,
+        "timestamp_sec": 4.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00024.png",
+        "source_index": 144,
+        "timestamp_sec": 4.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00026.png",
+        "source_index": 156,
+        "timestamp_sec": 5.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00027.png",
+        "source_index": 162,
+        "timestamp_sec": 5.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00028.png",
+        "source_index": 168,
+        "timestamp_sec": 5.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00030.png",
+        "source_index": 180,
+        "timestamp_sec": 6.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00031.png",
+        "source_index": 186,
+        "timestamp_sec": 6.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00032.png",
+        "source_index": 192,
+        "timestamp_sec": 6.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00033.png",
+        "source_index": 198,
+        "timestamp_sec": 6.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00035.png",
+        "source_index": 210,
+        "timestamp_sec": 7.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00036.png",
+        "source_index": 216,
+        "timestamp_sec": 7.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00037.png",
+        "source_index": 222,
+        "timestamp_sec": 7.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00039.png",
+        "source_index": 234,
+        "timestamp_sec": 7.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00040.png",
+        "source_index": 240,
+        "timestamp_sec": 8.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00041.png",
+        "source_index": 246,
+        "timestamp_sec": 8.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00042.png",
+        "source_index": 252,
+        "timestamp_sec": 8.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00044.png",
+        "source_index": 264,
+        "timestamp_sec": 8.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00045.png",
+        "source_index": 270,
+        "timestamp_sec": 9.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00046.png",
+        "source_index": 276,
+        "timestamp_sec": 9.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00048.png",
+        "source_index": 288,
+        "timestamp_sec": 9.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00049.png",
+        "source_index": 294,
+        "timestamp_sec": 9.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00050.png",
+        "source_index": 300,
+        "timestamp_sec": 10.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00051.png",
+        "source_index": 306,
+        "timestamp_sec": 10.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00053.png",
+        "source_index": 318,
+        "timestamp_sec": 10.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00054.png",
+        "source_index": 324,
+        "timestamp_sec": 10.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00055.png",
+        "source_index": 330,
+        "timestamp_sec": 11.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00057.png",
+        "source_index": 342,
+        "timestamp_sec": 11.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00058.png",
+        "source_index": 348,
+        "timestamp_sec": 11.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00059.png",
+        "source_index": 354,
+        "timestamp_sec": 11.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00060.png",
+        "source_index": 360,
+        "timestamp_sec": 12.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00062.png",
+        "source_index": 372,
+        "timestamp_sec": 12.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00063.png",
+        "source_index": 378,
+        "timestamp_sec": 12.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00064.png",
+        "source_index": 384,
+        "timestamp_sec": 12.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00066.png",
+        "source_index": 396,
+        "timestamp_sec": 13.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00067.png",
+        "source_index": 402,
+        "timestamp_sec": 13.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00068.png",
+        "source_index": 408,
+        "timestamp_sec": 13.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00069.png",
+        "source_index": 414,
+        "timestamp_sec": 13.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00071.png",
+        "source_index": 426,
+        "timestamp_sec": 14.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00072.png",
+        "source_index": 432,
+        "timestamp_sec": 14.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00073.png",
+        "source_index": 438,
+        "timestamp_sec": 14.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00075.png",
+        "source_index": 450,
+        "timestamp_sec": 15.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00076.png",
+        "source_index": 456,
+        "timestamp_sec": 15.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00077.png",
+        "source_index": 462,
+        "timestamp_sec": 15.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00078.png",
+        "source_index": 467,
+        "timestamp_sec": 15.633
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00080.png",
+        "source_index": 476,
+        "timestamp_sec": 16.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00081.png",
+        "source_index": 482,
+        "timestamp_sec": 16.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00082.png",
+        "source_index": 488,
+        "timestamp_sec": 16.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00084.png",
+        "source_index": 500,
+        "timestamp_sec": 16.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00085.png",
+        "source_index": 506,
+        "timestamp_sec": 17.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00086.png",
+        "source_index": 512,
+        "timestamp_sec": 17.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00088.png",
+        "source_index": 524,
+        "timestamp_sec": 17.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00089.png",
+        "source_index": 530,
+        "timestamp_sec": 17.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00090.png",
+        "source_index": 536,
+        "timestamp_sec": 18.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00091.png",
+        "source_index": 542,
+        "timestamp_sec": 18.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00093.png",
+        "source_index": 554,
+        "timestamp_sec": 18.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00094.png",
+        "source_index": 560,
+        "timestamp_sec": 18.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00095.png",
+        "source_index": 566,
+        "timestamp_sec": 19.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00097.png",
+        "source_index": 578,
+        "timestamp_sec": 19.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00098.png",
+        "source_index": 584,
+        "timestamp_sec": 19.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00099.png",
+        "source_index": 590,
+        "timestamp_sec": 19.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00100.png",
+        "source_index": 596,
+        "timestamp_sec": 20.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00102.png",
+        "source_index": 608,
+        "timestamp_sec": 20.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00103.png",
+        "source_index": 614,
+        "timestamp_sec": 20.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00104.png",
+        "source_index": 620,
+        "timestamp_sec": 20.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00106.png",
+        "source_index": 632,
+        "timestamp_sec": 21.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00107.png",
+        "source_index": 638,
+        "timestamp_sec": 21.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00108.png",
+        "source_index": 644,
+        "timestamp_sec": 21.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00109.png",
+        "source_index": 650,
+        "timestamp_sec": 21.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00111.png",
+        "source_index": 662,
+        "timestamp_sec": 22.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00112.png",
+        "source_index": 668,
+        "timestamp_sec": 22.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00113.png",
+        "source_index": 674,
+        "timestamp_sec": 22.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00115.png",
+        "source_index": 686,
+        "timestamp_sec": 23.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00116.png",
+        "source_index": 692,
+        "timestamp_sec": 23.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00117.png",
+        "source_index": 698,
+        "timestamp_sec": 23.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00118.png",
+        "source_index": 704,
+        "timestamp_sec": 23.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00120.png",
+        "source_index": 716,
+        "timestamp_sec": 24.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00121.png",
+        "source_index": 722,
+        "timestamp_sec": 24.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00122.png",
+        "source_index": 728,
+        "timestamp_sec": 24.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00124.png",
+        "source_index": 740,
+        "timestamp_sec": 24.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00125.png",
+        "source_index": 746,
+        "timestamp_sec": 25.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00126.png",
+        "source_index": 752,
+        "timestamp_sec": 25.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00127.png",
+        "source_index": 758,
+        "timestamp_sec": 25.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00129.png",
+        "source_index": 770,
+        "timestamp_sec": 25.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00130.png",
+        "source_index": 776,
+        "timestamp_sec": 26.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00131.png",
+        "source_index": 782,
+        "timestamp_sec": 26.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00133.png",
+        "source_index": 794,
+        "timestamp_sec": 26.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00134.png",
+        "source_index": 800,
+        "timestamp_sec": 26.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00135.png",
+        "source_index": 806,
+        "timestamp_sec": 27.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00136.png",
+        "source_index": 812,
+        "timestamp_sec": 27.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00138.png",
+        "source_index": 824,
+        "timestamp_sec": 27.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00139.png",
+        "source_index": 830,
+        "timestamp_sec": 27.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00140.png",
+        "source_index": 836,
+        "timestamp_sec": 28.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00142.png",
+        "source_index": 848,
+        "timestamp_sec": 28.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00143.png",
+        "source_index": 854,
+        "timestamp_sec": 28.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00144.png",
+        "source_index": 860,
+        "timestamp_sec": 28.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00145.png",
+        "source_index": 866,
+        "timestamp_sec": 29.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00147.png",
+        "source_index": 878,
+        "timestamp_sec": 29.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00148.png",
+        "source_index": 884,
+        "timestamp_sec": 29.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00149.png",
+        "source_index": 890,
+        "timestamp_sec": 29.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00151.png",
+        "source_index": 902,
+        "timestamp_sec": 30.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00152.png",
+        "source_index": 908,
+        "timestamp_sec": 30.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00153.png",
+        "source_index": 914,
+        "timestamp_sec": 30.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00154.png",
+        "source_index": 920,
+        "timestamp_sec": 30.8
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00156.png",
+        "source_index": 932,
+        "timestamp_sec": 31.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00157.png",
+        "source_index": 938,
+        "timestamp_sec": 31.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00158.png",
+        "source_index": 944,
+        "timestamp_sec": 31.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00160.png",
+        "source_index": 956,
+        "timestamp_sec": 32.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00161.png",
+        "source_index": 962,
+        "timestamp_sec": 32.2
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00162.png",
+        "source_index": 968,
+        "timestamp_sec": 32.4
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00163.png",
+        "source_index": 974,
+        "timestamp_sec": 32.6
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00165.png",
+        "source_index": 986,
+        "timestamp_sec": 33.0
+      },
+      {
+        "path": "artifacts/all_videos_full_frame_usage_rule/frames/524bf9ff2d5e81211dbbeff73129dbb5f3a5e5e35a64f443f53e16b1c2d471c7/00166.png",
+        "source_index": 992,
+        "timestamp_sec": 33.2
+      }
+    ],
+    "stats": {
+      "input_shapes": {
+        "input_ids": [
+          1,
+          26528
+        ],
+        "attention_mask": [
+          1,
+          26528
+        ],
+        "mm_token_type_ids": [
+          1,
+          26528
+        ],
+        "pixel_values_videos": [
+          94640,
+          1536
+        ],
+        "video_grid_thw": [
+          1,
+          3
+        ]
+      },
+      "input_tokens": 26528,
+      "output_tokens": 763,
+      "sampled_frames": 130,
+      "vision_forward_calls": 1,
+      "video_grid_thw": [
+        [
+          65,
+          52,
+          28
+        ]
+      ]
+    },
+    "text_input_keys": [
+      "input_ids",
+      "attention_mask"
+    ]
+  },
+  "focus_windows": [],
+  "observations": [
+    {
+      "t": 0.0,
+      "action": "setup",
+      "event": "Кассир в белой блузе сидит за деревянным столом в кабинете с белыми стенами и стеклянной перегородкой, на столе перед ней лежат деньги и документы, справа стоит счётчик банкнот, слева — ноутбук и детектор, напротив пустое синее кресло."
+    },
+    {
+      "t": 1.0,
+      "action": "other",
+      "event": "Кассир поднимает правую руку и нажимает кнопку на верхней панели счётчика банкнот."
+    },
+    {
+      "t": 3.4,
+      "action": "other",
+      "event": "Кассир опускает руку на стол и смотрит на устройство."
+    },
+    {
+      "t": 8.0,
+      "action": "other",
+      "event": "Кассир берёт со стола деньги и перекладывает их перед собой."
+    },
+    {
+      "t": 10.0,
+      "action": "other",
+      "event": "Кассир держит деньги в руках и рассматривает их."
+    },
+    {
+      "t": 12.0,
+      "action": "counter_load",
+      "event": "Кассир берёт часть денег и загружает их в приёмный лоток счётчика банкнот."
+    },
+    {
+      "t": 13.0,
+      "action": "counter_load",
+      "event": "Кассир продолжает загружать деньги в счётчик, выравнивая их в лотке."
+    },
+    {
+      "t": 15.0,
+      "action": "other",
+      "event": "Кассир запускает процесс подсчёта, нажимая на панель управления."
+    },
+    {
+      "t": 18.0,
+      "action": "counter_unload",
+      "event": "Кассир извлекает отсчитанные деньги из нижнего лотка счётчика."
+    },
+    {
+      "t": 20.0,
+      "action": "other",
+      "event": "Кассир кладёт извлечённые деньги на стол перед собой."
+    },
+    {
+      "t": 22.0,
+      "action": "other",
+      "event": "Кассир берёт оставшиеся деньги и рассматривает их в руках."
+    },
+    {
+      "t": 25.0,
+      "action": "other",
+      "event": "Кассир складывает деньги в стопку на столе."
+    },
+    {
+      "t": 28.0,
+      "action": "other",
+      "event": "Кассир выравнивает стопку денег на столе."
+    },
+    {
+      "t": 33.0,
+      "action": "other",
+      "event": "Кассир сидит за столом, перед ней лежит стопка денег, она смотрит на них."
+    }
+  ],
+  "timeline": [
+    {
+      "t": 0.0,
+      "event": "Кассир в белой блузе сидит за деревянным столом в кабинете с белыми стенами и стеклянной перегородкой, на столе перед ней лежат деньги и документы, справа стоит счётчик банкнот, слева — ноутбук и детектор, напротив пустое синее кресло."
+    },
+    {
+      "t": 1.0,
+      "event": "Кассир поднимает правую руку и нажимает кнопку на верхней панели счётчика банкнот."
+    },
+    {
+      "t": 3.4,
+      "event": "Кассир опускает руку на стол и смотрит на устройство."
+    },
+    {
+      "t": 8.0,
+      "event": "Кассир берёт со стола деньги и перекладывает их перед собой."
+    },
+    {
+      "t": 10.0,
+      "event": "Кассир держит деньги в руках и рассматривает их."
+    },
+    {
+      "t": 12.0,
+      "event": "Кассир берёт часть денег и загружает их в приёмный лоток счётчика банкнот."
+    },
+    {
+      "t": 13.0,
+      "event": "Кассир продолжает загружать деньги в счётчик, выравнивая их в лотке."
+    },
+    {
+      "t": 15.0,
+      "event": "Кассир запускает процесс подсчёта, нажимая на панель управления."
+    },
+    {
+      "t": 18.0,
+      "event": "Кассир извлекает отсчитанные деньги из нижнего лотка счётчика."
+    },
+    {
+      "t": 20.0,
+      "event": "Кассир кладёт извлечённые деньги на стол перед собой."
+    },
+    {
+      "t": 22.0,
+      "event": "Кассир берёт оставшиеся деньги и рассматривает их в руках."
+    },
+    {
+      "t": 25.0,
+      "event": "Кассир складывает деньги в стопку на столе."
+    },
+    {
+      "t": 28.0,
+      "event": "Кассир выравнивает стопку денег на столе."
+    },
+    {
+      "t": 33.0,
+      "event": "Кассир сидит за столом, перед ней лежит стопка денег, она смотрит на них."
+    }
+  ],
+  "elapsed_sec": 114.32626694900682
+}

@@ -1,0 +1,35 @@
+{
+  "id": "Х-10",
+  "job_id": "a603c4d1684b4cd3",
+  "categories": [
+    "2"
+  ],
+  "timeline_sha256": "c16df72a844363ab0a4eff739f8befb5961ad92938f2c76d6442e8537bcfbb66",
+  "prompt_sha256": "9ae094edb435bbe28738a241df9aa28b2fa5398ddf75f6e05c02ec8d9563f075",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4184,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается самостоятельный подсчет: кассир помещает купюры в лоток счетчика (t=6.8) и извлекает их (t=8.0).",
+      "Клиент отсутствует, клиентские этапы (документ, сейф в присутствии) неприменимы."
+    ],
+    "limitations": [
+      "Видео является отрезком, начало и конец операции не показаны полностью."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "a603c4d1684b4cd3",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 10.976110128045548
+}

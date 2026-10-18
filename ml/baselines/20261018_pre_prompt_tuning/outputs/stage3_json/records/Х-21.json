@@ -1,0 +1,36 @@
+{
+  "id": "Х-21",
+  "job_id": "7e2db67acdd109fc",
+  "categories": [
+    "4",
+    "2"
+  ],
+  "timeline_sha256": "3393aea3705af32d6cd40aa587b28541792a38b841733a78796515745c081c68",
+  "prompt_sha256": "b9e630bd72b3765ba1351f5f00a00c0b83b5640fe8c2ea1453821c677d8e9069",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4472,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается закрытие открытого сейфа сотрудницей (t=1.0) перед переходом к работе со столом и загрузкой купюр в счётчик (t=12.0).",
+      "Сценарий соответствует самостоятельному подсчету (раздел 2, вариант Б) или завершению этапа извлечения (раздел 3), клиент отсутствует."
+    ],
+    "limitations": [
+      "Ролик является фрагментом длительностью 19.6 секунд, начало и полный конец операции не видны."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "7e2db67acdd109fc",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 12.428506791999098
+}

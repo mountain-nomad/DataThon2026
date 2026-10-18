@@ -11,6 +11,7 @@ import time
 
 from scenario_audit import ROUTES, SCOPES, load_routes, rule_catalog, scoped_rules, source_sections
 from timeline_json_schema import prefix_constraint
+from finding_catalog import allowed_types, canonical_type
 
 ROOT = Path(__file__).resolve().parents[1]
 INSTRUCTIONS = '''Ты выполняешь ФИНАЛЬНУЮ ТЕКСТОВУЮ проверку кассовой операции.
@@ -82,9 +83,14 @@ INSTRUCTIONS = '''Ты выполняешь ФИНАЛЬНУЮ ТЕКСТОВУ�
 повторяет это название, не фиксируй «помещение удостоверения/документа в счётчик»
 ни как НАРУШЕНИЕ, ни как ПРЕДУПРЕЖДЕНИЕ. Не переноси эту интерпретацию на
 все ранее переданные документы: правило относится к предмету в лотке счётчика.
-type должен называть конкретное отклонение (например, «ПРЕДУПРЕЖДЕНИЕ: Возврат
-денег после пересчета; основание неизвестно»), а не копировать нормальный идеальный
-шаг как название ошибки. Не утверждай «полный цикл», когда конец операции неизвестен.
+type выбирай ДОСЛОВНО из списка ДОПУСТИМЫЕ ТИПЫ для выбранного rule_id.
+Не добавляй в type свои слова, токены, пояснения и названия законов.
+Для идеального шага разрешено только ПРЕДУПРЕЖДЕНИЕ о неподтвержденном действии;
+не считай отсутствие наблюдения доказанным отсутствием действия.
+Конкретные наблюдения и обоснование пиши в description, ограничения — в limitations.
+Не придумывай законы, ссылки и блоки «Источник:», «Основание:», «Ограничения:» внутри
+description: проверенные источники и ограничения добавит сервер после генерации.
+Не утверждай «полный цикл», когда конец операции неизвестен.
 
 Выдай итог по наблюдаемой части даже при частичной применимости сценария:
 verdict=no_violation, если обоснованных замечаний нет; violations тогда пуст.
@@ -143,7 +149,7 @@ def output_schema(rules, record):
                 'required': ['rule_id', 'type', 'timecode_sec', 'description'],
                 'properties': {
                     'rule_id': {'type': 'string', 'enum': list(rules)},
-                    'type': {'type': 'string', 'maxLength': 160},
+                    'type': {'type': 'string', 'enum': sorted({name for rid, rule in rules.items() for name in allowed_types(rid, rule)})},
                     'timecode_sec': {'type': 'number', 'enum': sorted({e['t'] for e in record['timeline']})},
                     'description': {'type': 'string'},
                 },
@@ -245,6 +251,7 @@ def combined_prompt(source, labels, record):
             + '\n' + '\n'.join(label + ': ' + SCOPES[label] for label in labels)
             + '\nОБЩИЙ НАБОР РАЗДЕЛОВ РЕГЛАМЕНТА\n' + '\n'.join(sections[i] for i in ids)
             + '\nОБЩИЙ КАТАЛОГ ПРАВИЛ\n' + json.dumps(rules, ensure_ascii=False)
+            + '\nДОПУСТИМЫЕ ТИПЫ ПО RULE_ID (выбирай дословно)\n' + json.dumps({rid: allowed_types(rid, rule) for rid, rule in rules.items()}, ensure_ascii=False)
             + '\nДАННЫЕ НАБЛЮДЕНИЙ\n' + json.dumps(context, ensure_ascii=False)
             + '\nПРОВЕРКА ФОРМАТА ПЕРЕД ОТВЕТОМ: сначала реши, какие замечания '
               'обоснованы, затем сформируй согласованный JSON. Если violations=[], '
@@ -280,12 +287,15 @@ def validate(raw, rules, record):
         kind = event.get('type', '')
         if not isinstance(kind, str) or not kind.startswith(('НАРУШЕНИЕ: ', 'ПРЕДУПРЕЖДЕНИЕ: ')):
             raise ValueError('Missing explicit type prefix')
+        canonical_type(event['rule_id'], kind, rule)
         violation = kind.startswith('НАРУШЕНИЕ: ')
         if violation and not rule['quote'].startswith('Нарушение:'):
             raise ValueError('Confirmed violation must reference a typical violation')
         for field in ('description',):
             if not isinstance(event.get(field), str) or not event[field].strip():
                 raise ValueError('Missing ' + field)
+        if re.search(r'(?:источник|основание|ограничения)\s*:', event['description'], re.I):
+            raise ValueError('Description must not invent structured source/limitation blocks')
         stamp = event.get('timecode_sec')
         if (type(stamp) not in (int, float) or not math.isfinite(stamp)
                 or stamp not in times or not 0 <= stamp <= record['duration_sec']):
@@ -325,6 +335,7 @@ def attach_evidence(value, record, job_id, root=ROOT):
         raise ValueError('No source frames available')
     result = {'job_id': job_id, 'status': 'done', 'verdict': value['verdict'], 'violations': []}
     for finding in value['violations']:
+        canonical_type(finding['rule_id'], finding['type'])
         stamp = finding['timecode_sec']
         nearest = min(samples, key=lambda t: (abs(t - stamp), t))
         with Image.open(root / samples[nearest]['path']) as image:

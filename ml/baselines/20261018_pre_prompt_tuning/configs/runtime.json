@@ -1,0 +1,53 @@
+{
+  "python": "3.12.3",
+  "torch_runtime": "2.12.0+cu130",
+  "gpu_reference": "RTX 5090 32GB",
+  "quantization": {
+    "load_in_4bit": true,
+    "bnb_4bit_quant_type": "nf4",
+    "bnb_4bit_use_double_quant": true,
+    "bnb_4bit_compute_dtype": "bfloat16"
+  },
+  "dtype": "bfloat16",
+  "device_map": "cuda",
+  "attn_implementation": "sdpa",
+  "torch_num_threads": 8,
+  "seed": 0,
+  "do_sample": false,
+  "temperature": null,
+  "top_p": null,
+  "top_k": null,
+  "enable_thinking": false,
+  "router": {
+    "sampling_fps": 1,
+    "edge": 768,
+    "jpeg_quality": 95,
+    "max_frames": 48,
+    "max_new_tokens": 2
+  },
+  "timeline": {
+    "sampling_fps": 5,
+    "png_full_frame": true,
+    "max_frames_per_request": 130,
+    "max_new_tokens": 4096,
+    "video_max_pixels": 56000000,
+    "processor_shortest_edge": 4096,
+    "dense_review_if_duration_over_sec": 30,
+    "arrival_review_before_sec": 1.5,
+    "arrival_review_after_sec": 24
+  },
+  "object_reconciliation": {
+    "text_only": true,
+    "max_new_tokens": 4096
+  },
+  "final_audit": {
+    "text_only": true,
+    "max_new_tokens": 1536,
+    "description_target_tokens": 150,
+    "description_hard_length_limit": false,
+    "review_mode": "on-demand",
+    "candidate_budget_if_review": 512,
+    "additional_calls_if_review": 2,
+    "evidence_frames_per_finding": 1
+  }
+}

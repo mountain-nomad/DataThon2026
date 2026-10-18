@@ -13,6 +13,7 @@ def run(args,folder,config,processor,infer,passed):
  label_tokens={label:tokenizer.encode(label,add_special_tokens=False) for label in config['class_labels']}
  assert all(len(v)==1 for v in label_tokens.values()),label_tokens
  config['label_tokens']=label_tokens
+ config['constrained_class_tokens']=True
  items=json.loads((ROOT/args.video_manifest).read_text())
  if args.limit:items=items[:args.limit]
  # This manifest has no ground-truth labels or operation names.
@@ -31,7 +32,7 @@ def run(args,folder,config,processor,infer,passed):
    if len(samples)%2:samples=samples+[samples[-1]]
    array=np.stack([np.asarray(Image.open(ROOT/f['path']).convert('RGB')) for f in samples])
    metadata=VideoMetadata(total_num_frames=round(item['duration_sec']*item['source_fps']),fps=item['source_fps'],frames_indices=[f['source_index'] for f in samples],duration=item['duration_sec'])
-   raw,stats=infer(array,metadata,config['prompt'],max_new_tokens=config['max_new_tokens'])
+   raw,stats=infer(array,metadata,config['prompt'],max_new_tokens=config['max_new_tokens'],label_token_ids=[ids[0] for ids in label_tokens.values()])
    torch.cuda.synchronize()
    label=raw.strip()
    try:

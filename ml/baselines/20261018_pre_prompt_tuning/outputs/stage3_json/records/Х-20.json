@@ -1,0 +1,36 @@
+{
+  "id": "Х-20",
+  "job_id": "0f878567753ff487",
+  "categories": [
+    "1",
+    "2"
+  ],
+  "timeline_sha256": "9d2cd2042daa895521116cabcbf2112dddb4fc2d02eaad1781fe2abbe07147b4",
+  "prompt_sha256": "aae270bf7cbe3b1aca81740badec12b54c17eaee095db0e8ab95ca4481f2f530",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4611,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается самостоятельный подсчет купюр сотрудником без присутствия клиента (раздел 2, вариант Б).",
+      "Вход в кабинет не показан в таймлайне, фрагмент начинается с нахождения сотрудника в кабинете."
+    ],
+    "limitations": [
+      "Видео является отрезком, начало процесса (вход в кабинет) не наблюдается."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "0f878567753ff487",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 9.87399395200191
+}

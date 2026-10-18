@@ -1,0 +1,35 @@
+{
+  "id": "Х-43",
+  "job_id": "4008f3864907952c",
+  "categories": [
+    "2"
+  ],
+  "timeline_sha256": "8b7f2cbf74003dc828401928336a10dd93a3fa916575d8ba47a3c352f0942ad7",
+  "prompt_sha256": "69657bd5c0404e043394d156a2cd685cbe199a8034adf10a20ab02433b1424dd",
+  "status": "done",
+  "calls": 1,
+  "review_triggered": false,
+  "input_keys": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "input_tokens": 4207,
+  "parsed": {
+    "evidence_check": [
+      "Наблюдается самостоятельный подсчет: кассир берет деньги, пересчитывает на счетчике и проверяет их (t=9.0-17.0).",
+      "Клиент отсутствует, клиентские этапы и требования по внесению в сейф не применяются к данному фрагменту."
+    ],
+    "limitations": [
+      "Ролик является отрезком, окончание операции и последующие действия не наблюдаются."
+    ],
+    "violations": [],
+    "verdict": "no_violation"
+  },
+  "result": {
+    "job_id": "4008f3864907952c",
+    "status": "done",
+    "verdict": "no_violation",
+    "violations": []
+  },
+  "elapsed_sec": 10.948389521974605
+}

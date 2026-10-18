@@ -253,12 +253,19 @@ def main():
     calls=[]
     handle=vision_module.register_forward_hook(lambda m,a,o:calls.append(1)) if vision_module is not None else None
 
-    def infer(frames,metadata,text,max_new_tokens=512):
+    def infer(frames,metadata,text,max_new_tokens=512,label_token_ids=None):
         before=len(calls)
         inputs=processor_inputs(processor,frames,metadata,text).to('cuda')
         input_shapes={k:list(v.shape) for k,v in inputs.items() if hasattr(v,'shape')}
+        generation_kwargs = {}
+        if label_token_ids is not None:
+            from routing_codes import label_prefix_constraint
+            eos = model.generation_config.eos_token_id or processor.tokenizer.eos_token_id
+            eos = [eos] if isinstance(eos, int) else list(eos)
+            generation_kwargs['prefix_allowed_tokens_fn'] = label_prefix_constraint(
+                label_token_ids, eos, inputs['input_ids'].shape[1], max_new_tokens)
         with torch.inference_mode():
-            output=model.generate(**inputs,do_sample=False,max_new_tokens=max_new_tokens,use_cache=True)
+            output=model.generate(**inputs,do_sample=False,max_new_tokens=max_new_tokens,use_cache=True,**generation_kwargs)
         new_ids=output[:,inputs['input_ids'].shape[1]:]
         raw=processor.batch_decode(new_ids,skip_special_tokens=True)[0]
         return raw,dict(input_shapes=input_shapes,input_tokens=inputs['input_ids'].shape[1],

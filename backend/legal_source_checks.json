@@ -1,0 +1,57 @@
+{
+  "N231": {
+    "document_id": "V1900019680",
+    "api_document_id": "c4cd4052-63e3-475b-ba9e-93f23de13fdb",
+    "title": "Об утверждении Правил осуществления кассовых операций и операций по инкассации банкнот, монет и ценностей в банках второго уровня, филиалах банков-нерезидентов Республики Казахстан, Национальном операторе почты и юридических лицах, исключительной деятельностью которых является инкассация банкнот, монет и ценностей",
+    "status": "upd",
+    "is_actual": true,
+    "checked_at": "2026-10-18",
+    "content_sha256": "8e92f27e54edfaa3dcb331cdb518d3bd53956aa86201c264b133618fc3363aec",
+    "metadata_api": "https://adilet.zan.kz/api/documents/by-ngr/V1900019680?language=rus",
+    "text_api": "https://adilet.zan.kz/api/documents/c4cd4052-63e3-475b-ba9e-93f23de13fdb/content"
+  },
+  "N14": {
+    "document_id": "V2000020075",
+    "api_document_id": "4bd1c354-b40c-4b38-ab7d-53aaa7b4f39c",
+    "title": "Об утверждении Правил организации охраны и устройства помещений банков второго уровня, филиалов банков-нерезидентов Республики Казахстан, Национального оператора почты, юридических лиц, исключительной деятельностью которых является инкассация банкнот, монет и ценностей, и юридических лиц, осуществляющих деятельность исключительно через обменные пункты на основании лицензии Национального Банка Республики Казахстан на обменные операции с наличной иностранной валютой",
+    "status": "upd",
+    "is_actual": true,
+    "checked_at": "2026-10-18",
+    "content_sha256": "e7365d0ff3b3784f8c145e2d4bfc953850153341ae3873bcbf5c044ec372af06",
+    "metadata_api": "https://adilet.zan.kz/api/documents/by-ngr/V2000020075?language=rus",
+    "text_api": "https://adilet.zan.kz/api/documents/4bd1c354-b40c-4b38-ab7d-53aaa7b4f39c/content"
+  },
+  "AML191": {
+    "document_id": "Z090000191_",
+    "api_document_id": "31a7b1ef-1777-4577-a765-d1a2ddba6c16",
+    "title": "О противодействии легализации (отмыванию) доходов, полученных преступным путем, финансированию терроризма и финансированию распространения оружия массового уничтожения",
+    "status": "upd",
+    "is_actual": true,
+    "checked_at": "2026-10-18",
+    "content_sha256": "2ec3b5b1c69d36011b35a45111c5ad308433f1c381f65377f96aab92d5f67da3",
+    "metadata_api": "https://adilet.zan.kz/api/documents/by-ngr/Z090000191_?language=rus",
+    "text_api": "https://adilet.zan.kz/api/documents/31a7b1ef-1777-4577-a765-d1a2ddba6c16/content"
+  },
+  "BANK258": {
+    "document_id": "Z2600000258",
+    "api_document_id": "a2074999-31bf-443e-98cf-1b8a0ebb960e",
+    "title": "О банках и банковской деятельности в Республике Казахстан",
+    "status": "upd",
+    "is_actual": true,
+    "checked_at": "2026-10-18",
+    "content_sha256": "7f87c74f92adebd444e1fcb2559f5bb6b01b306f5f03138ff1cc648e21533cc8",
+    "metadata_api": "https://adilet.zan.kz/api/documents/by-ngr/Z2600000258?language=rus",
+    "text_api": "https://adilet.zan.kz/api/documents/a2074999-31bf-443e-98cf-1b8a0ebb960e/content"
+  },
+  "INFO53": {
+    "document_id": "V2600038336",
+    "api_document_id": "315d5902-73a2-45bf-a03d-05bdb8e1db76",
+    "title": "Об утверждении Требований к обеспечению информационной безопасности банков, филиалов банков-нерезидентов Республики Казахстан и организаций, осуществляющих отдельные виды банковских операций",
+    "status": "new",
+    "is_actual": true,
+    "checked_at": "2026-10-18",
+    "content_sha256": "ad989f44a2f854232d61aee13f5a5b998ead77c5a0d65c0930fe24009e8f3d04",
+    "metadata_api": "https://adilet.zan.kz/api/documents/by-ngr/V2600038336?language=rus",
+    "text_api": "https://adilet.zan.kz/api/documents/315d5902-73a2-45bf-a03d-05bdb8e1db76/content"
+  }
+}
