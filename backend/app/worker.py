@@ -136,6 +136,7 @@ def _type_name(basis: dict | None, r: dict) -> str:
     """
     if r.get("rule_id") and r.get("type"):
         from app.finding_catalog import require_type
+
         require_type(r["rule_id"], r["type"])
         return r["type"]
     if text := _rule_text(r).rstrip("."):
@@ -150,6 +151,11 @@ def _description(r: dict, basis: dict | None) -> str:
     lines = [r.get("evidence") or "Признаки нарушения на видео."]
     if text := _rule_text(r):
         lines.append(f"Сценарное правило: {text}")
+    if r.get("severity") == "warning":
+        lines.append(
+            "Уровень: предупреждение. Нормативное основание не позволяет квалифицировать "
+            "наблюдаемое действие как нарушение."
+        )
     limitations = list(r.get("limitations") or [])
     if basis:
         if basis.get("limitations"):
@@ -165,7 +171,16 @@ def _description(r: dict, basis: dict | None) -> str:
     return "\n\n".join(lines)
 
 
-PIPELINE_FIELDS = ("scenario", "rule_id", "status", "quote", "evidence", "start_sec", "end_sec")
+PIPELINE_FIELDS = (
+    "scenario",
+    "rule_id",
+    "status",
+    "severity",
+    "quote",
+    "evidence",
+    "start_sec",
+    "end_sec",
+)
 
 
 def pipeline_item(r: dict, frames: list | None = None, basis: dict | None = None) -> dict:
@@ -188,6 +203,8 @@ def build_result(video_path: str, analysis: dict, legal: LegalIndex) -> dict:
             r["status"] = "insufficient_evidence"
         frames, basis = [], legal.resolve(r.get("rule_id"), r.get("type"))
         if r["status"] == "violation":
+            # The mapping caps the level whatever the model said (its max_severity).
+            r["severity"] = (basis or {}).get("max_severity") or "violation"
             stamps = r.get("evidence_timestamps")
             at = r["start_sec"] if r["start_sec"] is not None else (stamps or [0.0])[0]
             at = _clamp(at, duration) or 0.0
@@ -200,6 +217,7 @@ def build_result(video_path: str, analysis: dict, legal: LegalIndex) -> dict:
                     "evidence_frames": frames,
                     # internal, for the web UIs only
                     "rule_id": r.get("rule_id"),
+                    "severity": r["severity"],
                     "legal_basis": basis,
                     "confidence": conf,
                 }

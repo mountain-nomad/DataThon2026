@@ -10,6 +10,7 @@ import {
   type PipelineResult,
   type ReviewStatus,
   type ScenarioResult,
+  type Severity,
   type SpecialistResult,
 } from "./types";
 
@@ -22,6 +23,7 @@ interface RawSpecialist {
   scenario?: string | null;
   rule_id?: string | null;
   status: string;
+  severity?: Severity | null;
   quote?: string | null;
   evidence?: string | null;
   start_sec?: number | null;
@@ -35,6 +37,8 @@ interface RawLegalBasis {
   type_id?: string | null;
   name?: string | null;
   mapping_status?: string | null;
+  max_severity?: Severity | null;
+  show_source?: boolean | null;
   limitations?: string | null;
   rules?: {
     rule_id: string;
@@ -42,6 +46,7 @@ interface RawLegalBasis {
     summary?: string | null;
     human_verified?: boolean;
     qualifier?: string | null;
+    binding?: boolean;
     source?: { source_id?: string; title?: string; url?: string; binding?: boolean };
   }[];
 }
@@ -167,6 +172,8 @@ function toLegalBasis(raw: RawLegalBasis | null | undefined): LegalBasis | undef
     typeId: raw.type_id ?? undefined,
     name: raw.name ?? undefined,
     mappingStatus: raw.mapping_status ?? undefined,
+    maxSeverity: raw.max_severity === "warning" ? "warning" : "violation",
+    showSource: raw.show_source !== false,
     limitations: raw.limitations ?? undefined,
     clauses: (raw.rules ?? []).map((c) => ({
       ruleId: c.rule_id,
@@ -174,6 +181,7 @@ function toLegalBasis(raw: RawLegalBasis | null | undefined): LegalBasis | undef
       summary: c.summary ?? undefined,
       humanVerified: c.human_verified === true,
       qualifier: c.qualifier ?? undefined,
+      binding: c.binding !== false && c.source?.binding !== false,
       source: {
         sourceId: c.source?.source_id ?? "",
         title: c.source?.title ?? c.source?.source_id ?? "",
@@ -207,6 +215,12 @@ export function toPipelineResult(job: RawPipelineJob): PipelineResult {
         scenario: r.scenario ? normalizeScenario(r.scenario) : scenario?.primary,
         ruleId: r.rule_id ?? undefined,
         status: r.status,
+        severity:
+          r.status !== "violation"
+            ? undefined
+            : (r.severity ?? r.legal_basis?.max_severity) === "warning"
+              ? "warning"
+              : "violation",
         quote: r.quote ?? "",
         evidence: r.evidence ?? "",
         startSec,

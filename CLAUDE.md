@@ -13,7 +13,7 @@ Note: `~/Desktop/CLAUDE.md` (an ancestor directory) describes an unrelated thesi
 ```bash
 cp backend/.env.example backend/.env   # API_KEY is required, the app refuses to start without it
 cp frontend/.env.example frontend/.env.local   # ANALYSIS_API_KEY = backend API_KEY
-make install                           # uv sync in backend/, npm ci --legacy-peer-deps in frontend/
+make install                           # uv sync in backend/, npm ci in frontend/
 make backend | make frontend | make dev   # :8000 (simple UI at /, docs at /docs) / Next.js :3000 / both
 make up                                # docker compose up --build (single service, data on a named volume)
 make lint                              # ruff check + ruff format --check
@@ -40,11 +40,12 @@ There is no test suite. Python commands run from inside `backend/` (imports are 
     2. timecodes are clamped;
     3. 1–3 frames with a fallback so there's always one;
     4. the legal basis;
-    5. the jury `type` (the catalog quote minus `Нарушение:`, else the legal type name) and `description` (evidence + "Почему…" + "Основание: …"; the simple page splits on `\nОснование:`);
+    5. the jury `type` (the catalog quote minus `Нарушение:`, else the legal type name) and `description` (evidence + rule + level + "Ограничения: …" + "Источник: …"; the simple page splits on `\nИсточник:`);
     6. the verdict.
 - `storage.py`: `get_storage()` → `SupabaseStorage` (`STORAGE_BACKEND=supabase`, default) or `LocalStorage`. After local validation `_start_job` uploads the file to a private bucket as `{YYYY}/{MM}/{job_id}{ext}` and the job keeps `storage_path` beside `video_path`; the analyzer always reads the local copy. A storage failure is `502` and creates no job. Signed URLs come only from the local-only `GET /api/jobs/{id}/video-url`; `SUPABASE_KEY` must be the secret/service_role key (the bucket is created at startup).
 - `legal.py`: `LegalIndex.resolve(rule_id, type_hint)` returns the legal basis for a result.
-  - The chain is crosswalk (`specialist_crosswalk.yaml`: rule_id → `T..` or an inline entry) → `violation_types` → `rules` (`R..`) → `sources` in the team's `fortebank_violation_legal_mapping_updated.yaml`.
+  - The chain is `scenario_rule_map` in the team's `fortebank_violation_legal_mapping_updated.yaml` (v3, the primary key), else the crosswalk (`specialist_crosswalk.yaml`: rule_id → `T..` or an inline entry) → `violation_types` → `rules` (`R..`) → `sources`.
+  - Enforced from the mapping: `max_severity` (min of the map entry, the type and its `severity_levels`; `no_confirmed_public_norm` counts as `unsourced`) caps a violation at `severity: "warning"` in the pipeline item; it stays in the jury list with a "Уровень: предупреждение" line. `show_source: false` drops the clauses and the "Источник" line; limitations always come before the source. Rules with `show_in_api_output: false` are skipped; a clause is `binding` only if both rule and source are.
   - Unmapped means `None`; never guess. Source URLs drop `utm_*` and prefer `alternate_url`. `binding` is false for non-normative sources.
   - The crosswalk is a **draft for the team to review**; the mapping YAML is theirs, so don't edit it.
 - `analyzers/`: models, `AnalysisContext` (`deadline`, `time_left()`, `report(partial)`), `run_analyzer()` (passes `ctx` only if `analyze` takes two parameters) and `load_analyzer("mock" | "http" | "module:Class")`.
@@ -97,4 +98,4 @@ There is no test suite. Python commands run from inside `backend/` (imports are 
 - The root `.gitignore` is the GitHub Python template, whose `lib/` rule would ignore `frontend/src/lib/`; an explicit `!frontend/src/lib/` exception keeps it tracked. `data/*` and `ml/artifacts/*` are gitignored (only `.gitkeep` is tracked), so trained models and datasets live locally. `backend/.gitignore` ignores `backend/data/` (uploads, job JSON).
 - `frontend/public/.gitkeep` must stay: the frontend Dockerfile copies `public/`.
 - Ruff line length is 100 in both Python services.
-- `package.json` currently pins `eslint-config-next@^14` next to Next 16, so plain `npm install` fails with ERESOLVE. Use `npm ci --legacy-peer-deps`. The right fix is pinning it to 16.x. `eslint-config-next` must match the installed `next` major (16.x). `npm audit fix --force` downgrades it to 14.x, which breaks `npm run lint` with `ERR_MODULE_NOT_FOUND` while the build still passes.
+- `eslint-config-next` is pinned to `^16.4.2`, matching `next`; plain `npm install` / `npm ci` work. Keep it on the same major as `next`: `npm audit fix --force` downgrades it to 14.x, which breaks `npm run lint` with `ERR_MODULE_NOT_FOUND`. The frontend needs Node 20+ (the WSL system Node is v12). `LayoutProps` comes from `next typegen`/`next build`, so a bare `tsc` before either reports it missing.

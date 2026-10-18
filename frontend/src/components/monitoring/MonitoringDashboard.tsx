@@ -34,18 +34,20 @@ export function MonitoringDashboard() {
   const [saving, setSaving] = useState<string[]>([]);
   const [reviewError, setReviewError] = useState<string | null>(null);
 
-  const load = useCallback(async (signal?: AbortSignal) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { items } = await api.jobs(signal);
-      setRecords(items.map(toAnalysisRecord));
-    } catch (e) {
-      if (signal?.aborted) return;
-      setError(e instanceof Error ? e.message : String(e));
-    }
-    setLoading(false);
-  }, []);
+  // State is set only in the promise callbacks; a retry resets it in the click handler.
+  const load = useCallback(
+    (signal?: AbortSignal) =>
+      api
+        .jobs(signal)
+        .then(({ items }) => setRecords(items.map(toAnalysisRecord)))
+        .catch((e) => {
+          if (!signal?.aborted) setError(e instanceof Error ? e.message : String(e));
+        })
+        .finally(() => {
+          if (!signal?.aborted) setLoading(false);
+        }),
+    [],
+  );
 
   useEffect(() => {
     const run = new AbortController();
@@ -90,7 +92,11 @@ export function MonitoringDashboard() {
           <SectionTitle n="01" title={td.stats} />
           <button
             type="button"
-            onClick={() => load()}
+            onClick={() => {
+              setLoading(true);
+              setError(null);
+              load();
+            }}
             disabled={loading}
             className={`${buttonSecondaryClass} disabled:opacity-50`}
           >

@@ -81,8 +81,8 @@ make dev        # backend :8000 + frontend :3000; Ctrl+C stops both
   open the address Next.js prints.
 - **The first backend start takes about 20 seconds.** Uploads before it's ready fail with
   "connection refused".
-- **Don't run plain `npm install`.** It fails with ERESOLVE, because `package.json` pins
-  `eslint-config-next@14` next to Next 16. `make install` uses `npm ci --legacy-peer-deps`.
+- **The frontend needs Node 20+.** Keep `eslint-config-next` on the same major as `next`
+  (16.x); `npm audit fix --force` downgrades it and breaks `npm run lint`.
 - **Test videos are not in the repo.** Share them separately, and keep them private.
 
 ### Windows (no `make`)
@@ -91,7 +91,7 @@ Run in two terminals:
 
 ```bash
 cd backend && uv sync && uv run fastapi dev app/main.py --port 8000
-cd frontend && npm ci --legacy-peer-deps && npm run dev -- --port 3000
+cd frontend && npm ci && npm run dev -- --port 3000
 ```
 
 ### API only, in Docker

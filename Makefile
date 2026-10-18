@@ -2,8 +2,7 @@
 
 install:          ## Install backend and frontend dependencies
 	cd backend && uv sync
-	# --legacy-peer-deps: package.json pins eslint-config-next 14 next to Next 16 (peer conflict)
-	cd frontend && npm ci --legacy-peer-deps
+	cd frontend && npm ci
 
 backend:          ## API + simple web UI on :8000
 	cd backend && uv run fastapi dev app/main.py --port 8000
