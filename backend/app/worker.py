@@ -20,6 +20,7 @@ from app import jobs
 from app.analyzers import AnalysisContext, load_analyzer, run_analyzer
 from app.config import settings
 from app.legal import LegalIndex, citation
+from app.storage import StorageError, get_storage
 from app.video import extract_frames, probe_duration
 
 log = logging.getLogger(__name__)
@@ -39,11 +40,11 @@ def _serve(conn: Connection, spec: str) -> None:
     else:
         load_error = None
     while True:
-        video_path, deadline = conn.recv()
+        video_path, video_url, deadline = conn.recv()
         if load_error:
             conn.send(("error", load_error))
             continue
-        ctx = AnalysisContext(deadline, lambda partial: conn.send(("partial", partial)))
+        ctx = AnalysisContext(deadline, lambda partial: conn.send(("partial", partial)), video_url)
         try:
             conn.send(("ok", run_analyzer(analyzer, video_path, ctx).model_dump()))
         except Exception as e:  # noqa: BLE001  (reported to the job, not raised)
@@ -77,10 +78,16 @@ class AnalyzerProcess:
             self.proc.join(5)
         self.proc = self.conn = None
 
-    def analyze(self, video_path: str, deadline: float, on_partial: Callable[[dict], None]) -> dict:
+    def analyze(
+        self,
+        video_path: str,
+        video_url: str | None,
+        deadline: float,
+        on_partial: Callable[[dict], None],
+    ) -> dict:
         """Blocking; call from a thread. Raises AnalysisTimeout with the last partial result."""
         self.start()
-        self.conn.send((video_path, deadline))
+        self.conn.send((video_path, video_url, deadline))
         partial = None
         while True:
             left = deadline + HARD_KILL_GRACE_SEC - time.time()
@@ -201,6 +208,17 @@ def build_result(video_path: str, analysis: dict, legal: LegalIndex) -> dict:
     }
 
 
+def _video_url(job: dict) -> str | None:
+    """A fresh signed link to the stored video, or None (local storage, or the store failed)."""
+    if not settings.ml_send_link or not job.get("storage_path"):
+        return None
+    try:
+        return get_storage().signed_url(job["storage_path"])
+    except StorageError as e:
+        log.warning("No signed URL for job %s, the analyzer gets the file: %s", job["job_id"], e)
+        return None
+
+
 def _stages(partial: dict) -> int:
     return 2 if partial.get("specialist_results") else 1 if partial.get("scenario") else 0
 
@@ -256,9 +274,10 @@ class Worker:
             )
 
         limitations = []
+        video_url = await asyncio.to_thread(_video_url, job)
         try:
             analysis = await asyncio.to_thread(
-                slot.analyze, job["video_path"], analyzer_deadline, on_partial
+                slot.analyze, job["video_path"], video_url, analyzer_deadline, on_partial
             )
         except AnalysisTimeout as e:
             if not (e.partial and e.partial.get("specialist_results")):

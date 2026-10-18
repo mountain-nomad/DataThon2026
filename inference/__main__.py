@@ -1,23 +1,35 @@
-"""Try it from the repo root:
+"""Start the ML service from the repo root, on the GPU machine:
 
-    python -m inference "https://.../video.mov"
+    ml/.venv/bin/python -m inference                     # 127.0.0.1:8001 (reach it via SSH)
+    ml/.venv/bin/python -m inference --host 0.0.0.0      # behind HTTPS; set INFERENCE_API_KEY
+
+Reads inference/.env if present (variables already set in the shell win).
 """
 
 import argparse
-import json
+import os
+from pathlib import Path
 
-from inference import run_inference
+import uvicorn
 
-parser = argparse.ArgumentParser(prog="python -m inference", description=__doc__)
-parser.add_argument("video_url", help="http(s) link to the video, e.g. a Supabase signed URL")
-parser.add_argument("--prompt", help="defaults to ml/prompts.py PROMPT")
-parser.add_argument("--job-id", help="defaults to the file name in the link")
-parser.add_argument("--short", action="store_true", help="shorten image_base64 when printing")
+env_file = Path(__file__).with_name(".env")
+if env_file.exists():
+    for line in env_file.read_text().splitlines():
+        key, sep, value = line.partition("=")
+        if sep and not key.strip().startswith("#"):
+            os.environ.setdefault(key.strip(), value.strip())
+
+parser = argparse.ArgumentParser(
+    prog="python -m inference",
+    description=__doc__,
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+)
+parser.add_argument("--host", default="127.0.0.1")
+parser.add_argument("--port", type=int, default=8001)
 args = parser.parse_args()
 
-result = run_inference(args.video_url, args.prompt, args.job_id)
-if args.short:
-    for v in result.get("violations", []):
-        for f in v["evidence_frames"]:
-            f["image_base64"] = f["image_base64"][:16] + "..."
-print(json.dumps(result, ensure_ascii=False, indent=2))
+if args.host not in ("127.0.0.1", "localhost") and not os.environ.get("INFERENCE_API_KEY"):
+    raise SystemExit("Set INFERENCE_API_KEY before listening on a public address")
+
+# One worker: the pipeline runs one video at a time on the GPU.
+uvicorn.run("inference.server:app", host=args.host, port=args.port, workers=1)

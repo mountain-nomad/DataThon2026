@@ -1,1 +1,3 @@
-opencv-python-headless>=4.10
+# Installed into ml/.venv on top of ml/requirements.txt (the pipeline's own pinned environment).
+fastapi[standard]>=0.115
+httpx>=0.27

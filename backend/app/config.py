@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     # "mock", "http" (the ML microservice at ML_SERVICE_URL) or "package.module:ClassName"
     analyzer: str = "http"
     ml_service_url: str = "http://localhost:8001"
+    # Sent as "Authorization: Bearer ..." (the service's INFERENCE_API_KEY); empty sends none.
+    ml_service_key: str = ""
+    # Send the ML service the Supabase signed link (it downloads the video itself). False uploads
+    # the file instead, for a GPU host with no internet access (e.g. reached only via SSH).
+    ml_send_link: bool = True
     data_dir: Path = Path("./data")  # uploads/ and jobs/ live here
     legal_mapping_file: Path = Path("./fortebank_violation_legal_mapping_updated.yaml")
     crosswalk_file: Path = Path("./specialist_crosswalk.yaml")

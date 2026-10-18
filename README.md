@@ -11,7 +11,8 @@ cashier violations:
 |---|---|
 | `backend/` | FastAPI service: the jury API, background jobs and a simple web page |
 | `frontend/` | Next.js UI: `/demo-inference` (upload, AI pipeline stages, violation episode) and `/demo-dashboard` (history, statistics, false-positive review) |
-| `ml/` | The old iris demo skeleton. The real model will be a separate ML microservice, see [the contract below](#plugging-in-the-ml-microservice) |
+| `ml/` | The ML team's Qwen3.8-27B pipeline (router → timelines → final audit), an offline CLI for a CUDA GPU; see `ml/README.md` |
+| `inference/` | The ML microservice: runs the `ml/` pipeline on the GPU machine behind [the contract below](#plugging-in-the-ml-microservice) |
 
 The analysis sits behind a swappable interface. By default `ANALYZER=http` sends each video to
 the ML microservice; until it runs, uploads are still stored but the job ends `failed` ("ML
@@ -211,17 +212,19 @@ The jury counts a video as unprocessed after 5 minutes.
 
 ## Plugging in the ML microservice
 
-Set `ANALYZER=http` and `ML_SERVICE_URL=http://<host>:<port>` in `backend/.env`. The ML service
-must implement:
+Set `ANALYZER=http` and `ML_SERVICE_URL=http://<host>:<port>` in `backend/.env`. `inference/`
+is that service ([below](#inference-service-inference)); any other service must implement:
 
 **`GET /health`** → `{"status": "ok", "model_loaded": true, "model_version": "..."}`. It's shown
 in the backend's `/health`.
 
-**`POST /analyze`**, `multipart/form-data`:
+**`POST /analyze`**, a form (`multipart/form-data`, or urlencoded when there's no file), with
+`Authorization: Bearer <ML_SERVICE_KEY>` when that is set:
 
 | Field | Meaning |
 |---|---|
-| `file` | The video (`.mov`) |
+| `video_url` | A signed Supabase link to the video. Sent when the upload is in Supabase and `ML_SEND_LINK=true` (the default); the service downloads it itself. |
+| `file` | The video (`.mov`), sent instead of `video_url` otherwise (`STORAGE_BACKEND=local`, `ML_SEND_LINK=false`). |
 | `deadline_sec` | Seconds the analysis may take from now. Do less when it's small: fewer frames, skip the secondary scenario. |
 | `job_id` | For logs |
 
@@ -295,55 +298,80 @@ Without a separate service, a Python class works too:
 - `ctx.time_left()` and `ctx.report(partial)` play the same roles as `deadline_sec` and the
   partial events.
 
-## Inference (`inference/`)
+## Inference service (`inference/`)
 
-`run_inference(video_url, prompt=None, job_id=None)` takes a video **link** (e.g. a Supabase
-Storage signed URL) and returns the result **in the jury API format**:
+The ML microservice. It runs the `ml/` pipeline **unchanged** (`ml/scripts/run_pipeline.py`:
+router → video timelines → object reconciliation → final text audit), so it must run **on the
+GPU machine** (the RTX 5090), in the pipeline's own environment. The backend can run anywhere
+that reaches it.
 
-```json
-{"job_id": "48d247dd…", "status": "done", "verdict": "violation",
- "violations": [{"type": "…", "timecode_sec": 35.8, "description": "…",
-                 "evidence_frames": [{"timestamp_sec": 35.8, "image_base64": "/9j/4AAQ…"}]}]}
+```
+frontend ──upload──▶ backend ──file──▶ Supabase (private bucket)
+                        │  signed link
+                        ▼
+              inference/ on the GPU machine ── downloads the video by the link
+                        │  ml/scripts/run_pipeline.py (Qwen3.8-27B)
+                        ▼
+backend ◀── NDJSON: router scenario, then the findings ── evidence frames, legal basis, verdict
+   │
+   ▼
+frontend (/demo-inference stages and results)
 ```
 
-- **The video is never saved.** OpenCV's FFmpeg reads the link over HTTP and requests only the
-  byte ranges around each moment it needs. The link must support HTTP `Range`, which Supabase
-  does. Frames are decoded in memory and sent to the model as images, each labeled with its
-  second, so the model can answer with timecodes. Measured on a 142 s, 28.7 MB video: 8 frames
-  take 0.3 s and ~33% of the file crosses the network; 16 frames, ~66%.
-- **Failures:** an expired link, or a link that isn't a video, returns
-  `{"job_id": …, "status": "failed", "error": "…"}`.
-- **`job_id`:** defaults to the file name in the link.
+- **Input:** a link (`video_url`) or an uploaded `file`, see the contract above. The video, its
+  frames and the run folder are deleted after each job (`KEEP_ARTIFACTS=1` keeps the run's prompts
+  and raw answers in `ml/artifacts/service/` for debugging; the video is always deleted).
+- **Progress:** a `partial` event with the router's scenario as soon as the timeline stage
+  starts, then the `result`. Each finding becomes one `violation` result with the catalog
+  `rule_id` (`s2:L58`…, the ids in `backend/specialist_crosswalk.yaml`) and the pipeline's
+  description and timecode; no finding gives one `no_violation` per routed scenario.
+  A `ПРЕДУПРЕЖДЕНИЕ:` (warning) finding keeps the model's own type, since it cites an ideal step
+  rather than a `Нарушение:` line.
+- **One video at a time.** The stages share manifests in `ml/artifacts/`; a second request waits
+  for the first, up to its deadline. `/health` shows `busy`.
+- **Time:** every stage loads the 27B model itself, so one video takes several minutes. That is
+  longer than the default `JOB_TIMEOUT_SEC=270` (the jury's 5-minute limit): measure it on the
+  5090 and raise `JOB_TIMEOUT_SEC` for demos. At the deadline the service kills the pipeline, so
+  the GPU is freed.
 
-**The pipeline is a PLACEHOLDER for now.** It reads real frames but doesn't call the model (no
-endpoint cost), and returns one violation marked `PLACEHOLDER` at the middle of the video, with
-3 real evidence frames. When `ml/pipeline.py` is ready, its code replaces `run_pipeline()` in
-the `PIPELINE` section of `inference/inference.py`. The building blocks:
-- `video.sample(n)` and `video.frames_at([seconds])`: frames from the link;
-- `frame_parts(frames, prompt)`: message parts for the model (labeled frames + prompt);
-- `call_model(parts)`: one OpenAI-compatible `/chat/completions` request; returns the text.
-
-The real pipeline returns the violations in the same shape.
-
-Endpoint settings (see `inference/.env.example`):
-
-| Setting | Meaning |
-|---|---|
-| `INFERENCE_ENDPOINT_URL` | Endpoint address, e.g. `https://api.runpod.ai/v2/<id>/openai/v1` |
-| `INFERENCE_API_KEY` | Endpoint key. Never commit it. |
-| `INFERENCE_MODEL` | `qwen/qwen3.8-27b` |
-| `INFERENCE_TIMEOUT_SEC` | Request timeout |
-| `INFERENCE_MAX_TOKENS` | Answer length limit |
-| `INFERENCE_FRAMES` | Frames per video, for the real pipeline |
-
-Needs OpenCV (`inference/requirements.txt`); the backend's environment already has it. Try it
-from the repo root:
+### Run it on the GPU machine
 
 ```bash
-backend/.venv/bin/python -m inference "https://<project>.supabase.co/storage/v1/object/sign/videos/….mov?token=…" --short
+# once: the ml/ environment and checkpoint as in ml/README.md, then
+ml/.venv/bin/python -m pip install -r inference/requirements.txt
+cp inference/.env.example inference/.env      # set INFERENCE_API_KEY for HTTPS
+
+ml/.venv/bin/python -m inference                    # 127.0.0.1:8001, reach it over SSH
+ml/.venv/bin/python -m inference --host 0.0.0.0     # public: refuses to start without a key
 ```
 
-From Python: `from inference import run_inference, VideoStream, frame_parts, call_model`.
+### Connect the backend
+
+**Over SSH** (the GPU is reachable only by SSH, e.g. a lab machine). Keep a tunnel open on the
+machine that runs the backend, through a jump host if needed:
+
+```bash
+ssh -N -L 8001:127.0.0.1:8001 user@gpu-host                  # direct
+ssh -N -L 8001:127.0.0.1:8001 -J user@jump-host user@gpu-host # via a jump host (e.g. the lab laptop)
+```
+
+Then `ML_SERVICE_URL=http://localhost:8001` in `backend/.env`. If the GPU machine has no internet
+access, it can't download the Supabase link: set `ML_SEND_LINK=false` and the backend uploads the
+file through the tunnel instead.
+
+**Over HTTPS** (the backend is somewhere else, e.g. in the cloud). Publish the service from the
+GPU machine, or from a machine that has the SSH tunnel above, e.g. with
+`cloudflared tunnel --url http://localhost:8001`. Then set `ML_SERVICE_URL=https://<address>`
+and `ML_SERVICE_KEY` (= the service's `INFERENCE_API_KEY`) in `backend/.env`.
+
+Try it without the backend:
+
+```bash
+curl -N -X POST http://localhost:8001/analyze -H "Authorization: Bearer $INFERENCE_API_KEY" \
+  -F video_url="https://<project>.supabase.co/storage/v1/object/sign/videos/….mov?token=…"
+curl -N -X POST http://localhost:8001/analyze -H "Authorization: Bearer $INFERENCE_API_KEY" \
+  -F file=@video.mov
+```
 
 ## Legal sources (task §6)
 
@@ -379,6 +407,8 @@ Sources used:
 | `API_KEY` | — (required) | Jury key; the service won't start without it |
 | `ANALYZER` | `http` | `http` (the ML microservice), `mock` (fake results, UI dev only) or `module.path:ClassName` |
 | `ML_SERVICE_URL` | `http://localhost:8001` | ML microservice, for `ANALYZER=http` |
+| `ML_SERVICE_KEY` | — | Bearer token for the ML service (its `INFERENCE_API_KEY`) |
+| `ML_SEND_LINK` | `true` | Send the ML service the Supabase signed link; `false` uploads the file |
 | `MOCK_DELAY_SEC` | `3` | Fake processing time of the mock |
 | `JOB_TIMEOUT_SEC` | `270` | Upload to done/failed, queue included |
 | `MAX_CONCURRENT_JOBS` | `1` | Videos analyzed at the same time |

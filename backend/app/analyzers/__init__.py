@@ -9,7 +9,8 @@
 varies per video, so the analyzer should check ctx.time_left() and do less when it runs short
 (fewer frames, skip the secondary scenario). ctx.report(partial) sends what is finished so far:
 it drives the frontend's stage progress, and if the deadline passes, the last partial result is
-returned instead of a failure.
+returned instead of a failure. ctx.video_url is a signed link to the same video in Supabase
+Storage (None with STORAGE_BACKEND=local), for analyzers that run elsewhere.
 
 Two output forms are accepted (pydantic models or plain dicts with the same keys):
 - AnalysisResult: the router scenario plus one result per specialist, including no_violation /
@@ -64,9 +65,12 @@ class AnalysisResult(BaseModel):
 
 
 class AnalysisContext:
-    def __init__(self, deadline: float, report: Callable[[dict], None]) -> None:
+    def __init__(
+        self, deadline: float, report: Callable[[dict], None], video_url: str | None = None
+    ) -> None:
         self.deadline = deadline  # time.time() by which analyze() should return
         self._report = report
+        self.video_url = video_url
 
     def time_left(self) -> float:
         return self.deadline - time.time()

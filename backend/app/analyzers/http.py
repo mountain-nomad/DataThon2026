@@ -1,11 +1,15 @@
-"""Analyzer that calls the ML microservice (ml/, contract in ml/README.md). ANALYZER=http.
+"""Analyzer that calls the ML microservice (inference/, contract in README.md). ANALYZER=http.
 
 POST {ML_SERVICE_URL}/analyze with the video and the remaining time budget; the service streams
 NDJSON partial results and a final result. Partials are forwarded through ctx.report(), so the
 frontend shows real stage progress and a timeout still returns the finished stages.
+
+The video goes as its Supabase signed link (`video_url`) when there is one, so the service
+fetches it itself; otherwise (STORAGE_BACKEND=local) the file is uploaded (`file`).
 """
 
 import json
+from contextlib import ExitStack
 from pathlib import Path
 
 import httpx
@@ -20,23 +24,27 @@ READ_TIMEOUT_MARGIN_SEC = 30.0
 class HttpAnalyzer:
     def __init__(self) -> None:
         self.url = settings.ml_service_url.rstrip("/")
-        self.client = httpx.Client()
+        headers = {"Authorization": f"Bearer {key}"} if (key := settings.ml_service_key) else {}
+        self.client = httpx.Client(headers=headers)
 
     def analyze(self, video_path: str, ctx: AnalysisContext) -> AnalysisResult:
         budget = max(ctx.time_left(), 1.0)
         timeout = httpx.Timeout(budget + READ_TIMEOUT_MARGIN_SEC, connect=10.0)
         path = Path(video_path)
+        data = {"deadline_sec": f"{budget:.1f}", "job_id": path.stem}
         try:
-            with (
-                path.open("rb") as f,
-                self.client.stream(
-                    "POST",
-                    f"{self.url}/analyze",
-                    files={"file": (path.name, f, "video/quicktime")},
-                    data={"deadline_sec": f"{budget:.1f}", "job_id": path.stem},
-                    timeout=timeout,
-                ) as resp,
-            ):
+            with ExitStack() as stack:
+                if ctx.video_url:
+                    data["video_url"] = ctx.video_url
+                    files = None
+                else:
+                    f = stack.enter_context(path.open("rb"))
+                    files = {"file": (path.name, f, "video/quicktime")}
+                resp = stack.enter_context(
+                    self.client.stream(
+                        "POST", f"{self.url}/analyze", files=files, data=data, timeout=timeout
+                    )
+                )
                 if resp.is_error:
                     resp.read()
                     raise RuntimeError(f"ML service error {resp.status_code}: {resp.text[:300]}")

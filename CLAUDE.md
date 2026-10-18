@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Hackathon (DataThon 2026): detect possible cashier violations in top-down bank CCTV videos. The **platform is deliberately minimal: one FastAPI service in `backend/`** (API + a simple web page + background jobs), plus the Next.js `frontend/` (`/demo-inference` and `/demo-dashboard` both talk to it). `docker-compose.yml` runs only the backend. `ml/` (iris demo) is unused; the real model will be a **separate ML microservice the team builds**, reached through `ANALYZER=http` (the default; `mock` only when set explicitly) and the contract in `README.md` ("Plugging in the ML microservice"). Don't build that service or add a model unless asked. `backend/backend_description.md` describes a bigger contract (router/specialists pipeline, demo dashboard) that is **not** what's implemented; `README.md` documents what is.
+Hackathon (DataThon 2026): detect possible cashier violations in top-down bank CCTV videos. The **platform is deliberately minimal: one FastAPI service in `backend/`** (API + a simple web page + background jobs), plus the Next.js `frontend/` (`/demo-inference` and `/demo-dashboard` both talk to it). `docker-compose.yml` runs only the backend. `ml/` is the ML team's Qwen3.8-27B pipeline (offline CLI, CUDA GPU; its scripts are a hash-pinned snapshot in `ml/configs/source_sha256.json`, so don't edit them). `inference/` is the ML microservice: it runs `ml/scripts/run_pipeline.py` unchanged as a subprocess on the GPU machine, one video at a time, and answers the backend's `ANALYZER=http` contract (the default; `mock` only when set explicitly; see `README.md`, "Plugging in the ML microservice" and "Inference service"). The backend sends it the Supabase signed link (`video_url`) or, with `STORAGE_BACKEND=local` / `ML_SEND_LINK=false`, the file. `backend/backend_description.md` describes a bigger contract (router/specialists pipeline, demo dashboard) that is **not** what's implemented; `README.md` documents what is.
 
 Note: `~/Desktop/CLAUDE.md` (an ancestor directory) describes an unrelated thesis project (histogram cardinality estimators) — ignore it for this repo.
 
@@ -33,7 +33,7 @@ There is no test suite. Python commands run from inside `backend/` (imports are 
   - Readers call `expire_if_overdue()`, so the deadline (`created_at + JOB_TIMEOUT_SEC`, default 270, queue time included) holds even if the worker is stuck.
   - At startup, leftover `processing` jobs become `failed`. `delete_old_uploads()` runs hourly when `UPLOAD_RETENTION_HOURS > 0`.
 - `worker.py`: an `asyncio.Queue` with `MAX_CONCURRENT_JOBS` slots. Each slot owns a long-lived **spawned child process** that loads the analyzer once (`_serve`).
-  - The child gets `(video_path, deadline)`. It streams `("partial", …)` messages, which are saved through `jobs.update()` with `stages_done` 1/2 so `/pipeline` shows live progress, then `("ok", …)` or `("error", …)`.
+  - The child gets `(video_path, video_url, deadline)`; `video_url` is a fresh signed link (`ctx.video_url`), or None. It streams `("partial", …)` messages, which are saved through `jobs.update()` with `stages_done` 1/2 so `/pipeline` shows live progress, then `("ok", …)` or `("error", …)`.
   - At `deadline + HARD_KILL_GRACE_SEC` the child is killed (a thread can't be stopped). If the last partial has specialist results, the job ends `done` with them and a `limitations` note; otherwise it fails.
   - `build_result()`:
     1. a violation below `MIN_CONFIDENCE` becomes `insufficient_evidence`;
